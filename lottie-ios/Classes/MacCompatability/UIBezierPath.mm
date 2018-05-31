@@ -76,7 +76,7 @@
     [self getLineDash:NULL count:&lineDashCount phase:NULL];
 
     if (lineDashCount > 0) {
-        CGFloat *lineDashPattern = malloc(sizeof(CGFloat) * lineDashCount);
+        CGFloat *lineDashPattern = (CGFloat*)malloc(sizeof(CGFloat) * lineDashCount);
         CGFloat lineDashPhase = 0;
         [self getLineDash:lineDashPattern count:NULL phase:&lineDashPhase];
         [copy setLineDash:lineDashPattern count:lineDashCount phase:lineDashPhase];
@@ -263,7 +263,7 @@
 
     if (pattern && count > 0) {
         const size_t size = sizeof(CGFloat) * count;
-        _lineDashPattern = malloc(size);
+        _lineDashPattern = (CGFloat*)malloc(size);
         bcopy(pattern, _lineDashPattern, size);
     } else {
         _lineDashPattern = NULL;

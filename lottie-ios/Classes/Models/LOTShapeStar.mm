@@ -60,7 +60,7 @@
   }
   
   NSNumber *type = jsonDictionary[@"sy"];
-  _type = type.integerValue;
+  _type = (LOTPolystarShape)type.integerValue;
 }
 
 @end

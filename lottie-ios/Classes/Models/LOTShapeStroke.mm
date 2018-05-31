@@ -43,8 +43,8 @@
     }];
   }
   
-  _capType = [jsonDictionary[@"lc"] integerValue] - 1;
-  _joinType = [jsonDictionary[@"lj"] integerValue] - 1;
+  _capType = (LOTLineCapType)([jsonDictionary[@"lc"] integerValue] - 1);
+  _joinType = (LOTLineJoinType)([jsonDictionary[@"lj"] integerValue] - 1);
   
   NSNumber *fillEnabled = jsonDictionary[@"fillEnabled"];
   _fillEnabled = fillEnabled.boolValue;

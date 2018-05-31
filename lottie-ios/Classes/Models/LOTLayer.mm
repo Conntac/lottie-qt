@@ -37,7 +37,7 @@
   _layerID = [jsonDictionary[@"ind"] copy];
   
   NSNumber *layerType = jsonDictionary[@"ty"];
-  _layerType = layerType.integerValue;
+  _layerType = (LOTLayerType)layerType.integerValue;
   
   if (jsonDictionary[@"refId"]) {
     _referenceID = [jsonDictionary[@"refId"] copy];
@@ -126,7 +126,7 @@
     }];
   }
   
-  _matteType = [jsonDictionary[@"tt"] integerValue];
+  _matteType = (LOTMatteType)[jsonDictionary[@"tt"] integerValue];
   
   
   NSMutableArray *masks = [NSMutableArray array];
