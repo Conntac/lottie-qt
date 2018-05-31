@@ -12,6 +12,11 @@
 #import "LOTKeypath.h"
 #import "LOTValueDelegate.h"
 
+#include <QMap>
+#include <QSharedPointer>
+
+class LOTValueInterpolator;
+
 extern NSInteger indentation_level;
 @interface LOTAnimatorNode : NSObject
 
@@ -20,7 +25,7 @@ extern NSInteger indentation_level;
                                     keyName:(NSString *_Nullable)keyname;
 
 /// A dictionary of the value interpolators this node controls
-@property (nonatomic, readonly, strong) NSDictionary * _Nullable valueInterpolators;
+@property (nonatomic, readonly) QMap<QString, QSharedPointer<LOTValueInterpolator>> valueInterpolators;
 
 /// The keyname of the node. Used for dynamically setting keyframe data.
 @property (nonatomic, readonly, strong) NSString * _Nullable keyname;

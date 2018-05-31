@@ -12,6 +12,11 @@
 #import "LOTKeypath.h"
 #import "LOTValueDelegate.h"
 
+#include <QMap>
+#include <QSharedPointer>
+
+class LOTValueInterpolator;
+
 @class LOTValueCallback;
 
 @interface LOTLayerContainer : CALayer
@@ -24,7 +29,7 @@
 @property (nonatomic, readonly, nonnull) NSNumber *timeStretchFactor;
 @property (nonatomic, assign) CGRect viewportBounds;
 @property (nonatomic, readonly, nonnull) CALayer *wrapperLayer;
-@property (nonatomic, readonly, nonnull) NSDictionary *valueInterpolators;
+@property (nonatomic, readonly) QMap<QString, QSharedPointer<LOTValueInterpolator>> valueInterpolators;
 
 - (void)displayWithFrame:(NSNumber * _Nonnull)frame;
 - (void)displayWithFrame:(NSNumber * _Nonnull)frame forceUpdate:(BOOL)forceUpdate;

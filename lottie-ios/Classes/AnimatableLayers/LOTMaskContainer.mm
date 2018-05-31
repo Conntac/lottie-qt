@@ -20,17 +20,17 @@
 @end
 
 @implementation LOTMaskNodeLayer {
-  LOTPathInterpolator *_pathInterpolator;
-  LOTNumberInterpolator *_opacityInterpolator;
-  LOTNumberInterpolator *_expansionInterpolator;
+  QSharedPointer<LOTPathInterpolator> _pathInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _expansionInterpolator;
 }
 
 - (instancetype)initWithMask:(LOTMask *)maskNode {
   self = [super init];
   if (self) {
-    _pathInterpolator = [[LOTPathInterpolator alloc] initWithKeyframes:maskNode.maskPath.keyframes];
-    _opacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:maskNode.opacity.keyframes];
-    _expansionInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:maskNode.expansion.keyframes];
+    _pathInterpolator = _pathInterpolator.create(maskNode.maskPath.keyframes);
+    _opacityInterpolator = _opacityInterpolator.create(maskNode.opacity.keyframes);
+    _expansionInterpolator = _expansionInterpolator.create(maskNode.expansion.keyframes);
     _maskNode = maskNode;
     self.fillColor = [UIColor blueColor].CGColor;
   }
@@ -39,7 +39,7 @@
 
 - (void)updateForFrame:(NSNumber *)frame withViewBounds:(CGRect)viewBounds {
   if ([self hasUpdateForFrame:frame]) {
-    LOTBezierPath *path = [_pathInterpolator pathForFrame:frame cacheLengths:NO];
+    LOTBezierPath *path = _pathInterpolator->pathForFrame(frame.floatValue, false);
     
     if (self.maskNode.maskMode == LOTMaskModeSubtract) {
       CGMutablePathRef pathRef = CGPathCreateMutable();
@@ -52,13 +52,13 @@
       self.path = path.CGPath;
     }
     
-    self.opacity = [_opacityInterpolator floatValueForFrame:frame];
+    self.opacity = _opacityInterpolator->floatValueForFrame(frame.floatValue);
   }
 }
 
 - (BOOL)hasUpdateForFrame:(NSNumber *)frame {
-  return ([_pathInterpolator hasUpdateForFrame:frame] ||
-          [_opacityInterpolator hasUpdateForFrame:frame]);
+  return (_pathInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _opacityInterpolator->hasUpdateForFrame(frame.floatValue));
 }
 
 @end

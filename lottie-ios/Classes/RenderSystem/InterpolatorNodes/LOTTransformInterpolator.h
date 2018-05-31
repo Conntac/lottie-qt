@@ -13,36 +13,48 @@
 #import "LOTKeyframe.h"
 #import "LOTLayer.h"
 
+#include <QTransform>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTTransformInterpolator : NSObject
+class LOTTransformInterpolator
+{
+public:
+    LOTTransformInterpolator(NSArray <LOTKeyframe *> *position,
+                             NSArray <LOTKeyframe *> *rotation,
+                             NSArray <LOTKeyframe *> *anchor,
+                             NSArray <LOTKeyframe *> *scale);
 
-+ (instancetype)transformForLayer:(LOTLayer *)layer;
+    LOTTransformInterpolator(NSArray <LOTKeyframe *> *positionX,
+                             NSArray <LOTKeyframe *> *positionY,
+                             NSArray <LOTKeyframe *> *rotation,
+                             NSArray <LOTKeyframe *> *anchor,
+                             NSArray <LOTKeyframe *> *scale);
 
-- (instancetype)initWithPosition:(NSArray <LOTKeyframe *> *)position
-                        rotation:(NSArray <LOTKeyframe *> *)rotation
-                          anchor:(NSArray <LOTKeyframe *> *)anchor
-                           scale:(NSArray <LOTKeyframe *> *)scale;
+    static QSharedPointer<LOTTransformInterpolator> transformForLayer(LOTLayer *layer);
 
-- (instancetype)initWithPositionX:(NSArray <LOTKeyframe *> *)positionX
-                        positionY:(NSArray <LOTKeyframe *> *)positionY
-                         rotation:(NSArray <LOTKeyframe *> *)rotation
-                           anchor:(NSArray <LOTKeyframe *> *)anchor
-                            scale:(NSArray <LOTKeyframe *> *)scale;
+    // Properties
+    QSharedPointer<LOTTransformInterpolator> inputNode;
 
-@property (nonatomic, strong) LOTTransformInterpolator * inputNode;
+    QSharedPointer<LOTPointInterpolator> positionInterpolator;
+    QSharedPointer<LOTPointInterpolator> anchorInterpolator;
+    QSharedPointer<LOTSizeInterpolator> scaleInterpolator;
+    QSharedPointer<LOTNumberInterpolator> rotationInterpolator;
+    QSharedPointer<LOTNumberInterpolator> positionXInterpolator;
+    QSharedPointer<LOTNumberInterpolator> positionYInterpolator;
+    NSString *parentKeyName;
 
-@property (nonatomic, readonly) LOTPointInterpolator *positionInterpolator;
-@property (nonatomic, readonly) LOTPointInterpolator *anchorInterpolator;
-@property (nonatomic, readonly) LOTSizeInterpolator *scaleInterpolator;
-@property (nonatomic, readonly) LOTNumberInterpolator *rotationInterpolator;
-@property (nonatomic, readonly) LOTNumberInterpolator *positionXInterpolator;
-@property (nonatomic, readonly) LOTNumberInterpolator *positionYInterpolator;
-@property (nonatomic, strong, nullable) NSString *parentKeyName;
+    // Functions
+    CATransform3D transformForFrame(qreal frame);
+    bool hasUpdateForFrame(qreal frame);
 
-- (CATransform3D)transformForFrame:(NSNumber *)frame;
-- (BOOL)hasUpdateForFrame:(NSNumber *)frame;
-
-@end
+private:
+    void initialize(NSArray <LOTKeyframe *> *positionX,
+                    NSArray <LOTKeyframe *> * positionY,
+                    NSArray <LOTKeyframe *> * position,
+                    NSArray <LOTKeyframe *> * rotation,
+                    NSArray <LOTKeyframe *> * anchor,
+                    NSArray <LOTKeyframe *> * scale);
+};
 
 NS_ASSUME_NONNULL_END

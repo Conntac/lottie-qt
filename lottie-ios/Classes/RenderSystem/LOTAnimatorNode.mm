@@ -104,7 +104,7 @@ NSInteger indentation_level = 0;
     if (keypath.endOfKeypath) {
       // Add self
       [keypath addSearchResultForCurrentPath:self];
-    } else if (self.valueInterpolators[keypath.currentKey] != nil) {
+    } else if (self.valueInterpolators[QString::fromNSString(keypath.currentKey)] != nil) {
       [keypath pushKey:keypath.currentKey];
       // We have a match!
       [keypath addSearchResultForCurrentPath:self];
@@ -118,10 +118,10 @@ NSInteger indentation_level = 0;
               forKeypath:(LOTKeypath * _Nonnull)keypath {
   if ([keypath pushKey:self.keyname]) {
     // Matches self. Check interpolators
-    LOTValueInterpolator *interpolator = self.valueInterpolators[keypath.currentKey];
+    QSharedPointer<LOTValueInterpolator> interpolator = self.valueInterpolators[QString::fromNSString(keypath.currentKey)];
     if (interpolator) {
       // We have a match!
-      [interpolator setValueDelegate:delegate];
+      interpolator->setValueDelegate(delegate);
     }
     [keypath popKey];
   }

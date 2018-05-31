@@ -12,61 +12,65 @@
 #import "LOTBezierPath.h"
 #import "CGGeometry+LOTAdditions.h"
 
+#include <QSharedPointer>
+
 const CGFloat kPOLYSTAR_MAGIC_NUMBER = .47829f;
 
 @implementation LOTPolystarAnimator {
-  LOTNumberInterpolator *_outerRadiusInterpolator;
-  LOTNumberInterpolator *_innerRadiusInterpolator;
-  LOTNumberInterpolator *_outerRoundnessInterpolator;
-  LOTNumberInterpolator *_innerRoundnessInterpolator;
-  LOTPointInterpolator *_positionInterpolator;
-  LOTNumberInterpolator *_pointsInterpolator;
-  LOTNumberInterpolator *_rotationInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _outerRadiusInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _innerRadiusInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _outerRoundnessInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _innerRoundnessInterpolator;
+  QSharedPointer<LOTPointInterpolator> _positionInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _pointsInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _rotationInterpolator;
 }
 
 - (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
                              shapeStar:(LOTShapeStar *_Nonnull)shapeStar {
   self = [super initWithInputNode:inputNode keyName:shapeStar.keyname];
   if (self) {
-    _outerRadiusInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeStar.outerRadius.keyframes];
-    _innerRadiusInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeStar.innerRadius.keyframes];
-    _outerRoundnessInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeStar.outerRoundness.keyframes];
-    _innerRoundnessInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeStar.innerRoundness.keyframes];
-    _pointsInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeStar.numberOfPoints.keyframes];
-    _rotationInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeStar.rotation.keyframes];
-    _positionInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:shapeStar.position.keyframes];
+    _outerRadiusInterpolator = _outerRadiusInterpolator.create(shapeStar.outerRadius.keyframes);
+    _innerRadiusInterpolator = _innerRadiusInterpolator.create(shapeStar.innerRadius.keyframes);
+    _outerRoundnessInterpolator = _outerRoundnessInterpolator.create(shapeStar.outerRoundness.keyframes);
+    _innerRoundnessInterpolator = _innerRoundnessInterpolator.create(shapeStar.innerRoundness.keyframes);
+    _pointsInterpolator = _pointsInterpolator.create(shapeStar.numberOfPoints.keyframes);
+    _rotationInterpolator = _rotationInterpolator.create(shapeStar.rotation.keyframes);
+    _positionInterpolator = _positionInterpolator.create(shapeStar.position.keyframes);
   }
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Points" : _pointsInterpolator,
-           @"Position" : _positionInterpolator,
-           @"Rotation" : _rotationInterpolator,
-           @"Inner Radius" : _innerRadiusInterpolator,
-           @"Outer Radius" : _outerRadiusInterpolator,
-           @"Inner Roundness" : _innerRoundnessInterpolator,
-           @"Outer Roundness" : _outerRoundnessInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Points", _pointsInterpolator);
+    map.insert("Position", _positionInterpolator);
+    map.insert("Rotation", _rotationInterpolator);
+    map.insert("Inner Radius", _innerRadiusInterpolator);
+    map.insert("Outer Radius", _outerRadiusInterpolator);
+    map.insert("Inner Roundness", _innerRoundnessInterpolator);
+    map.insert("Outer Roundness", _outerRoundnessInterpolator);
+    return map;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return ([_outerRadiusInterpolator hasUpdateForFrame:frame] ||
-          [_innerRadiusInterpolator hasUpdateForFrame:frame] ||
-          [_outerRoundnessInterpolator hasUpdateForFrame:frame] ||
-          [_innerRoundnessInterpolator hasUpdateForFrame:frame] ||
-          [_pointsInterpolator hasUpdateForFrame:frame] ||
-          [_rotationInterpolator hasUpdateForFrame:frame] ||
-          [_positionInterpolator hasUpdateForFrame:frame]);
+  return (_outerRadiusInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _innerRadiusInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _outerRoundnessInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _innerRoundnessInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _pointsInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _rotationInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _positionInterpolator->hasUpdateForFrame(frame.floatValue));
 }
 
 - (void)performLocalUpdate {
-  CGFloat outerRadius = [_outerRadiusInterpolator floatValueForFrame:self.currentFrame];
-  CGFloat innerRadius = [_innerRadiusInterpolator floatValueForFrame:self.currentFrame];
-  CGFloat outerRoundness = [_outerRoundnessInterpolator floatValueForFrame:self.currentFrame] / 100.f;
-  CGFloat innerRoundness = [_innerRoundnessInterpolator floatValueForFrame:self.currentFrame] / 100.f;
-  CGFloat points = [_pointsInterpolator floatValueForFrame:self.currentFrame];
-  CGFloat rotation = [_rotationInterpolator floatValueForFrame:self.currentFrame];
-  CGPoint position = [_positionInterpolator pointValueForFrame:self.currentFrame];
+  CGFloat outerRadius = _outerRadiusInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  CGFloat innerRadius = _innerRadiusInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  CGFloat outerRoundness = _outerRoundnessInterpolator->floatValueForFrame(self.currentFrame.floatValue) / 100.f;
+  CGFloat innerRoundness = _innerRoundnessInterpolator->floatValueForFrame(self.currentFrame.floatValue)/ 100.f;
+  CGFloat points = _pointsInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  CGFloat rotation = _rotationInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  CGPoint position = _positionInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
   LOTBezierPath *path = [[LOTBezierPath alloc] init];
   path.cacheLengths = self.pathShouldCacheLengths;
   CGFloat currentAngle = LOT_DegreesToRadians(rotation - 90);

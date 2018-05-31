@@ -11,12 +11,14 @@
 #import "LOTNumberInterpolator.h"
 #import "LOTHelpers.h"
 
+#include <QSharedPointer>
+
 @implementation LOTRepeaterRenderer {
-  LOTTransformInterpolator *_transformInterpolator;
-  LOTNumberInterpolator *_copiesInterpolator;
-  LOTNumberInterpolator *_offsetInterpolator;
-  LOTNumberInterpolator *_startOpacityInterpolator;
-  LOTNumberInterpolator *_endOpacityInterpolator;
+  QSharedPointer<LOTTransformInterpolator> _transformInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _copiesInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _offsetInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _startOpacityInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _endOpacityInterpolator;
   
   CALayer *_instanceLayer;
   CAReplicatorLayer *_replicatorLayer;
@@ -27,14 +29,14 @@
                               shapeRepeater:(LOTShapeRepeater *)repeater {
   self = [super initWithInputNode:inputNode keyName:repeater.keyname];
   if (self) {
-    _transformInterpolator = [[LOTTransformInterpolator alloc] initWithPosition:repeater.position.keyframes
-                                                                       rotation:repeater.rotation.keyframes
-                                                                         anchor:repeater.anchorPoint.keyframes
-                                                                          scale:repeater.scale.keyframes];
-    _copiesInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:repeater.copies.keyframes];
-    _offsetInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:repeater.offset.keyframes];
-    _startOpacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:repeater.startOpacity.keyframes];
-    _endOpacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:repeater.endOpacity.keyframes];
+    _transformInterpolator = _transformInterpolator.create(repeater.position.keyframes,
+                                                           repeater.rotation.keyframes,
+                                                           repeater.anchorPoint.keyframes,
+                                                           repeater.scale.keyframes);
+    _copiesInterpolator = _copiesInterpolator.create(repeater.copies.keyframes);
+    _offsetInterpolator = _offsetInterpolator.create(repeater.offset.keyframes);
+    _startOpacityInterpolator = _startOpacityInterpolator.create(repeater.startOpacity.keyframes);
+    _endOpacityInterpolator = _endOpacityInterpolator.create(repeater.endOpacity.keyframes);
     
     _instanceLayer = [CALayer layer];
     [self recursivelyAddChildLayers:inputNode];
@@ -55,15 +57,17 @@
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Copies" : _copiesInterpolator,
-           @"Offset" : _offsetInterpolator,
-           @"Transform.Anchor Point" : _transformInterpolator.anchorInterpolator,
-           @"Transform.Position" : _transformInterpolator.positionInterpolator,
-           @"Transform.Scale" : _transformInterpolator.scaleInterpolator,
-           @"Transform.Rotation" : _transformInterpolator.rotationInterpolator,
-           @"Transform.Start Opacity" : _startOpacityInterpolator,
-           @"Transform.End Opacity" : _endOpacityInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Copies", _copiesInterpolator);
+    map.insert("Offset", _offsetInterpolator);
+    map.insert("Transform.Anchor Point", _transformInterpolator->anchorInterpolator);
+    map.insert("Transform.Position", _transformInterpolator->positionInterpolator);
+    map.insert("Transform.Scale", _transformInterpolator->scaleInterpolator);
+    map.insert("Transform.Rotation", _transformInterpolator->rotationInterpolator);
+    map.insert("Transform.Start Opacity", _startOpacityInterpolator);
+    map.insert("Transform.End Opacity", _endOpacityInterpolator);
+    return map;
 }
 
 - (void)recursivelyAddChildLayers:(LOTAnimatorNode *)node {
@@ -78,10 +82,10 @@
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
   // TODO BW Add offset ability
-  return ([_transformInterpolator hasUpdateForFrame:frame] ||
-          [_copiesInterpolator hasUpdateForFrame:frame] ||
-          [_startOpacityInterpolator hasUpdateForFrame:frame] ||
-          [_endOpacityInterpolator hasUpdateForFrame:frame]);
+  return (_transformInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _copiesInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _startOpacityInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _endOpacityInterpolator->hasUpdateForFrame(frame.floatValue));
 }
 
 - (void)performLocalUpdate {
@@ -89,11 +93,11 @@
   centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
   centerPoint_DEBUG.borderWidth = 2.f;
   
-  CGFloat copies = ceilf([_copiesInterpolator floatValueForFrame:self.currentFrame]);
+  CGFloat copies = ceilf(_copiesInterpolator->floatValueForFrame(self.currentFrame.floatValue));
   _replicatorLayer.instanceCount = (NSInteger)copies;
-  _replicatorLayer.instanceTransform = [_transformInterpolator transformForFrame:self.currentFrame];
-  CGFloat startOpacity = [_startOpacityInterpolator floatValueForFrame:self.currentFrame];
-  CGFloat endOpacity = [_endOpacityInterpolator floatValueForFrame:self.currentFrame];
+  _replicatorLayer.instanceTransform = _transformInterpolator->transformForFrame(self.currentFrame.floatValue);
+  CGFloat startOpacity = _startOpacityInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  CGFloat endOpacity = _endOpacityInterpolator->floatValueForFrame(self.currentFrame.floatValue);
   CGFloat opacityStep = (endOpacity - startOpacity) / copies;
   _instanceLayer.opacity = startOpacity;
   _replicatorLayer.instanceAlphaOffset = opacityStep;

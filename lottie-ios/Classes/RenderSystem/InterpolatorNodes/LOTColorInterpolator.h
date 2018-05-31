@@ -12,12 +12,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTColorInterpolator : LOTValueInterpolator
+class LOTColorInterpolator : public LOTValueInterpolator
+{
+public:
+    LOTColorInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-- (CGColorRef)colorForFrame:(NSNumber *)frame;
+    CGColorRef colorForFrame(NSNumber *frame);
 
-@property (nonatomic, weak, nullable) id<LOTColorValueDelegate> delegate;
+//    @property (nonatomic, weak, nullable)
+    id<LOTColorValueDelegate> delegate = nil;
 
-@end
+    // LOTValueInterpolator interface
+    bool hasDelegateOverride() const override;
+    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+};
+
+
+
+
 
 NS_ASSUME_NONNULL_END

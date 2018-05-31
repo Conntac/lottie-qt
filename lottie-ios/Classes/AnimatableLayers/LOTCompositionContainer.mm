@@ -16,11 +16,13 @@
 #import "LOTRenderGroup.h"
 #import "LOTNumberInterpolator.h"
 
+#include <QSharedPointer>
+
 @implementation LOTCompositionContainer {
   NSNumber *_frameOffset;
   CALayer *DEBUG_Center;
   NSMutableDictionary *_keypathCache;
-  LOTNumberInterpolator *_timeInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _timeInterpolator;
 }
 
 - (instancetype)initWithModel:(LOTLayer *)layer
@@ -45,7 +47,7 @@
     }
 
     if (layer.timeRemapping) {
-      _timeInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:layer.timeRemapping.keyframes];
+      _timeInterpolator = _timeInterpolator.create(layer.timeRemapping.keyframes);
     }
 
     [self initializeWithChildGroup:childLayerGroup withAssetGroup:assetGroup];
@@ -98,7 +100,7 @@
   [super displayWithFrame:frame forceUpdate:forceUpdate];
   NSNumber *newFrame = @((frame.floatValue  - _frameOffset.floatValue) / self.timeStretchFactor.floatValue);
   if (_timeInterpolator) {
-    newFrame = @([_timeInterpolator floatValueForFrame:newFrame]);
+    newFrame = @(_timeInterpolator->floatValueForFrame(newFrame.floatValue));
   }
   for (LOTLayerContainer *child in _childLayers) {
     [child displayWithFrame:newFrame forceUpdate:forceUpdate];

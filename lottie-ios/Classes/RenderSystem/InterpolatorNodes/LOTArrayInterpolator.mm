@@ -9,24 +9,26 @@
 #import "LOTArrayInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTArrayInterpolator
-
-- (NSArray *)numberArrayForFrame:(NSNumber *)frame {
-  CGFloat progress = [self progressForFrame:frame];
-  if (progress == 0) {
-    return self.leadingKeyframe.arrayValue;
-  }
-  if (progress == 1) {
-    return self.trailingKeyframe.arrayValue;
-  }
-  NSMutableArray *returnArray = [NSMutableArray array];
-  for (int i = 0; i < self.leadingKeyframe.arrayValue.count; i ++) {
-    CGFloat from = [(NSNumber *)self.leadingKeyframe.arrayValue[i] floatValue];
-    CGFloat to = [(NSNumber *)self.trailingKeyframe.arrayValue[i] floatValue];
-    CGFloat value = LOT_RemapValue(progress, 0, 1, from, to);
-    [returnArray addObject:@(value)];
-  }
-  return returnArray;
+LOTArrayInterpolator::LOTArrayInterpolator(NSArray<LOTKeyframe *> *keyframes)
+: LOTValueInterpolator(keyframes)
+{
 }
 
-@end
+NSArray *LOTArrayInterpolator::numberArrayForFrame(qreal frame)
+{
+    CGFloat progress = progressForFrame(frame);
+    if (progress == 0) {
+      return leadingKeyframe.arrayValue;
+    }
+    if (progress == 1) {
+      return trailingKeyframe.arrayValue;
+    }
+    NSMutableArray *returnArray = [NSMutableArray array];
+    for (int i = 0; i < leadingKeyframe.arrayValue.count; i ++) {
+      CGFloat from = [(NSNumber *)leadingKeyframe.arrayValue[i] floatValue];
+      CGFloat to = [(NSNumber *)trailingKeyframe.arrayValue[i] floatValue];
+      CGFloat value = LOT_RemapValue(progress, 0, 1, from, to);
+      [returnArray addObject:@(value)];
+    }
+    return returnArray;
+}

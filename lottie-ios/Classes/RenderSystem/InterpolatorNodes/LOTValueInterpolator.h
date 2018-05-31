@@ -10,21 +10,30 @@
 #import "LOTKeyframe.h"
 #import "LOTValueDelegate.h"
 
+#include <QtCore>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTValueInterpolator : NSObject
+class LOTValueInterpolator
+{
+public:
+    LOTValueInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-- (instancetype)initWithKeyframes:(NSArray <LOTKeyframe *> *)keyframes;
+    // Properties
+    LOTKeyframe *leadingKeyframe = nullptr;
+    LOTKeyframe *trailingKeyframe = nullptr;
 
-@property (nonatomic, weak, nullable) LOTKeyframe *leadingKeyframe;
-@property (nonatomic, weak, nullable) LOTKeyframe *trailingKeyframe;
-@property (nonatomic, readonly) BOOL hasDelegateOverride;
+    // Functions
+    virtual bool hasDelegateOverride() const;
+    virtual void setValueDelegate(id<LOTValueDelegate> _Nonnull delegate);
 
-- (void)setValueDelegate:(id<LOTValueDelegate> _Nonnull)delegate;
+    bool hasUpdateForFrame(qreal frame);
+    qreal progressForFrame(qreal frame);
 
-- (BOOL)hasUpdateForFrame:(NSNumber *)frame;
-- (CGFloat)progressForFrame:(NSNumber *)frame;
+private:
+    void updateKeyframeSpanForFrame(qreal frame);
 
-@end
+    NSArray <LOTKeyframe *> *keyframes;
+};
 
 NS_ASSUME_NONNULL_END

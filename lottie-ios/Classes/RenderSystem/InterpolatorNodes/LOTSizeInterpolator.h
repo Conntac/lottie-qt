@@ -9,14 +9,24 @@
 #import "LOTValueInterpolator.h"
 #import "LOTValueDelegate.h"
 
+#include <QSizeF>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTSizeInterpolator : LOTValueInterpolator
+class LOTSizeInterpolator : public LOTValueInterpolator
+{
+public:
+    LOTSizeInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-- (CGSize)sizeValueForFrame:(NSNumber *)frame;
+    // Functions
+    QSizeF sizeValueForFrame(qreal frame);
 
-@property (nonatomic, weak, nullable) id<LOTSizeValueDelegate> delegate;
+    // Properties
+    id<LOTSizeValueDelegate> delegate;
 
-@end
+    // LOTValueInterpolator interface
+    bool hasDelegateOverride() const override;
+    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+};
 
 NS_ASSUME_NONNULL_END

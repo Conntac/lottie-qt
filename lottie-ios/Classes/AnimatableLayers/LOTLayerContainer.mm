@@ -19,9 +19,12 @@
 #import "LOTCacheProvider.h"
 #endif
 
+#include <QSharedPointer>
+#include <QMap>
+
 @implementation LOTLayerContainer {
-  LOTTransformInterpolator *_transformInterpolator;
-  LOTNumberInterpolator *_opacityInterpolator;
+  QSharedPointer<LOTTransformInterpolator> _transformInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
   NSNumber *_inFrame;
   NSNumber *_outFrame;
   CALayer *DEBUG_Center;
@@ -78,20 +81,20 @@
   _outFrame = [layer.outFrame copy];
 
   _timeStretchFactor = [layer.timeStretch copy];
-  _transformInterpolator = [LOTTransformInterpolator transformForLayer:layer];
+  _transformInterpolator = LOTTransformInterpolator::transformForLayer(layer);
 
   if (layer.parentID) {
     NSNumber *parentID = layer.parentID;
-    LOTTransformInterpolator *childInterpolator = _transformInterpolator;
+    QSharedPointer<LOTTransformInterpolator> childInterpolator = _transformInterpolator;
     while (parentID != nil) {
       LOTLayer *parentModel = [layerGroup layerModelForID:parentID];
-      LOTTransformInterpolator *interpolator = [LOTTransformInterpolator transformForLayer:parentModel];
-      childInterpolator.inputNode = interpolator;
+      QSharedPointer<LOTTransformInterpolator> interpolator = LOTTransformInterpolator::transformForLayer(parentModel);
+      childInterpolator->inputNode = interpolator;
       childInterpolator = interpolator;
       parentID = parentModel.parentID;
     }
   }
-  _opacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:layer.opacity.keyframes];
+  _opacityInterpolator = _opacityInterpolator.create(layer.opacity.keyframes);
   if (layer.layerType == LOTLayerTypeShape &&
       layer.shapes.count) {
     [self buildContents:layer.shapes];
@@ -104,30 +107,30 @@
     _wrapperLayer.mask = _maskLayer;
   }
   
-  NSMutableDictionary *interpolators = [NSMutableDictionary dictionary];
-  interpolators[@"Opacity"] = _opacityInterpolator;
-  interpolators[@"Anchor Point"] = _transformInterpolator.anchorInterpolator;
-  interpolators[@"Scale"] = _transformInterpolator.scaleInterpolator;
-  interpolators[@"Rotation"] = _transformInterpolator.rotationInterpolator;
-  if (_transformInterpolator.positionXInterpolator &&
-      _transformInterpolator.positionYInterpolator) {
-    interpolators[@"X Position"] = _transformInterpolator.positionXInterpolator;
-    interpolators[@"Y Position"] = _transformInterpolator.positionYInterpolator;
-  } else if (_transformInterpolator.positionInterpolator) {
-    interpolators[@"Position"] = _transformInterpolator.positionInterpolator;
+  QMap<QString, QSharedPointer<LOTValueInterpolator>> interpolators;
+  interpolators["Opacity"] = _opacityInterpolator;
+  interpolators["Anchor Point"] = _transformInterpolator->anchorInterpolator;
+  interpolators["Scale"] = _transformInterpolator->scaleInterpolator;
+  interpolators["Rotation"] = _transformInterpolator->rotationInterpolator;
+  if (_transformInterpolator->positionXInterpolator &&
+      _transformInterpolator->positionYInterpolator) {
+    interpolators["X Position"] = _transformInterpolator->positionXInterpolator;
+    interpolators["Y Position"] = _transformInterpolator->positionYInterpolator;
+  } else if (_transformInterpolator->positionInterpolator) {
+    interpolators["Position"] = _transformInterpolator->positionInterpolator;
   }
 
   // Deprecated
-  interpolators[@"Transform.Opacity"] = _opacityInterpolator;
-  interpolators[@"Transform.Anchor Point"] = _transformInterpolator.anchorInterpolator;
-  interpolators[@"Transform.Scale"] = _transformInterpolator.scaleInterpolator;
-  interpolators[@"Transform.Rotation"] = _transformInterpolator.rotationInterpolator;
-  if (_transformInterpolator.positionXInterpolator &&
-      _transformInterpolator.positionYInterpolator) {
-    interpolators[@"Transform.X Position"] = _transformInterpolator.positionXInterpolator;
-    interpolators[@"Transform.Y Position"] = _transformInterpolator.positionYInterpolator;
-  } else if (_transformInterpolator.positionInterpolator) {
-    interpolators[@"Transform.Position"] = _transformInterpolator.positionInterpolator;
+  interpolators["Transform.Opacity"] = _opacityInterpolator;
+  interpolators["Transform.Anchor Point"] = _transformInterpolator->anchorInterpolator;
+  interpolators["Transform.Scale"] = _transformInterpolator->scaleInterpolator;
+  interpolators["Transform.Rotation"] = _transformInterpolator->rotationInterpolator;
+  if (_transformInterpolator->positionXInterpolator &&
+      _transformInterpolator->positionYInterpolator) {
+    interpolators["Transform.X Position"] = _transformInterpolator->positionXInterpolator;
+    interpolators["Transform.Y Position"] = _transformInterpolator->positionYInterpolator;
+  } else if (_transformInterpolator->positionInterpolator) {
+    interpolators["Transform.Position"] = _transformInterpolator->positionInterpolator;
   }
   _valueInterpolators = interpolators;
 }
@@ -251,11 +254,11 @@
   if (hidden) {
     return;
   }
-  if (_opacityInterpolator && [_opacityInterpolator hasUpdateForFrame:newFrame]) {
-    self.opacity = [_opacityInterpolator floatValueForFrame:newFrame];
+  if (_opacityInterpolator && _opacityInterpolator->hasUpdateForFrame(newFrame.floatValue)) {
+    self.opacity = _opacityInterpolator->floatValueForFrame(newFrame.floatValue);
   }
-  if (_transformInterpolator && [_transformInterpolator hasUpdateForFrame:newFrame]) {
-    _wrapperLayer.transform = [_transformInterpolator transformForFrame:newFrame];
+  if (_transformInterpolator && _transformInterpolator->hasUpdateForFrame(newFrame.floatValue)) {
+    _wrapperLayer.transform = _transformInterpolator->transformForFrame(newFrame.floatValue);
   }
   [_contentsGroup updateWithFrame:newFrame withModifierBlock:nil forceLocalUpdate:forceUpdate];
   _maskLayer.currentFrame = newFrame;
@@ -275,7 +278,7 @@
     // Matches self.
     if ([keypath pushKey:@"Transform"]) {
       // Is a transform node, check interpolators
-      LOTValueInterpolator *interpolator = _valueInterpolators[keypath.currentKey];
+      QSharedPointer<LOTValueInterpolator> interpolator = _valueInterpolators[QString::fromNSString(keypath.currentKey)];
       if (interpolator) {
         // We have a match!
         [keypath pushKey:keypath.currentKey];
@@ -301,10 +304,10 @@
     // Matches self.
     if ([keypath pushKey:@"Transform"]) {
       // Is a transform node, check interpolators
-      LOTValueInterpolator *interpolator = _valueInterpolators[keypath.currentKey];
+      QSharedPointer<LOTValueInterpolator> interpolator = _valueInterpolators[QString::fromNSString(keypath.currentKey)];
       if (interpolator) {
         // We have a match!
-        [interpolator setValueDelegate:delegate];
+        interpolator->setValueDelegate(delegate);
       }
       [keypath popKey];
     }

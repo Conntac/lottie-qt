@@ -9,43 +9,47 @@
 #import "LOTPointInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTPointInterpolator
-
-- (CGPoint)pointValueForFrame:(NSNumber *)frame {
-  CGFloat progress = [self progressForFrame:frame];
-  CGPoint returnPoint;
-  if (progress == 0) {
-    returnPoint = self.leadingKeyframe.pointValue;
-  } else if (progress == 1) {
-    returnPoint = self.trailingKeyframe.pointValue;
-  } else if (!CGPointEqualToPoint(self.leadingKeyframe.spatialOutTangent, CGPointZero) ||
-             !CGPointEqualToPoint(self.trailingKeyframe.spatialInTangent, CGPointZero)) {
-    // Spatial Bezier path
-    CGPoint outTan = LOT_PointAddedToPoint(self.leadingKeyframe.pointValue, self.leadingKeyframe.spatialOutTangent);
-    CGPoint inTan = LOT_PointAddedToPoint(self.trailingKeyframe.pointValue, self.trailingKeyframe.spatialInTangent);
-    returnPoint = LOT_PointInCubicCurve(self.leadingKeyframe.pointValue, outTan, inTan, self.trailingKeyframe.pointValue, progress);
-  } else {
-    returnPoint = LOT_PointInLine(self.leadingKeyframe.pointValue, self.trailingKeyframe.pointValue, progress);
-  }
-  if (self.hasDelegateOverride) {
-    return [self.delegate pointForFrame:frame.floatValue
-                          startKeyframe:self.leadingKeyframe.keyframeTime.floatValue
-                            endKeyframe:self.trailingKeyframe.keyframeTime.floatValue
-                   interpolatedProgress:progress
-                             startPoint:self.leadingKeyframe.pointValue
-                               endPoint:self.trailingKeyframe.pointValue
-                           currentPoint:returnPoint];
-  }
-  return returnPoint;
+LOTPointInterpolator::LOTPointInterpolator(NSArray<LOTKeyframe *> *keyframes)
+: LOTValueInterpolator(keyframes)
+{
 }
 
-- (BOOL)hasDelegateOverride {
-  return self.delegate != nil;
+QPointF LOTPointInterpolator::pointValueForFrame(qreal frame)
+{
+    CGFloat progress = progressForFrame(frame);
+    CGPoint returnPoint;
+    if (progress == 0) {
+      returnPoint = leadingKeyframe.pointValue;
+    } else if (progress == 1) {
+      returnPoint = trailingKeyframe.pointValue;
+    } else if (!CGPointEqualToPoint(leadingKeyframe.spatialOutTangent, CGPointZero) ||
+               !CGPointEqualToPoint(trailingKeyframe.spatialInTangent, CGPointZero)) {
+      // Spatial Bezier path
+      CGPoint outTan = LOT_PointAddedToPoint(leadingKeyframe.pointValue, leadingKeyframe.spatialOutTangent);
+      CGPoint inTan = LOT_PointAddedToPoint(trailingKeyframe.pointValue, trailingKeyframe.spatialInTangent);
+      returnPoint = LOT_PointInCubicCurve(leadingKeyframe.pointValue, outTan, inTan, trailingKeyframe.pointValue, progress);
+    } else {
+      returnPoint = LOT_PointInLine(leadingKeyframe.pointValue, trailingKeyframe.pointValue, progress);
+    }
+    if (hasDelegateOverride()) {
+      returnPoint = [delegate pointForFrame:frame
+                            startKeyframe:leadingKeyframe.keyframeTime.floatValue
+                              endKeyframe:trailingKeyframe.keyframeTime.floatValue
+                     interpolatedProgress:progress
+                               startPoint:leadingKeyframe.pointValue
+                                 endPoint:trailingKeyframe.pointValue
+                             currentPoint:returnPoint];
+    }
+    return QPointF::fromCGPoint(returnPoint);
 }
 
-- (void)setValueDelegate:(id<LOTValueDelegate>)delegate {
-  NSAssert(([delegate conformsToProtocol:@protocol(LOTPointValueDelegate)]), @"Point Interpolator set with incorrect callback type. Expected LOTPointValueDelegate");
-  self.delegate = (id<LOTPointValueDelegate>)delegate;
+bool LOTPointInterpolator::hasDelegateOverride() const
+{
+    return delegate != nil;
 }
 
-@end
+void LOTPointInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+{
+    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTPointValueDelegate)]), "setValueDelegate", "Point Interpolator set with incorrect callback type. Expected LOTPointValueDelegate");
+    this->delegate = (id<LOTPointValueDelegate>)delegate;
+}

@@ -14,6 +14,8 @@
 #import "LOTHelpers.h"
 #import "LOTRadialGradientLayer.h"
 
+#include <QSharedPointer>
+
 @implementation LOTGradientFillRender {
   BOOL _evenOddFillRule;
   CALayer *centerPoint_DEBUG;
@@ -26,20 +28,20 @@
   CGPoint _startPoint;
   CGPoint _endPoint;
   
-  LOTArrayInterpolator *_gradientInterpolator;
-  LOTPointInterpolator *_startPointInterpolator;
-  LOTPointInterpolator *_endPointInterpolator;
-  LOTNumberInterpolator *_opacityInterpolator;
+  QSharedPointer<LOTArrayInterpolator> _gradientInterpolator;
+  QSharedPointer<LOTPointInterpolator> _startPointInterpolator;
+  QSharedPointer<LOTPointInterpolator> _endPointInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
 }
 
 - (instancetype)initWithInputNode:(LOTAnimatorNode *)inputNode
                           shapeGradientFill:(LOTShapeGradientFill *)fill {
   self = [super initWithInputNode:inputNode keyName:fill.keyname];
   if (self) {
-    _gradientInterpolator = [[LOTArrayInterpolator alloc] initWithKeyframes:fill.gradient.keyframes];
-    _startPointInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:fill.startPoint.keyframes];
-    _endPointInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:fill.endPoint.keyframes];
-    _opacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:fill.opacity.keyframes];
+    _gradientInterpolator = _gradientInterpolator.create(fill.gradient.keyframes);
+    _startPointInterpolator = _startPointInterpolator.create(fill.startPoint.keyframes);
+    _endPointInterpolator = _endPointInterpolator.create(fill.endPoint.keyframes);
+    _opacityInterpolator = _opacityInterpolator.create(fill.opacity.keyframes);
     _numberOfPositions = fill.numberOfColors.integerValue;
     
     _evenOddFillRule = fill.evenOddFillRule;
@@ -77,27 +79,29 @@
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Start Point" : _startPointInterpolator,
-           @"End Point" : _endPointInterpolator,
-           @"Opacity" : _opacityInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Start Point", _startPointInterpolator);
+    map.insert("End Point", _endPointInterpolator);
+    map.insert("Opacity", _opacityInterpolator);
+    return map;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return ([_gradientInterpolator hasUpdateForFrame:frame] ||
-          [_startPointInterpolator hasUpdateForFrame:frame] ||
-          [_endPointInterpolator hasUpdateForFrame:frame] ||
-          [_opacityInterpolator hasUpdateForFrame:frame]);
+  return (_gradientInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _startPointInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _endPointInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _opacityInterpolator->hasUpdateForFrame(frame.floatValue));
 }
 
 - (void)performLocalUpdate {
   centerPoint_DEBUG.backgroundColor =  [UIColor magentaColor].CGColor;
   centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
   centerPoint_DEBUG.borderWidth = 2.f;
-  _startPoint = [_startPointInterpolator pointValueForFrame:self.currentFrame];
-  _endPoint = [_endPointInterpolator pointValueForFrame:self.currentFrame];
-  self.outputLayer.opacity = [_opacityInterpolator floatValueForFrame:self.currentFrame];
-  NSArray *numberArray = [_gradientInterpolator numberArrayForFrame:self.currentFrame];
+  _startPoint = _startPointInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
+  _endPoint = _endPointInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
+  self.outputLayer.opacity = _opacityInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  NSArray *numberArray = _gradientInterpolator->numberArrayForFrame(self.currentFrame.floatValue);
   NSMutableArray *colorArray = [NSMutableArray array];
   NSMutableArray *locationsArray = [NSMutableArray array];
   

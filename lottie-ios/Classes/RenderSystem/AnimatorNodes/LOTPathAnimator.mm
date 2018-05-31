@@ -9,9 +9,11 @@
 #import "LOTPathAnimator.h"
 #import "LOTPathInterpolator.h"
 
+#include <QSharedPointer>
+
 @implementation LOTPathAnimator {
   LOTShapePath *_pathConent;
-  LOTPathInterpolator *_interpolator;
+  QSharedPointer<LOTPathInterpolator> _interpolator;
 }
 
 - (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
@@ -19,21 +21,23 @@
   self = [super initWithInputNode:inputNode keyName:shapePath.keyname];
   if (self) {
     _pathConent = shapePath;
-    _interpolator = [[LOTPathInterpolator alloc] initWithKeyframes:_pathConent.shapePath.keyframes];
+    _interpolator = _interpolator.create(_pathConent.shapePath.keyframes);
   }
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Path" : _interpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Path", _interpolator);
+    return map;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return [_interpolator hasUpdateForFrame:frame];
+  return _interpolator->hasUpdateForFrame(frame.floatValue);
 }
 
 - (void)performLocalUpdate {
-  self.localPath = [_interpolator pathForFrame:self.currentFrame cacheLengths:self.pathShouldCacheLengths];
+  self.localPath = _interpolator->pathForFrame(self.currentFrame.floatValue, self.pathShouldCacheLengths);
 }
 
 @end

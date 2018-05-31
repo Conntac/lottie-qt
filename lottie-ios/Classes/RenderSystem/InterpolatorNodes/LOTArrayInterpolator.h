@@ -10,10 +10,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTArrayInterpolator : LOTValueInterpolator
+class LOTArrayInterpolator : public LOTValueInterpolator
+{
+public:
+    LOTArrayInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-- (NSArray *)numberArrayForFrame:(NSNumber *)frame;
-
-@end
+    NSArray *numberArrayForFrame(qreal frame);
+};
 
 NS_ASSUME_NONNULL_END

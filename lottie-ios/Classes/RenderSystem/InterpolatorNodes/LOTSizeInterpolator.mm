@@ -10,37 +10,41 @@
 #import "LOTSizeInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTSizeInterpolator
-
-- (CGSize)sizeValueForFrame:(NSNumber *)frame {
-  CGFloat progress = [self progressForFrame:frame];
-  CGSize returnSize;
-  if (progress == 0) {
-    returnSize = self.leadingKeyframe.sizeValue;
-  }else if (progress == 1) {
-    returnSize = self.trailingKeyframe.sizeValue;
-  } else {
-    returnSize = CGSizeMake(LOT_RemapValue(progress, 0, 1, self.leadingKeyframe.sizeValue.width, self.trailingKeyframe.sizeValue.width),
-                            LOT_RemapValue(progress, 0, 1, self.leadingKeyframe.sizeValue.height, self.trailingKeyframe.sizeValue.height));
-  }
-  if (self.hasDelegateOverride) {
-    return [self.delegate sizeForFrame:frame.floatValue
-                         startKeyframe:self.leadingKeyframe.keyframeTime.floatValue
-                           endKeyframe:self.trailingKeyframe.keyframeTime.floatValue
-                  interpolatedProgress:progress startSize:self.leadingKeyframe.sizeValue
-                               endSize:self.trailingKeyframe.sizeValue
-                           currentSize:returnSize];
-  }
-  return returnSize;
+LOTSizeInterpolator::LOTSizeInterpolator(NSArray<LOTKeyframe *> *keyframes)
+: LOTValueInterpolator(keyframes)
+{
 }
 
-- (BOOL)hasDelegateOverride {
-  return self.delegate != nil;
+QSizeF LOTSizeInterpolator::sizeValueForFrame(qreal frame)
+{
+    CGFloat progress = progressForFrame(frame);
+    CGSize returnSize;
+    if (progress == 0) {
+      returnSize = leadingKeyframe.sizeValue;
+    }else if (progress == 1) {
+      returnSize = trailingKeyframe.sizeValue;
+    } else {
+      returnSize = CGSizeMake(LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.width, trailingKeyframe.sizeValue.width),
+                              LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.height, trailingKeyframe.sizeValue.height));
+    }
+    if (hasDelegateOverride()) {
+      returnSize = [delegate sizeForFrame:frame
+                           startKeyframe:leadingKeyframe.keyframeTime.floatValue
+                             endKeyframe:trailingKeyframe.keyframeTime.floatValue
+                    interpolatedProgress:progress startSize:leadingKeyframe.sizeValue
+                                 endSize:trailingKeyframe.sizeValue
+                             currentSize:returnSize];
+    }
+    return QSizeF::fromCGSize(returnSize);
 }
 
-- (void)setValueDelegate:(id<LOTValueDelegate>)delegate {
-  NSAssert(([delegate conformsToProtocol:@protocol(LOTSizeValueDelegate)]), @"Size Interpolator set with incorrect callback type. Expected LOTSizeValueDelegate");
-  self.delegate = (id<LOTSizeValueDelegate>)delegate;
+bool LOTSizeInterpolator::hasDelegateOverride() const
+{
+    return delegate != nil;
 }
 
-@end
+void LOTSizeInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+{
+    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTSizeValueDelegate)]), "setValueDelegate", "Size Interpolator set with incorrect callback type. Expected LOTSizeValueDelegate");
+    this->delegate = (id<LOTSizeValueDelegate>)delegate;
+}

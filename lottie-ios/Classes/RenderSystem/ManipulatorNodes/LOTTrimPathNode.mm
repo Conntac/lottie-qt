@@ -13,10 +13,12 @@
 #import "LOTRoundedRectAnimator.h"
 #import "LOTRenderGroup.h"
 
+#include <QSharedPointer>
+
 @implementation LOTTrimPathNode {
-  LOTNumberInterpolator *_startInterpolator;
-  LOTNumberInterpolator *_endInterpolator;
-  LOTNumberInterpolator *_offsetInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _startInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _endInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _offsetInterpolator;
   
   CGFloat _startT;
   CGFloat _endT;
@@ -28,23 +30,25 @@
   self = [super initWithInputNode:inputNode keyName:trimPath.keyname];
   if (self) {
     inputNode.pathShouldCacheLengths = YES;
-    _startInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:trimPath.start.keyframes];
-    _endInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:trimPath.end.keyframes];
-    _offsetInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:trimPath.offset.keyframes];
+    _startInterpolator = _startInterpolator.create(trimPath.start.keyframes);
+    _endInterpolator = _endInterpolator.create(trimPath.end.keyframes);
+    _offsetInterpolator = _offsetInterpolator.create(trimPath.offset.keyframes);
   }
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Start" : _startInterpolator,
-           @"End" : _endInterpolator,
-           @"Offset" : _offsetInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Start", _startInterpolator);
+    map.insert("End", _endInterpolator);
+    map.insert("Offset", _offsetInterpolator);
+    return map;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return ([_startInterpolator hasUpdateForFrame:frame] ||
-          [_endInterpolator hasUpdateForFrame:frame] ||
-          [_offsetInterpolator hasUpdateForFrame:frame]);
+  return (_startInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _endInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _offsetInterpolator->hasUpdateForFrame(frame.floatValue));
 }
 
 - (BOOL)updateWithFrame:(NSNumber *)frame
@@ -75,9 +79,9 @@
 }
 
 - (void)performLocalUpdate {
-  _startT = [_startInterpolator floatValueForFrame:self.currentFrame] / 100;
-  _endT = [_endInterpolator floatValueForFrame:self.currentFrame] / 100;
-  _offsetT = [_offsetInterpolator floatValueForFrame:self.currentFrame] / 360;
+  _startT = _startInterpolator->floatValueForFrame(self.currentFrame.floatValue) / 100;
+  _endT = _endInterpolator->floatValueForFrame(self.currentFrame.floatValue) / 100;
+  _offsetT = _offsetInterpolator->floatValueForFrame(self.currentFrame.floatValue) / 360;
 }
 
 - (void)rebuildOutputs {

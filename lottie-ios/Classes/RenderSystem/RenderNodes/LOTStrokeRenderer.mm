@@ -10,27 +10,30 @@
 #import "LOTColorInterpolator.h"
 #import "LOTNumberInterpolator.h"
 
+#include <QSharedPointer>
+#include <QList>
+
 @implementation LOTStrokeRenderer {
-  LOTColorInterpolator *_colorInterpolator;
-  LOTNumberInterpolator *_opacityInterpolator;
-  LOTNumberInterpolator *_widthInterpolator;
-  LOTNumberInterpolator *_dashOffsetInterpolator;
-  NSArray *_dashPatternInterpolators;
+  QSharedPointer<LOTColorInterpolator> _colorInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _widthInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _dashOffsetInterpolator;
+  QList<QSharedPointer<LOTNumberInterpolator>> _dashPatternInterpolators;
 }
 
 - (instancetype)initWithInputNode:(LOTAnimatorNode *)inputNode
                                 shapeStroke:(LOTShapeStroke *)stroke {
   self = [super initWithInputNode:inputNode keyName:stroke.keyname];
   if (self) {
-    _colorInterpolator = [[LOTColorInterpolator alloc] initWithKeyframes:stroke.color.keyframes];
-    _opacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:stroke.opacity.keyframes];
-    _widthInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:stroke.width.keyframes];
+    _colorInterpolator = _colorInterpolator.create(stroke.color.keyframes);
+    _opacityInterpolator = _opacityInterpolator.create(stroke.opacity.keyframes);
+    _widthInterpolator = _widthInterpolator.create(stroke.width.keyframes);
     
-    NSMutableArray *dashPatternIntpolators = [NSMutableArray array];
+    QList<QSharedPointer<LOTNumberInterpolator>> dashPatternIntpolators;
     NSMutableArray *dashPatterns = [NSMutableArray array];
     for (LOTKeyframeGroup *keyframegroup in stroke.lineDashPattern) {
-      LOTNumberInterpolator *interpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:keyframegroup.keyframes];
-      [dashPatternIntpolators addObject:interpolator];
+      QSharedPointer<LOTNumberInterpolator> interpolator = interpolator.create(keyframegroup.keyframes);
+      dashPatternIntpolators.append(interpolator);
       if (dashPatterns && keyframegroup.keyframes.count == 1) {
         LOTKeyframe *first = keyframegroup.keyframes.firstObject;
         [dashPatterns addObject:@(first.floatValue)];
@@ -47,7 +50,7 @@
     }
     
     if (stroke.dashOffset) {
-      _dashOffsetInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:stroke.dashOffset.keyframes];
+      _dashOffsetInterpolator = _dashOffsetInterpolator.create(stroke.dashOffset.keyframes);
     }
     
     self.outputLayer.fillColor = nil;
@@ -69,18 +72,20 @@
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Color" : _colorInterpolator,
-           @"Opacity" : _opacityInterpolator,
-           @"Stroke Width" : _widthInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Color", _colorInterpolator);
+    map.insert("Opacity", _opacityInterpolator);
+    map.insert("Stroke Width", _widthInterpolator);
+    return map;
 }
 
 - (void)_updateLineDashPatternsForFrame:(NSNumber *)frame {
-  if (_dashPatternInterpolators.count) {
+  if (_dashPatternInterpolators.size()) {
     NSMutableArray *lineDashPatterns = [NSMutableArray array];
     CGFloat dashTotal = 0;
-    for (LOTNumberInterpolator *interpolator in _dashPatternInterpolators) {
-      CGFloat patternValue = [interpolator floatValueForFrame:frame];
+    for (auto interpolator : _dashPatternInterpolators) {
+      CGFloat patternValue = interpolator->floatValueForFrame(frame.floatValue);
       dashTotal = dashTotal + patternValue;
       [lineDashPatterns addObject:@(patternValue)];
     }
@@ -94,19 +99,19 @@
   [self _updateLineDashPatternsForFrame:frame];
   BOOL dashOffset = NO;
   if (_dashOffsetInterpolator) {
-    dashOffset = [_dashOffsetInterpolator hasUpdateForFrame:frame];
+    dashOffset = _dashOffsetInterpolator->hasUpdateForFrame(frame.floatValue);
   }
   return (dashOffset ||
-          [_colorInterpolator hasUpdateForFrame:frame] ||
-          [_opacityInterpolator hasUpdateForFrame:frame] ||
-          [_widthInterpolator hasUpdateForFrame:frame]);
+          _colorInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _opacityInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _widthInterpolator->hasUpdateForFrame(frame.floatValue));
 }
 
 - (void)performLocalUpdate {
-  self.outputLayer.lineDashPhase = [_dashOffsetInterpolator floatValueForFrame:self.currentFrame];
-  self.outputLayer.strokeColor = [_colorInterpolator colorForFrame:self.currentFrame];
-  self.outputLayer.lineWidth = [_widthInterpolator floatValueForFrame:self.currentFrame];
-  self.outputLayer.opacity = [_opacityInterpolator floatValueForFrame:self.currentFrame];
+  self.outputLayer.lineDashPhase = _dashOffsetInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  self.outputLayer.strokeColor = _colorInterpolator->colorForFrame(self.currentFrame);
+  self.outputLayer.lineWidth = _widthInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  self.outputLayer.opacity = _opacityInterpolator->floatValueForFrame(self.currentFrame.floatValue);
 }
 
 - (void)rebuildOutputs {

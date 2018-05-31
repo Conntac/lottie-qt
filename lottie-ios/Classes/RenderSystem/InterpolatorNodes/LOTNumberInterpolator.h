@@ -11,12 +11,21 @@
 #import "LOTValueDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface LOTNumberInterpolator : LOTValueInterpolator
 
-- (CGFloat)floatValueForFrame:(NSNumber *)frame;
+class LOTNumberInterpolator : public LOTValueInterpolator
+{
+public:
+    LOTNumberInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-@property (nonatomic, weak, nullable) id<LOTNumberValueDelegate> delegate;
+    // Functions
+    qreal floatValueForFrame(qreal frame);
 
-@end
+    // Properties
+    id<LOTNumberValueDelegate> delegate = nil;
+
+    // LOTValueInterpolator interface
+    bool hasDelegateOverride() const override;
+    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+};
 
 NS_ASSUME_NONNULL_END

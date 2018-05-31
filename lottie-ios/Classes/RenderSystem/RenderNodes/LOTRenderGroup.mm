@@ -24,13 +24,15 @@
 #import "LOTRepeaterRenderer.h"
 #import "LOTShapeRepeater.h"
 
+#include <QSharedPointer>
+
 @implementation LOTRenderGroup {
   LOTAnimatorNode *_rootNode;
   LOTBezierPath *_outputPath;
   LOTBezierPath *_localPath;
   BOOL _rootNodeHasUpdate;
-  LOTNumberInterpolator *_opacityInterpolator;
-  LOTTransformInterpolator *_transformInterolator;
+  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
+  QSharedPointer<LOTTransformInterpolator> _transformInterolator;
 }
 
 - (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode * _Nullable)inputNode
@@ -46,22 +48,24 @@
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+
   if (_opacityInterpolator && _transformInterolator) {
-    return @{@"Opacity" : _opacityInterpolator,
-             @"Position" : _transformInterolator.positionInterpolator,
-             @"Scale" : _transformInterolator.scaleInterpolator,
-             @"Rotation" : _transformInterolator.scaleInterpolator,
-             @"Anchor Point" : _transformInterolator.anchorInterpolator,
-             // Deprecated
-             @"Transform.Opacity" : _opacityInterpolator,
-             @"Transform.Position" : _transformInterolator.positionInterpolator,
-             @"Transform.Scale" : _transformInterolator.scaleInterpolator,
-             @"Transform.Rotation" : _transformInterolator.scaleInterpolator,
-             @"Transform.Anchor Point" : _transformInterolator.anchorInterpolator
-             };
+    map.insert("Opacity", _opacityInterpolator);
+    map.insert("Position", _transformInterolator->positionInterpolator);
+    map.insert("Scale", _transformInterolator->scaleInterpolator);
+    map.insert("Rotation", _transformInterolator->scaleInterpolator);
+    map.insert("Anchor Point", _transformInterolator->anchorInterpolator);
+    // Deprecated
+    map.insert("Transform.Opacity", _opacityInterpolator);
+    map.insert("Transform.Position", _transformInterolator->positionInterpolator);
+    map.insert("Transform.Scale", _transformInterolator->scaleInterpolator);
+    map.insert("Transform.Rotation", _transformInterolator->scaleInterpolator);
+    map.insert("Transform.Anchor Point", _transformInterolator->anchorInterpolator);
   }
-  return nil;
+
+  return map;
 }
 
 - (void)buildContents:(NSArray *)contents {
@@ -121,18 +125,18 @@
     }
   }
   if (transform) {
-    _opacityInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:transform.opacity.keyframes];
-    _transformInterolator = [[LOTTransformInterpolator alloc] initWithPosition:transform.position.keyframes
-                                                                      rotation:transform.rotation.keyframes
-                                                                        anchor:transform.anchor.keyframes
-                                                                         scale:transform.scale.keyframes];
+    _opacityInterpolator = _opacityInterpolator.create(transform.opacity.keyframes);
+    _transformInterolator = _transformInterolator.create(transform.position.keyframes,
+                                                         transform.rotation.keyframes,
+                                                         transform.anchor.keyframes,
+                                                         transform.scale.keyframes);
   }
   _rootNode = previousNode;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return ([_opacityInterpolator hasUpdateForFrame:frame] ||
-          [_transformInterolator hasUpdateForFrame:frame] ||
+  return (_opacityInterpolator->hasUpdateForFrame(frame.floatValue) ||
+          _transformInterolator->hasUpdateForFrame(frame.floatValue) ||
           _rootNodeHasUpdate);
 
 }
@@ -147,10 +151,10 @@
 
 - (void)performLocalUpdate {
   if (_opacityInterpolator) {
-    self.containerLayer.opacity = [_opacityInterpolator floatValueForFrame:self.currentFrame];
+    self.containerLayer.opacity = _opacityInterpolator->floatValueForFrame(self.currentFrame.floatValue);
   }
   if (_transformInterolator) {
-    CATransform3D xform = [_transformInterolator transformForFrame:self.currentFrame];
+    CATransform3D xform = _transformInterolator->transformForFrame(self.currentFrame.floatValue);
     self.containerLayer.transform = xform;
     
     CGAffineTransform appliedXform = CATransform3DGetAffineTransform(xform);
@@ -191,7 +195,7 @@
 
     if ([keypath pushKey:@"Transform"]) {
       // Matches a Transform interpolator!
-      if (self.valueInterpolators[keypath.currentKey] != nil) {
+      if (self.valueInterpolators[QString::fromNSString(keypath.currentKey)] != nil) {
         [keypath pushKey:keypath.currentKey];
         [keypath addSearchResultForCurrentPath:self];
         [keypath popKey];
@@ -216,10 +220,10 @@
     // Check interpolators
     if ([keypath pushKey:@"Transform"]) {
       // Matches a Transform interpolator!
-      LOTValueInterpolator *interpolator = self.valueInterpolators[keypath.currentKey];
+      QSharedPointer<LOTValueInterpolator> interpolator = self.valueInterpolators[QString::fromNSString(keypath.currentKey)];
       if (interpolator) {
         // We have a match!
-        [interpolator setValueDelegate:delegate];
+        interpolator->setValueDelegate(delegate);
       }
       [keypath popKey];
     }

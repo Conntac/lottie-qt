@@ -11,10 +11,12 @@
 #import "LOTNumberInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
+#include <QSharedPointer>
+
 @implementation LOTRoundedRectAnimator {
-  LOTPointInterpolator *_centerInterpolator;
-  LOTPointInterpolator *_sizeInterpolator;
-  LOTNumberInterpolator *_cornerRadiusInterpolator;
+  QSharedPointer<LOTPointInterpolator> _centerInterpolator;
+  QSharedPointer<LOTPointInterpolator> _sizeInterpolator;
+  QSharedPointer<LOTNumberInterpolator> _cornerRadiusInterpolator;
   BOOL _reversed;
 }
 
@@ -22,22 +24,24 @@
                              shapeRectangle:(LOTShapeRectangle *_Nonnull)shapeRectangle {
   self = [super initWithInputNode:inputNode keyName:shapeRectangle.keyname];
   if (self) {
-    _centerInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:shapeRectangle.position.keyframes];
-    _sizeInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:shapeRectangle.size.keyframes];
-    _cornerRadiusInterpolator = [[LOTNumberInterpolator alloc] initWithKeyframes:shapeRectangle.cornerRadius.keyframes];
+    _centerInterpolator = _centerInterpolator.create(shapeRectangle.position.keyframes);
+    _sizeInterpolator = _sizeInterpolator.create(shapeRectangle.size.keyframes);
+    _cornerRadiusInterpolator = _cornerRadiusInterpolator.create(shapeRectangle.cornerRadius.keyframes);
     _reversed = shapeRectangle.reversed;
   }
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Size" : _sizeInterpolator,
-           @"Position" : _centerInterpolator,
-           @"Roundness" : _cornerRadiusInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Size", _sizeInterpolator);
+    map.insert("Position", _centerInterpolator);
+    map.insert("Roundness", _cornerRadiusInterpolator);
+    return map;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return [_centerInterpolator hasUpdateForFrame:frame] || [_sizeInterpolator hasUpdateForFrame:frame] || [_cornerRadiusInterpolator hasUpdateForFrame:frame];
+  return _centerInterpolator->hasUpdateForFrame(frame.floatValue) || _sizeInterpolator->hasUpdateForFrame(frame.floatValue) || _cornerRadiusInterpolator->hasUpdateForFrame(frame.floatValue);
 }
 
 - (void)addCorner:(CGPoint)cornerPoint withRadius:(CGFloat)radius toPath:(LOTBezierPath *)path clockwise:(BOOL)clockwise {
@@ -104,9 +108,9 @@
 }
 
 - (void)performLocalUpdate {
-  CGFloat cornerRadius = [_cornerRadiusInterpolator floatValueForFrame:self.currentFrame];
-  CGPoint size = [_sizeInterpolator pointValueForFrame:self.currentFrame];
-  CGPoint position = [_centerInterpolator pointValueForFrame:self.currentFrame];
+  CGFloat cornerRadius = _cornerRadiusInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  CGPoint size = _sizeInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
+  CGPoint position = _centerInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
   
   CGFloat halfWidth = size.x / 2;
   CGFloat halfHeight = size.y / 2;

@@ -9,11 +9,13 @@
 #import "LOTCircleAnimator.h"
 #import "LOTPointInterpolator.h"
 
+#include <QSharedPointer>
+
 const CGFloat kLOTEllipseControlPointPercentage = 0.55228;
 
 @implementation LOTCircleAnimator {
-  LOTPointInterpolator *_centerInterpolator;
-  LOTPointInterpolator *_sizeInterpolator;
+  QSharedPointer<LOTPointInterpolator> _centerInterpolator;
+  QSharedPointer<LOTPointInterpolator> _sizeInterpolator;
   BOOL _reversed;
 }
 
@@ -21,20 +23,22 @@ const CGFloat kLOTEllipseControlPointPercentage = 0.55228;
                                   shapeCircle:(LOTShapeCircle *_Nonnull)shapeCircle {
   self = [super initWithInputNode:inputNode keyName:shapeCircle.keyname];
   if (self) {
-    _centerInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:shapeCircle.position.keyframes];
-    _sizeInterpolator = [[LOTPointInterpolator alloc] initWithKeyframes:shapeCircle.size.keyframes];
+    _centerInterpolator = _centerInterpolator.create(shapeCircle.position.keyframes);
+    _sizeInterpolator = _sizeInterpolator.create(shapeCircle.size.keyframes);
     _reversed = shapeCircle.reversed;
   }
   return self;
 }
 
-- (NSDictionary *)valueInterpolators {
-  return @{@"Size" : _sizeInterpolator,
-           @"Position" : _centerInterpolator};
+- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+  QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+  map.insert("Size", _sizeInterpolator);
+  map.insert("Position", _centerInterpolator);
+  return map;
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return [_centerInterpolator hasUpdateForFrame:frame] || [_sizeInterpolator hasUpdateForFrame:frame];
+  return _centerInterpolator->hasUpdateForFrame(frame.floatValue) || _sizeInterpolator->hasUpdateForFrame(frame.floatValue);
 }
 
 - (void)performLocalUpdate {
@@ -42,8 +46,8 @@ const CGFloat kLOTEllipseControlPointPercentage = 0.55228;
   // Every Apple method constructs from the 3 o-clock position
   // After effects constructs from the Noon position.
   // After effects does clockwise, but also has a flag for reversed.
-  CGPoint center = [_centerInterpolator pointValueForFrame:self.currentFrame];
-  CGPoint size = [_sizeInterpolator pointValueForFrame:self.currentFrame];
+  CGPoint center = _centerInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
+  CGPoint size = _sizeInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
   
   CGFloat halfWidth = size.x / 2;
   CGFloat halfHeight = size.y / 2;

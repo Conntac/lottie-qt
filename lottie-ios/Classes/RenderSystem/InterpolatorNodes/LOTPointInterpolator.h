@@ -9,14 +9,24 @@
 #import "LOTValueInterpolator.h"
 #import "LOTValueDelegate.h"
 
+#include <QPointF>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTPointInterpolator : LOTValueInterpolator
+class LOTPointInterpolator : public LOTValueInterpolator
+{
+public:
+    LOTPointInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-- (CGPoint)pointValueForFrame:(NSNumber *)frame;
+    // Functions
+    QPointF pointValueForFrame(qreal frame);
 
-@property (nonatomic, weak, nullable) id<LOTPointValueDelegate> delegate;
+    // Properties
+    id<LOTPointValueDelegate> delegate = nil;
 
-@end
+    // LOTValueInterpolator interface
+    bool hasDelegateOverride() const override;
+    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+};
 
 NS_ASSUME_NONNULL_END

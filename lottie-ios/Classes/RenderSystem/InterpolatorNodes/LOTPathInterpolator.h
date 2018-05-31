@@ -13,12 +13,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTPathInterpolator : LOTValueInterpolator
+class LOTPathInterpolator : public LOTValueInterpolator
+{
+public:
+    LOTPathInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-- (LOTBezierPath *)pathForFrame:(NSNumber *)frame cacheLengths:(BOOL)cacheLengths;
+    LOTBezierPath *pathForFrame(qreal frame, bool cacheLengths);
 
-@property (nonatomic, weak, nullable) id<LOTPathValueDelegate> delegate;
+//@property (nonatomic, weak, nullable)
+    id<LOTPathValueDelegate> delegate = nil;
 
-@end
+    // LOTValueInterpolator interface
+    bool hasDelegateOverride() const override;
+    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+};
 
 NS_ASSUME_NONNULL_END
