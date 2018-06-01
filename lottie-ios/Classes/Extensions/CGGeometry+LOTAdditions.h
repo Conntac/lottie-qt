@@ -9,6 +9,10 @@
 
 extern const CGSize CGSizeMax;
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 CGRect LOT_RectIntegral(CGRect rect);
 
 // Centering
@@ -96,3 +100,7 @@ CGFloat LOT_CubicRoot(CGFloat f);
 
 CGFloat LOT_CubicLength(CGPoint fromPoint, CGPoint toPoint, CGPoint controlPoint1, CGPoint controlPoint2);
 CGFloat LOT_CubicLengthWithPrecision(CGPoint fromPoint, CGPoint toPoint, CGPoint controlPoint1, CGPoint controlPoint2, CGFloat iterations);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
