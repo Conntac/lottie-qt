@@ -14,55 +14,70 @@
 
 #include <QMap>
 #include <QSharedPointer>
+#include <functional>
 
 class LOTValueInterpolator;
 
 extern NSInteger indentation_level;
-@interface LOTAnimatorNode : NSObject
 
-/// Initializes the node with and optional input node and keyname.
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                    keyName:(NSString *_Nullable)keyname;
+class LOTAnimatorNode
+{
+public:
+    /// Initializes the node with and optional input node and keyname.
+    explicit LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *_Nullable keyname);
+    virtual ~LOTAnimatorNode();
 
-/// A dictionary of the value interpolators this node controls
-@property (nonatomic, readonly) QMap<QString, QSharedPointer<LOTValueInterpolator>> valueInterpolators;
+    /// A dictionary of the value interpolators this node controls
+//@property (nonatomic, readonly)
+    virtual QMap<QString, QSharedPointer<LOTValueInterpolator>> valueInterpolators() const = 0;
 
-/// The keyname of the node. Used for dynamically setting keyframe data.
-@property (nonatomic, readonly, strong) NSString * _Nullable keyname;
+    /// The keyname of the node. Used for dynamically setting keyframe data.
+//@property (nonatomic, readonly, strong)
+    NSString * _Nullable keyname = nil;
 
-/// The current time in frames
-@property (nonatomic, readonly, strong) NSNumber * _Nullable currentFrame;
-/// The upstream animator node
-@property (nonatomic, readonly, strong) LOTAnimatorNode * _Nullable inputNode;
+    /// The current time in frames
+//@property (nonatomic, readonly, strong)
+    qreal currentFrame = 0.0;
+    /// The upstream animator node
+//@property (nonatomic, readonly, strong)
+    QSharedPointer<LOTAnimatorNode> inputNode;
 
-/// This nodes path in local object space
-@property (nonatomic, strong) LOTBezierPath * _Nonnull localPath;
-/// The sum of all paths in the tree including this node
-@property (nonatomic, strong) LOTBezierPath * _Nonnull outputPath;
+    /// This nodes path in local object space
+//@property (nonatomic, strong)
+    void setLocalPath(LOTBezierPath *localPath);
+    virtual LOTBezierPath * _Nonnull localPath() const;
+    /// The sum of all paths in the tree including this node
+//@property (nonatomic, strong)
+    virtual LOTBezierPath * _Nonnull outputPath() const;
 
-/// Returns true if this node needs to update its contents for the given frame. To be overwritten by subclasses.
-- (BOOL)needsUpdateForFrame:(NSNumber *_Nonnull)frame;
+    /// Returns true if this node needs to update its contents for the given frame. To be overwritten by subclasses.
+    virtual bool needsUpdateForFrame(qreal frame);
 
-/// Sets the current frame and performs any updates. Returns true if any updates were performed, locally or upstream.
-- (BOOL)updateWithFrame:(NSNumber *_Nonnull)frame;
-- (BOOL)updateWithFrame:(NSNumber *_Nonnull)frame
-      withModifierBlock:(void (^_Nullable)(LOTAnimatorNode * _Nonnull inputNode))modifier
-       forceLocalUpdate:(BOOL)forceUpdate;
+    /// Sets the current frame and performs any updates. Returns true if any updates were performed, locally or upstream.
+    bool updateWithFrame(qreal frame);
+    virtual bool updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode * _Nonnull inputNode)> modifier, bool forceUpdate);
 
-- (void)forceSetCurrentFrame:(NSNumber *_Nonnull)frame;
+    void forceSetCurrentFrame(qreal frame);
 
-@property (nonatomic, assign) BOOL pathShouldCacheLengths;
-/// Update the local content for the frame.
-- (void)performLocalUpdate;
+//@property (nonatomic, assign)
+    virtual void setPathShouldCacheLengths(bool pathShouldCacheLengths);
+    bool pathShouldCacheLengths() const;
 
-/// Rebuild all outputs for the node. This is called after upstream updates have been performed.
-- (void)rebuildOutputs;
+    /// Update the local content for the frame.
+    virtual void performLocalUpdate();
 
-- (void)logString:(NSString *_Nonnull)string;
+    /// Rebuild all outputs for the node. This is called after upstream updates have been performed.
+    virtual void rebuildOutputs();
 
-- (void)searchNodesForKeypath:(LOTKeypath * _Nonnull)keypath;
+    void logString(NSString *_Nullable string);
 
-- (void)setValueDelegate:(id<LOTValueDelegate> _Nonnull)delegate
-              forKeypath:(LOTKeypath * _Nonnull)keypath;
+    virtual void searchNodesForKeypath(LOTKeypath *_Nonnull keypath);
 
-@end
+    virtual void setValueDelegate(id<LOTValueDelegate> _Nonnull delegate,
+                                  LOTKeypath * _Nonnull keypath);
+
+private:
+    LOTBezierPath *_localPath = nil;
+    LOTBezierPath *_outputPath = nil;
+    bool _pathShouldCacheLengths = false;
+};

@@ -7,37 +7,29 @@
 //
 
 #import "LOTPathAnimator.h"
-#import "LOTPathInterpolator.h"
 
 #include <QSharedPointer>
 
-@implementation LOTPathAnimator {
-  LOTShapePath *_pathConent;
-  QSharedPointer<LOTPathInterpolator> _interpolator;
-}
-
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                  shapePath:(LOTShapePath *_Nonnull)shapePath {
-  self = [super initWithInputNode:inputNode keyName:shapePath.keyname];
-  if (self) {
+LOTPathAnimator::LOTPathAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapePath *shapePath)
+: LOTAnimatorNode(inputNode, shapePath.keyname)
+{
     _pathConent = shapePath;
     _interpolator = _interpolator.create(_pathConent.shapePath.keyframes);
-  }
-  return self;
 }
 
-- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
+QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTPathAnimator::valueInterpolators() const
+{
     QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
     map.insert("Path", _interpolator);
     return map;
 }
 
-- (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return _interpolator->hasUpdateForFrame(frame.floatValue);
+bool LOTPathAnimator::needsUpdateForFrame(qreal frame)
+{
+    return _interpolator->hasUpdateForFrame(frame);
 }
 
-- (void)performLocalUpdate {
-  self.localPath = _interpolator->pathForFrame(self.currentFrame.floatValue, self.pathShouldCacheLengths);
+void LOTPathAnimator::performLocalUpdate()
+{
+    setLocalPath(_interpolator->pathForFrame(currentFrame, pathShouldCacheLengths()));
 }
-
-@end

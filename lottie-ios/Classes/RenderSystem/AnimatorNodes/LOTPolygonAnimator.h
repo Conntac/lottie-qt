@@ -9,9 +9,27 @@
 #import "LOTAnimatorNode.h"
 #import "LOTShapeStar.h"
 
-@interface LOTPolygonAnimator : LOTAnimatorNode
+class LOTNumberInterpolator;
+class LOTPointInterpolator;
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                             shapePolygon:(LOTShapeStar *_Nonnull)shapeStar;
+class LOTPolygonAnimator : public LOTAnimatorNode
+{
+public:
+    explicit LOTPolygonAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
+                                LOTShapeStar *_Nonnull shapeStar);
 
-@end
+    // LOTAnimatorNode interface
+    QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
+    bool needsUpdateForFrame(qreal frame) override;
+    void performLocalUpdate() override;
+
+private:
+    QSharedPointer<LOTNumberInterpolator> _outerRadiusInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _outerRoundnessInterpolator;
+    QSharedPointer<LOTPointInterpolator> _positionInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _pointsInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _rotationInterpolator;
+
+};
+
+

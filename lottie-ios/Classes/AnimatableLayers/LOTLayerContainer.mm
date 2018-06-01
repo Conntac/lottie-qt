@@ -28,7 +28,7 @@
   NSNumber *_inFrame;
   NSNumber *_outFrame;
   CALayer *DEBUG_Center;
-  LOTRenderGroup *_contentsGroup;
+  QSharedPointer<LOTRenderGroup> _contentsGroup;
   LOTMaskContainer *_maskLayer;
 }
 
@@ -136,8 +136,8 @@
 }
 
 - (void)buildContents:(NSArray *)contents {
-  _contentsGroup = [[LOTRenderGroup alloc] initWithInputNode:nil contents:contents keyname:_layerName];
-  [_wrapperLayer addSublayer:_contentsGroup.containerLayer];
+  _contentsGroup = _contentsGroup.create(nil, contents, _layerName);
+  [_wrapperLayer addSublayer:_contentsGroup->containerLayer];
 }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
@@ -260,7 +260,7 @@
   if (_transformInterpolator && _transformInterpolator->hasUpdateForFrame(newFrame.floatValue)) {
     _wrapperLayer.transform = _transformInterpolator->transformForFrame(newFrame.floatValue);
   }
-  [_contentsGroup updateWithFrame:newFrame withModifierBlock:nil forceLocalUpdate:forceUpdate];
+  _contentsGroup->updateWithFrame(newFrame.floatValue, nullptr, forceUpdate);
   _maskLayer.currentFrame = newFrame;
 }
 
@@ -295,7 +295,7 @@
     }
     [keypath popKey];
   }
-  [_contentsGroup searchNodesForKeypath:keypath];
+  _contentsGroup->searchNodesForKeypath(keypath);
 }
 
 - (void)setValueDelegate:(id<LOTValueDelegate> _Nonnull)delegate
@@ -313,7 +313,7 @@
     }
     [keypath popKey];
   }
-  [_contentsGroup setValueDelegate:delegate forKeypath:keypath];
+  _contentsGroup->setValueDelegate(delegate, keypath);
 }
 
 @end

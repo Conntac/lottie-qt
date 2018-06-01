@@ -17,7 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTValueInterpolator
 {
 public:
-    LOTValueInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    explicit LOTValueInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    virtual ~LOTValueInterpolator();
 
     // Properties
     LOTKeyframe *leadingKeyframe = nullptr;

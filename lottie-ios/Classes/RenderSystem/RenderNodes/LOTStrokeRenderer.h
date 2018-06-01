@@ -9,10 +9,29 @@
 #import "LOTRenderNode.h"
 #import "LOTShapeStroke.h"
 
-@interface LOTStrokeRenderer : LOTRenderNode
+class LOTColorInterpolator;
+class LOTNumberInterpolator;
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                shapeStroke:(LOTShapeStroke *_Nonnull)stroke;
+class LOTStrokeRenderer : public LOTRenderNode
+{
+public:
+    explicit LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStroke *_Nonnull stroke);
 
+    // LOTRenderNode interface
+    NSDictionary *actionsForRenderLayer() const override;
 
-@end
+    // LOTAnimatorNode interface
+    QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
+    bool needsUpdateForFrame(qreal frame) override;
+    void performLocalUpdate() override;
+    void rebuildOutputs() override;
+
+private:
+    void _updateLineDashPatternsForFrame(qreal frame);
+
+    QSharedPointer<LOTColorInterpolator> _colorInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _widthInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _dashOffsetInterpolator;
+    QList<QSharedPointer<LOTNumberInterpolator>> _dashPatternInterpolators;
+};

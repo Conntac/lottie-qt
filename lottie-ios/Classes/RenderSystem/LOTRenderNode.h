@@ -8,10 +8,19 @@
 
 #import "LOTAnimatorNode.h"
 
-@interface LOTRenderNode : LOTAnimatorNode
+class LOTRenderNode : public LOTAnimatorNode
+{
+public:
+    explicit LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *_Nullable keyname);
 
-@property (nonatomic, readonly, strong) CAShapeLayer * _Nonnull outputLayer;
+//@property (nonatomic, readonly, strong)
+    CAShapeLayer * _Nonnull outputLayer;
 
-- (NSDictionary * _Nonnull)actionsForRenderLayer;
+    virtual NSDictionary *actionsForRenderLayer() const;
 
-@end
+    // LOTAnimatorNode interface
+    LOTBezierPath *localPath() const override;
+    LOTBezierPath *outputPath() const override;
+    void performLocalUpdate() override;
+    void rebuildOutputs() override;
+};

@@ -15,9 +15,9 @@ LOTColorInterpolator::LOTColorInterpolator(NSArray<LOTKeyframe *> *keyframes)
 {
 }
 
-CGColorRef LOTColorInterpolator::colorForFrame(NSNumber *frame)
+CGColorRef LOTColorInterpolator::colorForFrame(qreal frame)
 {
-    CGFloat progress = progressForFrame(frame.floatValue);
+    CGFloat progress = progressForFrame(frame);
     UIColor *returnColor;
 
     if (progress == 0) {
@@ -28,7 +28,7 @@ CGColorRef LOTColorInterpolator::colorForFrame(NSNumber *frame)
       returnColor = [UIColor LOT_colorByLerpingFromColor:leadingKeyframe.colorValue toColor:trailingKeyframe.colorValue amount:progress];
     }
     if (hasDelegateOverride()) {
-      return [delegate colorForFrame:frame.floatValue
+      return [delegate colorForFrame:frame
                        startKeyframe:leadingKeyframe.keyframeTime.floatValue
                          endKeyframe:trailingKeyframe.keyframeTime.floatValue
                 interpolatedProgress:progress

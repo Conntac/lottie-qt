@@ -8,10 +8,41 @@
 
 #import "LOTRenderNode.h"
 #import "LOTShapeGradientFill.h"
+#import "LOTRadialGradientLayer.h"
 
-@interface LOTGradientFillRender : LOTRenderNode
+class LOTArrayInterpolator;
+class LOTPointInterpolator;
+class LOTNumberInterpolator;
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                          shapeGradientFill:(LOTShapeGradientFill *_Nonnull)fill;
+class LOTGradientFillRender : public LOTRenderNode
+{
+public:
+    explicit LOTGradientFillRender(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeGradientFill *_Nonnull fill);
 
-@end
+    // LOTRenderNode interface
+    NSDictionary *actionsForRenderLayer() const override;
+
+    // LOTAnimatorNode interface
+    QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
+    bool needsUpdateForFrame(qreal frame) override;
+    void performLocalUpdate() override;
+    void rebuildOutputs() override;
+
+private:
+    BOOL _evenOddFillRule;
+    CALayer *centerPoint_DEBUG;
+
+    CAShapeLayer *_maskShape;
+    LOTRadialGradientLayer *_gradientOpacityLayer;
+    LOTRadialGradientLayer *_gradientLayer;
+    NSInteger _numberOfPositions;
+
+    CGPoint _startPoint;
+    CGPoint _endPoint;
+
+    QSharedPointer<LOTArrayInterpolator> _gradientInterpolator;
+    QSharedPointer<LOTPointInterpolator> _startPointInterpolator;
+    QSharedPointer<LOTPointInterpolator> _endPointInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
+};
+

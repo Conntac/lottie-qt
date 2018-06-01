@@ -14,6 +14,10 @@ LOTValueInterpolator::LOTValueInterpolator(NSArray<LOTKeyframe *> *keyframes)
 {
 }
 
+LOTValueInterpolator::~LOTValueInterpolator()
+{
+}
+
 bool LOTValueInterpolator::hasDelegateOverride() const
 {
     return false;

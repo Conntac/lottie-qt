@@ -8,10 +8,20 @@
 
 #import "LOTAnimatorNode.h"
 #import "LOTShapePath.h"
+#import "LOTPathInterpolator.h"
 
-@interface LOTPathAnimator : LOTAnimatorNode
+class LOTPathAnimator : public LOTAnimatorNode
+{
+public:
+    explicit LOTPathAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
+                             LOTShapePath *_Nonnull shapePath);
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                  shapePath:(LOTShapePath *_Nonnull)shapePath;
+    // LOTAnimatorNode interface
+    QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
+    bool needsUpdateForFrame(qreal frame) override;
+    void performLocalUpdate() override;
 
-@end
+private:
+    LOTShapePath *_pathConent;
+    QSharedPointer<LOTPathInterpolator> _interpolator;
+};

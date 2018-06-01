@@ -9,10 +9,23 @@
 #import "LOTAnimatorNode.h"
 #import "LOTShapeRectangle.h"
 
-@interface LOTRoundedRectAnimator : LOTAnimatorNode
+class LOTPointInterpolator;
+class LOTNumberInterpolator;
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                shapeRectangle:(LOTShapeRectangle *_Nonnull)shapeRectangle;
+class LOTRoundedRectAnimator : public LOTAnimatorNode
+{
+public:
+    explicit LOTRoundedRectAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
+                                    LOTShapeRectangle *_Nonnull shapeRectangle);
 
+    // LOTAnimatorNode interface
+    QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
+    bool needsUpdateForFrame(qreal frame) override;
+    void performLocalUpdate() override;
 
-@end
+private:
+    QSharedPointer<LOTPointInterpolator> _centerInterpolator;
+    QSharedPointer<LOTPointInterpolator> _sizeInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _cornerRadiusInterpolator;
+    BOOL _reversed;
+};

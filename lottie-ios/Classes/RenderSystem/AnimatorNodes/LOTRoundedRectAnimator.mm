@@ -13,38 +13,8 @@
 
 #include <QSharedPointer>
 
-@implementation LOTRoundedRectAnimator {
-  QSharedPointer<LOTPointInterpolator> _centerInterpolator;
-  QSharedPointer<LOTPointInterpolator> _sizeInterpolator;
-  QSharedPointer<LOTNumberInterpolator> _cornerRadiusInterpolator;
-  BOOL _reversed;
-}
-
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                             shapeRectangle:(LOTShapeRectangle *_Nonnull)shapeRectangle {
-  self = [super initWithInputNode:inputNode keyName:shapeRectangle.keyname];
-  if (self) {
-    _centerInterpolator = _centerInterpolator.create(shapeRectangle.position.keyframes);
-    _sizeInterpolator = _sizeInterpolator.create(shapeRectangle.size.keyframes);
-    _cornerRadiusInterpolator = _cornerRadiusInterpolator.create(shapeRectangle.cornerRadius.keyframes);
-    _reversed = shapeRectangle.reversed;
-  }
-  return self;
-}
-
-- (QMap<QString, QSharedPointer<LOTValueInterpolator>>)valueInterpolators {
-    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
-    map.insert("Size", _sizeInterpolator);
-    map.insert("Position", _centerInterpolator);
-    map.insert("Roundness", _cornerRadiusInterpolator);
-    return map;
-}
-
-- (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return _centerInterpolator->hasUpdateForFrame(frame.floatValue) || _sizeInterpolator->hasUpdateForFrame(frame.floatValue) || _cornerRadiusInterpolator->hasUpdateForFrame(frame.floatValue);
-}
-
-- (void)addCorner:(CGPoint)cornerPoint withRadius:(CGFloat)radius toPath:(LOTBezierPath *)path clockwise:(BOOL)clockwise {
+static void addCorner(CGPoint cornerPoint, CGFloat radius, LOTBezierPath *path, bool clockwise)
+{
   CGPoint currentPoint = path.currentPoint;
   
   CGFloat ellipseControlPointPercentage = 0.55228;
@@ -107,45 +77,68 @@
   }
 }
 
-- (void)performLocalUpdate {
-  CGFloat cornerRadius = _cornerRadiusInterpolator->floatValueForFrame(self.currentFrame.floatValue);
-  CGPoint size = _sizeInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
-  CGPoint position = _centerInterpolator->pointValueForFrame(self.currentFrame.floatValue).toCGPoint();
-  
-  CGFloat halfWidth = size.x / 2;
-  CGFloat halfHeight = size.y / 2;
-  
-  CGRect rectFrame =  CGRectMake(position.x - halfWidth, position.y - halfHeight, size.x, size.y);
-  
-  CGPoint topLeft = CGPointMake(CGRectGetMinX(rectFrame), CGRectGetMinY(rectFrame));
-  CGPoint topRight = CGPointMake(CGRectGetMaxX(rectFrame), CGRectGetMinY(rectFrame));
-  CGPoint bottomLeft = CGPointMake(CGRectGetMinX(rectFrame), CGRectGetMaxY(rectFrame));
-  CGPoint bottomRight = CGPointMake(CGRectGetMaxX(rectFrame), CGRectGetMaxY(rectFrame));
-  // UIBezierPath Draws rects from the top left corner, After Effects draws them from the top right.
-  // Switching to manual drawing.
-  
-  CGFloat radius = MIN(MIN(halfWidth, halfHeight), cornerRadius);
-  BOOL clockWise = !_reversed;
-  
-  LOTBezierPath *path1 = [[LOTBezierPath alloc] init];
-  path1.cacheLengths = self.pathShouldCacheLengths;
-  CGPoint startPoint = (clockWise ?
-                        CGPointMake(topRight.x, topRight.y + radius) :
-                        CGPointMake(topRight.x - radius, topRight.y));
-  [path1 LOT_moveToPoint:startPoint];
-  if (clockWise) {
-    [self addCorner:bottomRight withRadius:radius toPath:path1 clockwise:clockWise];
-    [self addCorner:bottomLeft withRadius:radius toPath:path1 clockwise:clockWise];
-    [self addCorner:topLeft withRadius:radius toPath:path1 clockwise:clockWise];
-    [self addCorner:topRight withRadius:radius toPath:path1 clockwise:clockWise];
-  } else {
-    [self addCorner:topLeft withRadius:radius toPath:path1 clockwise:clockWise];
-    [self addCorner:bottomLeft withRadius:radius toPath:path1 clockwise:clockWise];
-    [self addCorner:bottomRight withRadius:radius toPath:path1 clockwise:clockWise];
-    [self addCorner:topRight withRadius:radius toPath:path1 clockwise:clockWise];
-  }
-  [path1 LOT_closePath];
-  self.localPath = path1;
+LOTRoundedRectAnimator::LOTRoundedRectAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeRectangle *shapeRectangle)
+: LOTAnimatorNode(inputNode, shapeRectangle.keyname)
+{
+    _centerInterpolator = _centerInterpolator.create(shapeRectangle.position.keyframes);
+    _sizeInterpolator = _sizeInterpolator.create(shapeRectangle.size.keyframes);
+    _cornerRadiusInterpolator = _cornerRadiusInterpolator.create(shapeRectangle.cornerRadius.keyframes);
+    _reversed = shapeRectangle.reversed;
 }
 
-@end
+QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTRoundedRectAnimator::valueInterpolators() const
+{
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> map;
+    map.insert("Size", _sizeInterpolator);
+    map.insert("Position", _centerInterpolator);
+    map.insert("Roundness", _cornerRadiusInterpolator);
+    return map;
+}
+
+bool LOTRoundedRectAnimator::needsUpdateForFrame(qreal frame)
+{
+    return _centerInterpolator->hasUpdateForFrame(frame) || _sizeInterpolator->hasUpdateForFrame(frame) || _cornerRadiusInterpolator->hasUpdateForFrame(frame);
+}
+
+void LOTRoundedRectAnimator::performLocalUpdate()
+{
+    CGFloat cornerRadius = _cornerRadiusInterpolator->floatValueForFrame(currentFrame);
+    CGPoint size = _sizeInterpolator->pointValueForFrame(currentFrame).toCGPoint();
+    CGPoint position = _centerInterpolator->pointValueForFrame(currentFrame).toCGPoint();
+
+    CGFloat halfWidth = size.x / 2;
+    CGFloat halfHeight = size.y / 2;
+
+    CGRect rectFrame =  CGRectMake(position.x - halfWidth, position.y - halfHeight, size.x, size.y);
+
+    CGPoint topLeft = CGPointMake(CGRectGetMinX(rectFrame), CGRectGetMinY(rectFrame));
+    CGPoint topRight = CGPointMake(CGRectGetMaxX(rectFrame), CGRectGetMinY(rectFrame));
+    CGPoint bottomLeft = CGPointMake(CGRectGetMinX(rectFrame), CGRectGetMaxY(rectFrame));
+    CGPoint bottomRight = CGPointMake(CGRectGetMaxX(rectFrame), CGRectGetMaxY(rectFrame));
+    // UIBezierPath Draws rects from the top left corner, After Effects draws them from the top right.
+    // Switching to manual drawing.
+
+    CGFloat radius = MIN(MIN(halfWidth, halfHeight), cornerRadius);
+    BOOL clockWise = !_reversed;
+
+    LOTBezierPath *path1 = [[LOTBezierPath alloc] init];
+    path1.cacheLengths = pathShouldCacheLengths();
+    CGPoint startPoint = (clockWise ?
+                          CGPointMake(topRight.x, topRight.y + radius) :
+                          CGPointMake(topRight.x - radius, topRight.y));
+    [path1 LOT_moveToPoint:startPoint];
+    if (clockWise) {
+      addCorner(bottomRight, radius, path1, clockWise);
+      addCorner(bottomLeft, radius, path1, clockWise);
+      addCorner(topLeft, radius, path1, clockWise);
+      addCorner(topRight, radius, path1, clockWise);
+    } else {
+      addCorner(topLeft, radius, path1, clockWise);
+      addCorner(bottomLeft, radius, path1, clockWise);
+      addCorner(bottomRight, radius, path1, clockWise);
+      addCorner(topRight, radius, path1, clockWise);
+    }
+    [path1 LOT_closePath];
+
+    setLocalPath(path1);
+}

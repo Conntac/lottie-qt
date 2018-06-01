@@ -10,122 +10,141 @@
 #import "LOTHelpers.h"
 #import "LOTValueInterpolator.h"
 
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(logAnimatorNode, "lottie.animator_node")
+
 NSInteger indentation_level = 0;
 
-@implementation LOTAnimatorNode
+LOTAnimatorNode::LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *keyname)
+: inputNode(inputNode)
+, keyname(keyname)
+{
+}
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                    keyName:(NSString *_Nullable)keyname {
-  self = [super init];
-  if (self) {
-    _keyname = keyname;
-    _inputNode = inputNode;
-  }
-  return self;
+LOTAnimatorNode::~LOTAnimatorNode()
+{
+}
+
+void LOTAnimatorNode::setLocalPath(LOTBezierPath *localPath)
+{
+    _localPath = localPath;
+}
+
+LOTBezierPath *LOTAnimatorNode::localPath() const
+{
+    return _localPath;
+}
+
+LOTBezierPath *LOTAnimatorNode::outputPath() const
+{
+    return _outputPath;
 }
 
 /// To be overwritten by subclass. Defaults to YES
-- (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return YES;
+bool LOTAnimatorNode::needsUpdateForFrame(qreal frame)
+{
+    return true;
 }
 
 /// The node checks if local update or if upstream update required. If upstream update outputs are rebuilt. If local update local update is performed. Returns no if no action
-- (BOOL)updateWithFrame:(NSNumber *_Nonnull)frame {
-  return [self updateWithFrame:frame withModifierBlock:NULL forceLocalUpdate:NO];
+bool LOTAnimatorNode::updateWithFrame(qreal frame)
+{
+    return updateWithFrame(frame, nullptr, false);
 }
 
-- (BOOL)updateWithFrame:(NSNumber *_Nonnull)frame
-      withModifierBlock:(void (^_Nullable)(LOTAnimatorNode * _Nonnull inputNode))modifier
-       forceLocalUpdate:(BOOL)forceUpdate {
-  if ([_currentFrame isEqual:frame] && !forceUpdate) {
-    return NO;
-  }
-  if (ENABLE_DEBUG_LOGGING) [self logString:[NSString stringWithFormat:@"%lu %@ Checking for update", (unsigned long)self.hash, self.keyname]];
-  BOOL localUpdate = [self needsUpdateForFrame:frame] || forceUpdate;
-  if (localUpdate && ENABLE_DEBUG_LOGGING) {
-    [self logString:[NSString stringWithFormat:@"%lu %@ Performing update", (unsigned long)self.hash, self.keyname]];
-  }
-  BOOL inputUpdated = [_inputNode updateWithFrame:frame
-                                withModifierBlock:modifier
-                                 forceLocalUpdate:forceUpdate];
-  _currentFrame = frame;
-  if (localUpdate) {
-    [self performLocalUpdate];
-    if (modifier) {
-      modifier(self);
+bool LOTAnimatorNode::updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode * _Nonnull inputNode)> modifier, bool forceUpdate)
+{
+    if (currentFrame == frame && !forceUpdate) {
+      return NO;
     }
-  }
-  
-  if (inputUpdated || localUpdate) {
-    [self rebuildOutputs];
-  }
-  return (inputUpdated || localUpdate);
+    if (ENABLE_DEBUG_LOGGING) logString([NSString stringWithFormat:@"%lu %@ Checking for update", (unsigned long)this, keyname]);
+    BOOL localUpdate = needsUpdateForFrame(frame) || forceUpdate;
+    if (localUpdate && ENABLE_DEBUG_LOGGING) {
+      logString([NSString stringWithFormat:@"%lu %@ Performing update", (unsigned long)this, keyname]);
+    }
+    BOOL inputUpdated = inputNode->updateWithFrame(frame, modifier, forceUpdate);
+    currentFrame = frame;
+    if (localUpdate) {
+      performLocalUpdate();
+      if (modifier) {
+        modifier(this);
+      }
+    }
+
+    if (inputUpdated || localUpdate) {
+      rebuildOutputs();
+    }
+    return (inputUpdated || localUpdate);
 }
 
-- (void)forceSetCurrentFrame:(NSNumber *_Nonnull)frame {
-  _currentFrame = frame;
+void LOTAnimatorNode::forceSetCurrentFrame(qreal frame)
+{
+    currentFrame = frame;
 }
 
-- (void)logString:(NSString *)string {
-  NSMutableString *logString = [NSMutableString string];
-  [logString appendString:@"|"];
-  for (int i = 0; i < indentation_level; i ++) {
-    [logString appendString:@"  "];
-  }
-  [logString appendString:string];
-  NSLog(@"%@ %@", NSStringFromClass([self class]), logString);
+void LOTAnimatorNode::setPathShouldCacheLengths(bool pathShouldCacheLengths)
+{
+    _pathShouldCacheLengths = pathShouldCacheLengths;
+    inputNode->setPathShouldCacheLengths(pathShouldCacheLengths);
+}
+
+bool LOTAnimatorNode::pathShouldCacheLengths() const
+{
+    return _pathShouldCacheLengths;
 }
 
 // TOBO BW Perf, make updates perform only when necessary. Currently everything in a node is updated
 /// Performs any local content update and updates self.localPath
-- (void)performLocalUpdate {
-  self.localPath = [[LOTBezierPath alloc] init];
+void LOTAnimatorNode::performLocalUpdate()
+{
+    _localPath = [[LOTBezierPath alloc] init];
 }
 
 /// Rebuilds outputs by adding localPath to inputNodes output path.
-- (void)rebuildOutputs {
-  if (self.inputNode) {
-    self.outputPath = [self.inputNode.outputPath copy];
-    [self.outputPath LOT_appendPath:self.localPath];
-  } else {
-    self.outputPath = self.localPath;
-  }
+void LOTAnimatorNode::rebuildOutputs()
+{
+    if (inputNode) {
+      _outputPath = [inputNode->outputPath() copy];
+      [_outputPath LOT_appendPath:localPath()];
+    } else {
+      _outputPath = localPath();
+    }
 }
 
-- (void)setPathShouldCacheLengths:(BOOL)pathShouldCacheLengths {
-  _pathShouldCacheLengths = pathShouldCacheLengths;
-  self.inputNode.pathShouldCacheLengths = pathShouldCacheLengths;
+void LOTAnimatorNode::logString(NSString *string)
+{
+    qCDebug(logAnimatorNode) << "|" << QString(indentation_level*2, QLatin1Char(' ')) << QString::fromNSString(string);
 }
 
-- (void)searchNodesForKeypath:(LOTKeypath * _Nonnull)keypath {
-  [self.inputNode searchNodesForKeypath:keypath];
-  if ([keypath pushKey:self.keyname]) {
-    // Matches self. Check interpolators
-    if (keypath.endOfKeypath) {
-      // Add self
-      [keypath addSearchResultForCurrentPath:self];
-    } else if (self.valueInterpolators[QString::fromNSString(keypath.currentKey)] != nil) {
-      [keypath pushKey:keypath.currentKey];
-      // We have a match!
-      [keypath addSearchResultForCurrentPath:self];
+void LOTAnimatorNode::searchNodesForKeypath(LOTKeypath *keypath)
+{
+    inputNode->searchNodesForKeypath(keypath);
+    if ([keypath pushKey:keyname]) {
+      // Matches self. Check interpolators
+      if (keypath.endOfKeypath) {
+        // Add self
+//        [keypath addSearchResultForCurrentPath:this];
+      } else if (valueInterpolators()[QString::fromNSString(keypath.currentKey)] != nil) {
+        [keypath pushKey:keypath.currentKey];
+        // We have a match!
+//        [keypath addSearchResultForCurrentPath:this];
+        [keypath popKey];
+      }
       [keypath popKey];
     }
-    [keypath popKey];
-  }
 }
 
-- (void)setValueDelegate:(id<LOTValueDelegate> _Nonnull)delegate
-              forKeypath:(LOTKeypath * _Nonnull)keypath {
-  if ([keypath pushKey:self.keyname]) {
-    // Matches self. Check interpolators
-    QSharedPointer<LOTValueInterpolator> interpolator = self.valueInterpolators[QString::fromNSString(keypath.currentKey)];
-    if (interpolator) {
-      // We have a match!
-      interpolator->setValueDelegate(delegate);
+void LOTAnimatorNode::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
+{
+    if ([keypath pushKey:keyname]) {
+      // Matches self. Check interpolators
+      QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators()[QString::fromNSString(keypath.currentKey)];
+      if (interpolator) {
+        // We have a match!
+        interpolator->setValueDelegate(delegate);
+      }
+      [keypath popKey];
     }
-    [keypath popKey];
-  }
-  [self.inputNode setValueDelegate:delegate forKeypath:keypath];
+    inputNode->setValueDelegate(delegate, keypath);
 }
-
-@end

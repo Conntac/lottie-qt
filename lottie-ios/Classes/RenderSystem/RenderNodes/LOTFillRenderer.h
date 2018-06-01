@@ -9,9 +9,26 @@
 #import "LOTRenderNode.h"
 #import "LOTShapeFill.h"
 
-@interface LOTFillRenderer : LOTRenderNode
+class LOTColorInterpolator;
+class LOTNumberInterpolator;
 
-- (instancetype _Nonnull)initWithInputNode:(LOTAnimatorNode *_Nullable)inputNode
-                                  shapeFill:(LOTShapeFill *_Nonnull)fill;
+class LOTFillRenderer : public LOTRenderNode
+{
+public:
+    explicit LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeFill *_Nonnull fill);
 
-@end
+    // LOTRenderNode interface
+    NSDictionary *actionsForRenderLayer() const override;
+
+    // LOTAnimatorNode interface
+    QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
+    bool needsUpdateForFrame(qreal frame) override;
+    void performLocalUpdate() override;
+    void rebuildOutputs() override;
+
+private:
+    QSharedPointer<LOTColorInterpolator> colorInterpolator_;
+    QSharedPointer<LOTNumberInterpolator> opacityInterpolator_;
+    BOOL _evenOddFillRule;
+    CALayer *centerPoint_DEBUG;
+};

@@ -166,18 +166,19 @@
     NSLog(@"LOTComposition could not find layer for keypath:%@", keypath.absoluteKeypath);
     return nil;
   }
-  if ([node isKindOfClass:[CALayer class]]) {
-    return (CALayer *)node;
-  }
-  if (![node isKindOfClass:[LOTRenderNode class]]) {
-    NSLog(@"LOTComposition: Keypath return non-layer node:%@ ", keypath.absoluteKeypath);
-    return nil;
-  }
-  if ([node isKindOfClass:[LOTRenderGroup class]]) {
-    return [(LOTRenderGroup *)node containerLayer];
-  }
-  LOTRenderNode *renderNode = (LOTRenderNode *)node;
-  return renderNode.outputLayer;
+//  if ([node isKindOfClass:[CALayer class]]) {
+//    return (CALayer *)node;
+//  }
+//  if (![node isKindOfClass:[LOTRenderNode class]]) {
+//    NSLog(@"LOTComposition: Keypath return non-layer node:%@ ", keypath.absoluteKeypath);
+//    return nil;
+//  }
+//  if ([node isKindOfClass:[LOTRenderGroup class]]) {
+//    return [(LOTRenderGroup *)node containerLayer];
+//  }
+//  LOTRenderNode *renderNode = (LOTRenderNode *)node;
+//  return renderNode.outputLayer;
+  return nil;
 }
 
 - (CGPoint)convertPoint:(CGPoint)point
