@@ -108,7 +108,7 @@
 }
 
 - (void)performLocalUpdate {
-  self.outputLayer.lineDashPhase = _dashOffsetInterpolator->floatValueForFrame(self.currentFrame.floatValue);
+  self.outputLayer.lineDashPhase = _dashOffsetInterpolator ? _dashOffsetInterpolator->floatValueForFrame(self.currentFrame.floatValue) : 0.0f;
   self.outputLayer.strokeColor = _colorInterpolator->colorForFrame(self.currentFrame);
   self.outputLayer.lineWidth = _widthInterpolator->floatValueForFrame(self.currentFrame.floatValue);
   self.outputLayer.opacity = _opacityInterpolator->floatValueForFrame(self.currentFrame.floatValue);

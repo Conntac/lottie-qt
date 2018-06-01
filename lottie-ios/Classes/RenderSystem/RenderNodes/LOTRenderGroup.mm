@@ -135,8 +135,10 @@
 }
 
 - (BOOL)needsUpdateForFrame:(NSNumber *)frame {
-  return (_opacityInterpolator->hasUpdateForFrame(frame.floatValue) ||
-          _transformInterolator->hasUpdateForFrame(frame.floatValue) ||
+  bool opacityNeedsUpdate = _opacityInterpolator ? _opacityInterpolator->hasUpdateForFrame(frame.floatValue) : false;
+  bool transformNeedsUpdate = _transformInterolator ? _transformInterolator->hasUpdateForFrame(frame.floatValue) : false;
+  return (opacityNeedsUpdate ||
+          transformNeedsUpdate ||
           _rootNodeHasUpdate);
 
 }
