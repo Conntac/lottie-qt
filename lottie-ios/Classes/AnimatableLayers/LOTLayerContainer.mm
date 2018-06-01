@@ -260,7 +260,10 @@
   if (_transformInterpolator && _transformInterpolator->hasUpdateForFrame(newFrame.floatValue)) {
     _wrapperLayer.transform = _transformInterpolator->transformForFrame(newFrame.floatValue);
   }
-  _contentsGroup->updateWithFrame(newFrame.floatValue, nullptr, forceUpdate);
+  if (_contentsGroup) {
+    _contentsGroup->updateWithFrame(newFrame.floatValue, nullptr, forceUpdate);
+  }
+  
   _maskLayer.currentFrame = newFrame;
 }
 

@@ -63,7 +63,7 @@ bool LOTAnimatorNode::updateWithFrame(qreal frame, std::function<void(LOTAnimato
     if (localUpdate && ENABLE_DEBUG_LOGGING) {
       logString([NSString stringWithFormat:@"%lu %@ Performing update", (unsigned long)this, keyname]);
     }
-    BOOL inputUpdated = inputNode->updateWithFrame(frame, modifier, forceUpdate);
+    bool inputUpdated = inputNode ? inputNode->updateWithFrame(frame, modifier, forceUpdate) : false;
     currentFrame = frame;
     if (localUpdate) {
       performLocalUpdate();
@@ -86,7 +86,9 @@ void LOTAnimatorNode::forceSetCurrentFrame(qreal frame)
 void LOTAnimatorNode::setPathShouldCacheLengths(bool pathShouldCacheLengths)
 {
     _pathShouldCacheLengths = pathShouldCacheLengths;
-    inputNode->setPathShouldCacheLengths(pathShouldCacheLengths);
+    if (inputNode) {
+        inputNode->setPathShouldCacheLengths(pathShouldCacheLengths);
+    }
 }
 
 bool LOTAnimatorNode::pathShouldCacheLengths() const
