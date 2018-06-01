@@ -29,7 +29,6 @@ private:
     QSharedPointer<LOTPointInterpolator> _positionInterpolator;
     QSharedPointer<LOTNumberInterpolator> _pointsInterpolator;
     QSharedPointer<LOTNumberInterpolator> _rotationInterpolator;
-
 };
 
 

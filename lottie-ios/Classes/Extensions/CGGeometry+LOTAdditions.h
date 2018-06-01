@@ -3,6 +3,8 @@
 
 #import <CoreGraphics/CoreGraphics.h>
 
+#include <QPointF>
+
 //
 // Core Graphics Geometry Additions
 //
@@ -78,28 +80,28 @@ CGRect LOT_RectAddPoint(CGRect rect, CGPoint point);
 CGRect LOT_RectAddSize(CGRect rect, CGSize size);
 CGRect LOT_RectBounded(CGRect rect);
 
-CGPoint LOT_PointAddedToPoint(CGPoint point1, CGPoint point2);
+QPointF LOT_PointAddedToPoint(const QPointF &point1, const QPointF &point2);
 
 CGRect LOT_RectSetHeight(CGRect rect, CGFloat height);
 
-CGFloat LOT_PointDistanceFromPoint(CGPoint point1, CGPoint point2);
+qreal LOT_PointDistanceFromPoint(const QPointF &point1, const QPointF &point2);
 CGFloat LOT_DegreesToRadians(CGFloat degrees);
 
 CGFloat LOT_RemapValue(CGFloat value, CGFloat low1, CGFloat high1, CGFloat low2, CGFloat high2 );
-CGPoint LOT_PointByLerpingPoints(CGPoint point1, CGPoint point2, CGFloat value);
+QPointF LOT_PointByLerpingPoints(const QPointF &point1, const QPointF &point2, qreal value);
 
-CGPoint LOT_PointInLine(CGPoint A, CGPoint B, CGFloat T);
-CGPoint LOT_PointInCubicCurve(CGPoint start, CGPoint cp1, CGPoint cp2, CGPoint end, CGFloat T);
+QPointF LOT_PointInLine(const QPointF &A, const QPointF &B, qreal T);
+QPointF LOT_PointInCubicCurve(const QPointF &start, const QPointF &cp1, const QPointF &cp2, const QPointF &end, qreal T);
 
-CGFloat LOT_CubicBezeirInterpolate(CGPoint P0, CGPoint P1, CGPoint P2, CGPoint P3, CGFloat x);
+qreal LOT_CubicBezeirInterpolate(const QPointF &P0, const QPointF &P1, const QPointF &P2, const QPointF &P3, qreal x);
 CGFloat LOT_SolveCubic(CGFloat a, CGFloat b, CGFloat c, CGFloat d);
 CGFloat LOT_SolveQuadratic(CGFloat a, CGFloat b, CGFloat c);
 CGFloat LOT_Squared(CGFloat f);
 CGFloat LOT_Cubed(CGFloat f);
 CGFloat LOT_CubicRoot(CGFloat f);
 
-CGFloat LOT_CubicLength(CGPoint fromPoint, CGPoint toPoint, CGPoint controlPoint1, CGPoint controlPoint2);
-CGFloat LOT_CubicLengthWithPrecision(CGPoint fromPoint, CGPoint toPoint, CGPoint controlPoint1, CGPoint controlPoint2, CGFloat iterations);
+qreal LOT_CubicLength(const QPointF &fromPoint, const QPointF &toPoint, const QPointF &controlPoint1, const QPointF &controlPoint2);
+qreal LOT_CubicLengthWithPrecision(const QPointF &fromPoint, const QPointF &toPoint, const QPointF &controlPoint1, const QPointF &controlPoint2, qreal iterations);
 
 #ifdef __cplusplus
 } // extern "C"

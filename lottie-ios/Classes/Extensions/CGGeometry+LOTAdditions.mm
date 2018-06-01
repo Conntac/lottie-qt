@@ -304,11 +304,11 @@ CGRect LOT_RectBounded(CGRect rect) {
   return returnRect;
 }
 
-CGPoint LOT_PointAddedToPoint(CGPoint point1, CGPoint point2) {
-  CGPoint returnPoint = point1;
-  returnPoint.x += point2.x;
-  returnPoint.y += point2.y;
-  return returnPoint;
+QPointF LOT_PointAddedToPoint(const QPointF &point1, const QPointF &point2) {
+//  QPointF returnPoint = point1;
+//  returnPoint.x += point2.x;
+//  returnPoint.y += point2.y;
+  return point1 + point2;
 }
 
 CGRect LOT_RectSetHeight(CGRect rect, CGFloat height) {
@@ -319,10 +319,10 @@ CGFloat LOT_DegreesToRadians(CGFloat degrees) {
   return degrees * M_PI / 180;
 }
 
-CGFloat LOT_PointDistanceFromPoint(CGPoint point1, CGPoint point2) {
-  CGFloat xDist = (point2.x - point1.x);
-  CGFloat yDist = (point2.y - point1.y);
-  CGFloat distance = sqrt((xDist * xDist) + (yDist * yDist));
+qreal LOT_PointDistanceFromPoint(const QPointF &point1, const QPointF &point2) {
+  qreal xDist = (point2.x() - point1.x());
+  qreal yDist = (point2.y() - point1.y());
+  qreal distance = sqrt((xDist * xDist) + (yDist * yDist));
   return distance;
 }
 
@@ -330,29 +330,29 @@ CGFloat LOT_RemapValue(CGFloat value, CGFloat low1, CGFloat high1, CGFloat low2,
   return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 }
 
-CGPoint LOT_PointByLerpingPoints(CGPoint point1, CGPoint point2, CGFloat value) {
-  CGFloat xDiff = point2.x - point1.x;
-  CGFloat yDiff = point2.y - point1.y;
-  CGPoint transposed = CGPointMake(fabs(xDiff), fabs(yDiff));
-  CGPoint returnPoint;
+QPointF LOT_PointByLerpingPoints(const QPointF &point1, const QPointF &point2, qreal value) {
+  qreal xDiff = point2.x() - point1.x();
+  qreal yDiff = point2.y() - point1.y();
+  QPointF transposed(fabs(xDiff), fabs(yDiff));
+  QPointF returnPoint;
   if (xDiff == 0 || yDiff == 0) {
-    returnPoint.x = xDiff == 0 ? point1.x : LOT_RemapValue(value, 0, 1, point1.x, point2.x);
-    returnPoint.y = yDiff == 0 ? point1.y : LOT_RemapValue(value, 0, 1, point1.y, point2.y);
+    returnPoint.setX(xDiff == 0 ? point1.x() : LOT_RemapValue(value, 0, 1, point1.x(), point2.x()));
+    returnPoint.setY(yDiff == 0 ? point1.y() : LOT_RemapValue(value, 0, 1, point1.y(), point2.y()));
   } else {
-    CGFloat rx = transposed.x / transposed.y;
-    CGFloat yLerp = LOT_RemapValue(value, 0, 1, 0, transposed.y);
-    CGFloat xLerp = yLerp * rx;
-    CGPoint interpolatedPoint = CGPointMake(point2.x < point1.x ? xLerp * -1 : xLerp,
-                                            point2.y < point1.y ? yLerp * -1 : yLerp);
+    qreal rx = transposed.x() / transposed.y();
+    qreal yLerp = LOT_RemapValue(value, 0, 1, 0, transposed.y());
+    qreal xLerp = yLerp * rx;
+    QPointF interpolatedPoint(point2.x() < point1.x() ? xLerp * -1 : xLerp,
+                              point2.y() < point1.y() ? yLerp * -1 : yLerp);
     returnPoint = LOT_PointAddedToPoint(point1, interpolatedPoint);
   }
   return returnPoint;
 }
 
-CGPoint LOT_PointInLine(CGPoint A, CGPoint B, CGFloat T) {
-  CGPoint C;
-  C.x = A.x - ((A.x - B.x) * T);
-  C.y = A.y - ((A.y - B.y) * T);
+QPointF LOT_PointInLine(const QPointF &A, const QPointF &B, qreal T) {
+  QPointF C;
+  C.setX(A.x() - ((A.x() - B.x()) * T));
+  C.setY(A.y() - ((A.y() - B.y()) * T));
   return C;
 }
 
@@ -361,13 +361,13 @@ CGFloat LOT_CubicBezierGetY(CGPoint cp1, CGPoint cp2, CGFloat T) {
   return 3 * powf(1.f - T, 2.f) * T * cp1.y + 3.f * (1.f - T) * powf(T, 2.f) * cp2.y + powf(T, 3.f);
 }
 
-CGPoint LOT_PointInCubicCurve(CGPoint start, CGPoint cp1, CGPoint cp2, CGPoint end, CGFloat T) {
-  CGPoint A = LOT_PointInLine(start, cp1, T);
-  CGPoint B = LOT_PointInLine(cp1, cp2, T);
-  CGPoint C = LOT_PointInLine(cp2, end, T);
-  CGPoint D = LOT_PointInLine(A, B, T);
-  CGPoint E = LOT_PointInLine(B, C, T);
-  CGPoint F = LOT_PointInLine(D, E, T);
+QPointF LOT_PointInCubicCurve(const QPointF &start, const QPointF &cp1, const QPointF &cp2, const QPointF &end, qreal T) {
+  QPointF A = LOT_PointInLine(start, cp1, T);
+  QPointF B = LOT_PointInLine(cp1, cp2, T);
+  QPointF C = LOT_PointInLine(cp2, end, T);
+  QPointF D = LOT_PointInLine(A, B, T);
+  QPointF E = LOT_PointInLine(B, C, T);
+  QPointF F = LOT_PointInLine(D, E, T);
   return F;
 }
 
@@ -434,36 +434,36 @@ CGFloat LOT_Cubed(CGFloat f) { return f * f * f; }
 
 CGFloat LOT_CubicRoot(CGFloat f) { return powf(f, 1.0 / 3.0); }
 
-CGFloat LOT_CubicBezeirInterpolate(CGPoint P0, CGPoint P1, CGPoint P2, CGPoint P3, CGFloat x) {
-  CGFloat t;
-  if (x == P0.x) {
+qreal LOT_CubicBezeirInterpolate(const QPointF &P0, const QPointF &P1, const QPointF &P2, const QPointF &P3, qreal x) {
+  qreal t;
+  if (x == P0.x()) {
     // Handle corner cases explicitly to prevent rounding errors
     t = 0;
-  } else if (x == P3.x) {
+  } else if (x == P3.x()) {
     t = 1;
   } else {
     // Calculate t
-    CGFloat a = -P0.x + 3 * P1.x - 3 * P2.x + P3.x;
-    CGFloat b = 3 * P0.x - 6 * P1.x + 3 * P2.x;
-    CGFloat c = -3 * P0.x + 3 * P1.x;
-    CGFloat d = P0.x - x;
-    CGFloat tTemp = LOT_SolveCubic(a, b, c, d);
+    qreal a = -P0.x() + 3 * P1.x() - 3 * P2.x() + P3.x();
+    qreal b = 3 * P0.x() - 6 * P1.x() + 3 * P2.x();
+    qreal c = -3 * P0.x() + 3 * P1.x();
+    qreal d = P0.x() - x;
+    qreal tTemp = LOT_SolveCubic(a, b, c, d);
     if (tTemp == -1) return -1;
     t = tTemp;
   }
   
   // Calculate y from t
-  return LOT_Cubed(1 - t) * P0.y + 3 * t * LOT_Squared(1 - t) * P1.y + 3 * LOT_Squared(t) * (1 - t) * P2.y + LOT_Cubed(t) * P3.y;
+  return LOT_Cubed(1 - t) * P0.y() + 3 * t * LOT_Squared(1 - t) * P1.y() + 3 * LOT_Squared(t) * (1 - t) * P2.y() + LOT_Cubed(t) * P3.y();
 }
 
-CGFloat LOT_CubicLengthWithPrecision(CGPoint fromPoint, CGPoint toPoint, CGPoint controlPoint1, CGPoint controlPoint2, CGFloat iterations) {
-  CGFloat length = 0;
-  CGPoint previousPoint = fromPoint;
+qreal LOT_CubicLengthWithPrecision(const QPointF &fromPoint, const QPointF &toPoint, const QPointF &controlPoint1, const QPointF &controlPoint2, qreal iterations) {
+  qreal length = 0;
+  QPointF previousPoint = fromPoint;
   iterations = ceilf(iterations);
   for (int i = 1; i <= iterations; ++i) {
     float s = (float)i  / iterations;
     
-    CGPoint p = LOT_PointInCubicCurve(fromPoint, controlPoint1, controlPoint2, toPoint, s);
+    QPointF p = LOT_PointInCubicCurve(fromPoint, controlPoint1, controlPoint2, toPoint, s);
     
     length += LOT_PointDistanceFromPoint(previousPoint, p);
     previousPoint = p;
@@ -471,7 +471,7 @@ CGFloat LOT_CubicLengthWithPrecision(CGPoint fromPoint, CGPoint toPoint, CGPoint
   return length;
 }
 
-CGFloat LOT_CubicLength(CGPoint fromPoint, CGPoint toPoint, CGPoint controlPoint1, CGPoint controlPoint2) {
+qreal LOT_CubicLength(const QPointF &fromPoint, const QPointF &toPoint, const QPointF &controlPoint1, const QPointF &controlPoint2) {
   return LOT_CubicLengthWithPrecision(fromPoint, toPoint, controlPoint1, controlPoint2, 20);
 }
 

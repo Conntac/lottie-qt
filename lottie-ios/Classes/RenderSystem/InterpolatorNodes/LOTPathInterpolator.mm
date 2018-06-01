@@ -27,32 +27,32 @@ LOTBezierPath *LOTPathInterpolator::pathForFrame(qreal frame, bool cacheLengths)
 
     LOTBezierPath *returnPath = [[LOTBezierPath alloc] init];
     returnPath.cacheLengths = cacheLengths;
-    LOTBezierData *leadingData = leadingKeyframe.pathData;
-    LOTBezierData *trailingData = trailingKeyframe.pathData;
-    NSInteger vertexCount = leadingData ? leadingData.count : trailingData.count;
-    BOOL closePath = leadingData ? leadingData.closed : trailingData.closed;
-    CGPoint cp1 = CGPointMake(0, 0);
-    CGPoint cp2, p1, cp3 = CGPointZero;
-    CGPoint startPoint = CGPointMake(0, 0);
-    CGPoint startInTangent = CGPointMake(0, 0);
+    QSharedPointer<LOTBezierData> leadingData = leadingKeyframe.pathData;
+    QSharedPointer<LOTBezierData> trailingData = trailingKeyframe.pathData;
+    int vertexCount = leadingData ? leadingData->count() : trailingData->count();
+    bool closePath = leadingData ? leadingData->closed() : trailingData->closed();
+    QPointF cp1;
+    QPointF cp2, p1, cp3;
+    QPointF startPoint;
+    QPointF startInTangent;
     for (int i = 0; i < vertexCount; i++) {
       if (progress == 0) {
-        cp2 = [leadingData inTangentAtIndex:i];
-        p1 = [leadingData vertexAtIndex:i];
-        cp3 = [leadingData outTangentAtIndex:i];
+        cp2 = leadingData->inTangentAtIndex(i);
+        p1 = leadingData->vertexAtIndex(i);
+        cp3 = leadingData->outTangentAtIndex(i);
       } else if (progress == 1) {
-        cp2 = [trailingData inTangentAtIndex:i];
-        p1 = [trailingData vertexAtIndex:i];
-        cp3 = [trailingData outTangentAtIndex:i];
+        cp2 = trailingData->inTangentAtIndex(i);
+        p1 = trailingData->vertexAtIndex(i);
+        cp3 = trailingData->outTangentAtIndex(i);
       } else {
-        cp2 = LOT_PointInLine([leadingData inTangentAtIndex:i],
-                              [trailingData inTangentAtIndex:i],
+        cp2 = LOT_PointInLine(leadingData->inTangentAtIndex(i),
+                              trailingData->inTangentAtIndex(i),
                               progress);
-        p1 = LOT_PointInLine([leadingData vertexAtIndex:i],
-                             [trailingData vertexAtIndex:i],
+        p1 = LOT_PointInLine(leadingData->vertexAtIndex(i),
+                             trailingData->vertexAtIndex(i),
                              progress);
-        cp3 = LOT_PointInLine([leadingData outTangentAtIndex:i],
-                              [trailingData outTangentAtIndex:i],
+        cp3 = LOT_PointInLine(leadingData->outTangentAtIndex(i),
+                              trailingData->outTangentAtIndex(i),
                               progress);
       }
       if (i == 0) {

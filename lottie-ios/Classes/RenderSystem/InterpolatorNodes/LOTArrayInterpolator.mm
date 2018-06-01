@@ -16,7 +16,7 @@ LOTArrayInterpolator::LOTArrayInterpolator(NSArray<LOTKeyframe *> *keyframes)
 
 NSArray *LOTArrayInterpolator::numberArrayForFrame(qreal frame)
 {
-    CGFloat progress = progressForFrame(frame);
+    qreal progress = progressForFrame(frame);
     if (progress == 0) {
       return leadingKeyframe.arrayValue;
     }

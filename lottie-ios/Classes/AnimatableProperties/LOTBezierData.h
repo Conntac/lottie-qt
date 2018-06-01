@@ -9,19 +9,33 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+#include <QPointF>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTBezierData : NSObject
+class LOTBezierData
+{
+public:
+    explicit LOTBezierData(NSDictionary *bezierData);
+    ~LOTBezierData();
 
-- (instancetype)initWithData:(NSDictionary *)bezierData;
+//    @property (nonatomic, readonly)
+    int count() const;
+//    @property (nonatomic, readonly)
+    bool closed() const;
 
-@property (nonatomic, readonly) NSInteger count;
-@property (nonatomic, readonly) BOOL closed;
+    QPointF vertexAtIndex(int index) const;
+    QPointF inTangentAtIndex(int index) const;
+    QPointF outTangentAtIndex(int index) const;
 
-- (CGPoint)vertexAtIndex:(NSInteger)index;
-- (CGPoint)inTangentAtIndex:(NSInteger)index;
-- (CGPoint)outTangentAtIndex:(NSInteger)index;
+private:
+    void initializeData(NSDictionary *bezierData);
 
-@end
+    QPointF *_vertices = nullptr;
+    QPointF *_inTangents = nullptr;
+    QPointF *_outTangents = nullptr;
+    int _count = 0;
+    bool _closed = false;
+};
 
 NS_ASSUME_NONNULL_END

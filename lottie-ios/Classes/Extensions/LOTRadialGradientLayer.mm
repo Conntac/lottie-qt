@@ -59,7 +59,7 @@
   NSInteger numberOfComponents = CGColorGetNumberOfComponents(colorRef);
   CGColorSpaceRef colorSpace = CGColorGetColorSpace(colorRef);
   
-  CGPoint origin = self.startPoint;
+  QPointF origin = self.startPoint;
   CGFloat radius = LOT_PointDistanceFromPoint(self.startPoint, self.endPoint);
   
   CGFloat gradientLocations[numberOfLocations];
@@ -78,9 +78,9 @@
   CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradientComponents, gradientLocations, numberOfLocations);
   
   if (self.isRadial) {
-    CGContextDrawRadialGradient(ctx, gradient, origin, 0, origin, radius, kCGGradientDrawsAfterEndLocation);
+    CGContextDrawRadialGradient(ctx, gradient, origin.toCGPoint(), 0, origin.toCGPoint(), radius, kCGGradientDrawsAfterEndLocation);
   } else {
-    CGContextDrawLinearGradient(ctx, gradient, self.startPoint, self.endPoint, kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
+    CGContextDrawLinearGradient(ctx, gradient, self.startPoint.toCGPoint(), self.endPoint.toCGPoint(), kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
   }
   
   CGGradientRelease(gradient);

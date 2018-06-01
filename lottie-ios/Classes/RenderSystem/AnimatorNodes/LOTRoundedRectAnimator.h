@@ -27,5 +27,5 @@ private:
     QSharedPointer<LOTPointInterpolator> _centerInterpolator;
     QSharedPointer<LOTPointInterpolator> _sizeInterpolator;
     QSharedPointer<LOTNumberInterpolator> _cornerRadiusInterpolator;
-    BOOL _reversed;
+    bool _reversed;
 };

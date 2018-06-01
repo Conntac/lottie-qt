@@ -32,7 +32,7 @@
   return interpolator;
 }
 - (CGPoint)pointForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint currentPoint:(CGPoint)interpolatedPoint {
-  return LOT_PointInLine(self.fromPoint, self.toPoint, self.currentProgress);
+  return LOT_PointInLine(QPointF::fromCGPoint(self.fromPoint), QPointF::fromCGPoint(self.toPoint), self.currentProgress).toCGPoint();
 }
 
 @end
@@ -47,10 +47,10 @@
 }
 
 - (CGSize)sizeForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startSize:(CGSize)startSize endSize:(CGSize)endSize currentSize:(CGSize)interpolatedSize {
-  CGPoint from = CGPointMake(self.fromSize.width, self.fromSize.height);
-  CGPoint to = CGPointMake(self.toSize.width, self.toSize.height);
-  CGPoint returnPoint = LOT_PointInLine(from, to, self.currentProgress);
-  return CGSizeMake(returnPoint.x, returnPoint.y);
+  QPointF from(self.fromSize.width, self.fromSize.height);
+  QPointF to(self.toSize.width, self.toSize.height);
+  QPointF returnPoint = LOT_PointInLine(from, to, self.currentProgress);
+  return CGSizeMake(returnPoint.x(), returnPoint.y());
 }
 
 @end

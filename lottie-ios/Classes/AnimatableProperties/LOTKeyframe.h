@@ -11,6 +11,10 @@
 #import "LOTPlatformCompat.h"
 #import "LOTBezierData.h"
 
+#include <QSharedPointer>
+#include <QPointF>
+#include <QSizeF>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LOTKeyframe : NSObject
@@ -22,16 +26,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSNumber *keyframeTime;
 @property (nonatomic, readonly) BOOL isHold;
-@property (nonatomic, readonly) CGPoint inTangent;
-@property (nonatomic, readonly) CGPoint outTangent;
-@property (nonatomic, readonly) CGPoint spatialInTangent;
-@property (nonatomic, readonly) CGPoint spatialOutTangent;
+@property (nonatomic, readonly) QPointF inTangent;
+@property (nonatomic, readonly) QPointF outTangent;
+@property (nonatomic, readonly) QPointF spatialInTangent;
+@property (nonatomic, readonly) QPointF spatialOutTangent;
 
 @property (nonatomic, readonly) CGFloat floatValue;
-@property (nonatomic, readonly) CGPoint pointValue;
-@property (nonatomic, readonly) CGSize sizeValue;
+@property (nonatomic, readonly) QPointF pointValue;
+@property (nonatomic, readonly) QSizeF sizeValue;
 @property (nonatomic, readonly) UIColor *colorValue;
-@property (nonatomic, readonly, nullable) LOTBezierData *pathData;
+@property (nonatomic, readonly) QSharedPointer<LOTBezierData> pathData;
 @property (nonatomic, readonly) NSArray *arrayValue;
 
 @end

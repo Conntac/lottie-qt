@@ -13,64 +13,64 @@
 
 #include <QSharedPointer>
 
-static void addCorner(CGPoint cornerPoint, CGFloat radius, LOTBezierPath *path, bool clockwise)
+static void addCorner(const QPointF &cornerPoint, CGFloat radius, LOTBezierPath *path, bool clockwise)
 {
-  CGPoint currentPoint = path.currentPoint;
+  QPointF currentPoint = path.currentPoint;
   
   CGFloat ellipseControlPointPercentage = 0.55228;
   
-  if (cornerPoint.y == currentPoint.y) {
+  if (cornerPoint.y() == currentPoint.y()) {
     // Moving east/west
-    if (cornerPoint.x < currentPoint.x) {
+    if (cornerPoint.x() < currentPoint.x()) {
       // Moving west
-      CGPoint corner = CGPointMake(cornerPoint.x + radius, currentPoint.y);
+      QPointF corner = QPointF(cornerPoint.x() + radius, currentPoint.y());
       [path LOT_addLineToPoint:corner];
       if (radius) {
-        CGPoint curvePoint = clockwise ? CGPointMake(cornerPoint.x, cornerPoint.y - radius) : CGPointMake(cornerPoint.x, cornerPoint.y + radius);
-        CGPoint cp1 = CGPointMake(corner.x - (radius * ellipseControlPointPercentage), corner.y);
-        CGPoint cp2 = (clockwise ?
-                       CGPointMake(curvePoint.x, curvePoint.y + (radius * ellipseControlPointPercentage)) :
-                       CGPointMake(curvePoint.x, curvePoint.y - (radius * ellipseControlPointPercentage)));
+        QPointF curvePoint = clockwise ? QPointF(cornerPoint.x(), cornerPoint.y() - radius) : QPointF(cornerPoint.x(), cornerPoint.y() + radius);
+        QPointF cp1 = QPointF(corner.x() - (radius * ellipseControlPointPercentage), corner.y());
+        QPointF cp2 = (clockwise ?
+                       QPointF(curvePoint.x(), curvePoint.y() + (radius * ellipseControlPointPercentage)) :
+                       QPointF(curvePoint.x(), curvePoint.y() - (radius * ellipseControlPointPercentage)));
         [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
       }
     } else {
       // Moving east
-      CGPoint corner = CGPointMake(cornerPoint.x - radius, currentPoint.y);
+      QPointF corner = QPointF(cornerPoint.x() - radius, currentPoint.y());
       [path LOT_addLineToPoint:corner];
       if (radius) {
-        CGPoint curvePoint = clockwise ? CGPointMake(cornerPoint.x, cornerPoint.y + radius) : CGPointMake(cornerPoint.x, cornerPoint.y - radius);
-        CGPoint cp1 = CGPointMake(corner.x + (radius * ellipseControlPointPercentage), corner.y);
-        CGPoint cp2 = (clockwise ?
-                       CGPointMake(curvePoint.x, curvePoint.y - (radius * ellipseControlPointPercentage)) :
-                       CGPointMake(curvePoint.x, curvePoint.y + (radius * ellipseControlPointPercentage)));
+        QPointF curvePoint = clockwise ? QPointF(cornerPoint.x(), cornerPoint.y() + radius) : QPointF(cornerPoint.x(), cornerPoint.y() - radius);
+        QPointF cp1 = QPointF(corner.x() + (radius * ellipseControlPointPercentage), corner.y());
+        QPointF cp2 = (clockwise ?
+                       QPointF(curvePoint.x(), curvePoint.y() - (radius * ellipseControlPointPercentage)) :
+                       QPointF(curvePoint.x(), curvePoint.y() + (radius * ellipseControlPointPercentage)));
         [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
       }
     }
   } else {
     // Moving North/South
-    if (cornerPoint.y < currentPoint.y) {
+    if (cornerPoint.y() < currentPoint.y()) {
       // Moving North
-      CGPoint corner = CGPointMake(currentPoint.x, cornerPoint.y + radius);
+      QPointF corner = QPointF(currentPoint.x(), cornerPoint.y() + radius);
       [path LOT_addLineToPoint:corner];
       if (radius) {
-        CGPoint curvePoint = clockwise ? CGPointMake(cornerPoint.x + radius, cornerPoint.y) : CGPointMake(cornerPoint.x - radius, cornerPoint.y);
-        CGPoint cp1 = CGPointMake(corner.x, corner.y  - (radius * ellipseControlPointPercentage));
-        CGPoint cp2 = (clockwise ?
-                       CGPointMake(curvePoint.x - (radius * ellipseControlPointPercentage), curvePoint.y) :
-                       CGPointMake(curvePoint.x + (radius * ellipseControlPointPercentage), curvePoint.y));
+        QPointF curvePoint = clockwise ? QPointF(cornerPoint.x() + radius, cornerPoint.y()) : QPointF(cornerPoint.x() - radius, cornerPoint.y());
+        QPointF cp1 = QPointF(corner.x(), corner.y()  - (radius * ellipseControlPointPercentage));
+        QPointF cp2 = (clockwise ?
+                       QPointF(curvePoint.x() - (radius * ellipseControlPointPercentage), curvePoint.y()) :
+                       QPointF(curvePoint.x() + (radius * ellipseControlPointPercentage), curvePoint.y()));
         [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
       }
 
     } else {
       // moving south
-      CGPoint corner = CGPointMake(currentPoint.x, cornerPoint.y - radius);
+      QPointF corner = QPointF(currentPoint.x(), cornerPoint.y() - radius);
       [path LOT_addLineToPoint:corner];
       if (radius) {
-        CGPoint curvePoint = clockwise ? CGPointMake(cornerPoint.x - radius, cornerPoint.y) : CGPointMake(cornerPoint.x + radius, cornerPoint.y);
-        CGPoint cp1 = CGPointMake(corner.x, corner.y  + (radius * ellipseControlPointPercentage));
-        CGPoint cp2 = (clockwise ?
-                       CGPointMake(curvePoint.x + (radius * ellipseControlPointPercentage), curvePoint.y) :
-                       CGPointMake(curvePoint.x - (radius * ellipseControlPointPercentage), curvePoint.y));
+        QPointF curvePoint = clockwise ? QPointF(cornerPoint.x() - radius, cornerPoint.y()) : QPointF(cornerPoint.x() + radius, cornerPoint.y());
+        QPointF cp1 = QPointF(corner.x(), corner.y()  + (radius * ellipseControlPointPercentage));
+        QPointF cp2 = (clockwise ?
+                       QPointF(curvePoint.x() + (radius * ellipseControlPointPercentage), curvePoint.y()) :
+                       QPointF(curvePoint.x() - (radius * ellipseControlPointPercentage), curvePoint.y()));
         [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
       }
     }
@@ -103,18 +103,18 @@ bool LOTRoundedRectAnimator::needsUpdateForFrame(qreal frame)
 void LOTRoundedRectAnimator::performLocalUpdate()
 {
     CGFloat cornerRadius = _cornerRadiusInterpolator->floatValueForFrame(currentFrame);
-    CGPoint size = _sizeInterpolator->pointValueForFrame(currentFrame).toCGPoint();
-    CGPoint position = _centerInterpolator->pointValueForFrame(currentFrame).toCGPoint();
+    QPointF size = _sizeInterpolator->pointValueForFrame(currentFrame);
+    QPointF position = _centerInterpolator->pointValueForFrame(currentFrame);
 
-    CGFloat halfWidth = size.x / 2;
-    CGFloat halfHeight = size.y / 2;
+    CGFloat halfWidth = size.x() / 2;
+    CGFloat halfHeight = size.y() / 2;
 
-    CGRect rectFrame =  CGRectMake(position.x - halfWidth, position.y - halfHeight, size.x, size.y);
+    QRectF rectFrame(position.x() - halfWidth, position.y() - halfHeight, size.x(), size.y());
 
-    CGPoint topLeft = CGPointMake(CGRectGetMinX(rectFrame), CGRectGetMinY(rectFrame));
-    CGPoint topRight = CGPointMake(CGRectGetMaxX(rectFrame), CGRectGetMinY(rectFrame));
-    CGPoint bottomLeft = CGPointMake(CGRectGetMinX(rectFrame), CGRectGetMaxY(rectFrame));
-    CGPoint bottomRight = CGPointMake(CGRectGetMaxX(rectFrame), CGRectGetMaxY(rectFrame));
+    QPointF topLeft = rectFrame.topLeft();
+    QPointF topRight = rectFrame.topRight();
+    QPointF bottomLeft = rectFrame.bottomLeft();
+    QPointF bottomRight = rectFrame.bottomRight();
     // UIBezierPath Draws rects from the top left corner, After Effects draws them from the top right.
     // Switching to manual drawing.
 
@@ -123,9 +123,9 @@ void LOTRoundedRectAnimator::performLocalUpdate()
 
     LOTBezierPath *path1 = [[LOTBezierPath alloc] init];
     path1.cacheLengths = pathShouldCacheLengths();
-    CGPoint startPoint = (clockWise ?
-                          CGPointMake(topRight.x, topRight.y + radius) :
-                          CGPointMake(topRight.x - radius, topRight.y));
+    QPointF startPoint = (clockWise ?
+                          QPointF(topRight.x(), topRight.y() + radius) :
+                          QPointF(topRight.x() - radius, topRight.y()));
     [path1 LOT_moveToPoint:startPoint];
     if (clockWise) {
       addCorner(bottomRight, radius, path1, clockWise);

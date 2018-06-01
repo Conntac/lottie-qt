@@ -17,30 +17,30 @@ LOTPointInterpolator::LOTPointInterpolator(NSArray<LOTKeyframe *> *keyframes)
 QPointF LOTPointInterpolator::pointValueForFrame(qreal frame)
 {
     CGFloat progress = progressForFrame(frame);
-    CGPoint returnPoint;
+    QPointF returnPoint;
     if (progress == 0) {
       returnPoint = leadingKeyframe.pointValue;
     } else if (progress == 1) {
       returnPoint = trailingKeyframe.pointValue;
-    } else if (!CGPointEqualToPoint(leadingKeyframe.spatialOutTangent, CGPointZero) ||
-               !CGPointEqualToPoint(trailingKeyframe.spatialInTangent, CGPointZero)) {
+    } else if (!leadingKeyframe.spatialOutTangent.isNull() ||
+               !trailingKeyframe.spatialInTangent.isNull()) {
       // Spatial Bezier path
-      CGPoint outTan = LOT_PointAddedToPoint(leadingKeyframe.pointValue, leadingKeyframe.spatialOutTangent);
-      CGPoint inTan = LOT_PointAddedToPoint(trailingKeyframe.pointValue, trailingKeyframe.spatialInTangent);
+      QPointF outTan = LOT_PointAddedToPoint(leadingKeyframe.pointValue, leadingKeyframe.spatialOutTangent);
+      QPointF inTan = LOT_PointAddedToPoint(trailingKeyframe.pointValue, trailingKeyframe.spatialInTangent);
       returnPoint = LOT_PointInCubicCurve(leadingKeyframe.pointValue, outTan, inTan, trailingKeyframe.pointValue, progress);
     } else {
       returnPoint = LOT_PointInLine(leadingKeyframe.pointValue, trailingKeyframe.pointValue, progress);
     }
     if (hasDelegateOverride()) {
-      returnPoint = [delegate pointForFrame:frame
+      returnPoint = QPointF::fromCGPoint([delegate pointForFrame:frame
                             startKeyframe:leadingKeyframe.keyframeTime.floatValue
                               endKeyframe:trailingKeyframe.keyframeTime.floatValue
                      interpolatedProgress:progress
-                               startPoint:leadingKeyframe.pointValue
-                                 endPoint:trailingKeyframe.pointValue
-                             currentPoint:returnPoint];
+                               startPoint:leadingKeyframe.pointValue.toCGPoint()
+                                 endPoint:trailingKeyframe.pointValue.toCGPoint()
+                             currentPoint:returnPoint.toCGPoint()]);
     }
-    return QPointF::fromCGPoint(returnPoint);
+    return returnPoint;
 }
 
 bool LOTPointInterpolator::hasDelegateOverride() const

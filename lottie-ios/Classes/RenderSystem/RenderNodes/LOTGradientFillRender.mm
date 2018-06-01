@@ -86,8 +86,8 @@ void LOTGradientFillRender::performLocalUpdate()
     centerPoint_DEBUG.backgroundColor =  [UIColor magentaColor].CGColor;
     centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
     centerPoint_DEBUG.borderWidth = 2.f;
-    _startPoint = _startPointInterpolator->pointValueForFrame(currentFrame).toCGPoint();
-    _endPoint = _endPointInterpolator->pointValueForFrame(currentFrame).toCGPoint();
+    _startPoint = _startPointInterpolator->pointValueForFrame(currentFrame);
+    _endPoint = _endPointInterpolator->pointValueForFrame(currentFrame);
     outputLayer.opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
     NSArray *numberArray = _gradientInterpolator->numberArrayForFrame(currentFrame);
     NSMutableArray *colorArray = [NSMutableArray array];
@@ -128,13 +128,13 @@ void LOTGradientFillRender::performLocalUpdate()
 
 void LOTGradientFillRender::rebuildOutputs()
 {
-    CGRect frame = [inputNode->outputPath() bounds];
-    CGPoint modifiedAnchor = CGPointMake(-frame.origin.x / frame.size.width,
-                                         -frame.origin.y / frame.size.height);
+    QRectF frame = [inputNode->outputPath() bounds];
+    CGPoint modifiedAnchor = CGPointMake(-frame.x() / frame.width(),
+                                         -frame.y() / frame.height());
     _maskShape.path = inputNode->outputPath().CGPath;
-    _gradientOpacityLayer.bounds = frame;
+    _gradientOpacityLayer.bounds = frame.toCGRect();
     _gradientOpacityLayer.anchorPoint = modifiedAnchor;
 
-    _gradientLayer.bounds = frame;
+    _gradientLayer.bounds = frame.toCGRect();
     _gradientLayer.anchorPoint = modifiedAnchor;
 }

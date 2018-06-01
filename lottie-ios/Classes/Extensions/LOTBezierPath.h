@@ -8,6 +8,9 @@
 
 #import "LOTPlatformCompat.h"
 
+#include <QPointF>
+#include <QRectF>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface LOTBezierPath : NSObject
@@ -16,13 +19,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)newPath;
 
-- (void)LOT_moveToPoint:(CGPoint)point;
+- (void)LOT_moveToPoint:(QPointF)point;
 
-- (void)LOT_addLineToPoint:(CGPoint)point;
+- (void)LOT_addLineToPoint:(QPointF)point;
 
-- (void)LOT_addCurveToPoint:(CGPoint)point
-              controlPoint1:(CGPoint)cp1
-              controlPoint2:(CGPoint)cp2;
+- (void)LOT_addCurveToPoint:(QPointF)point
+              controlPoint1:(QPointF)cp1
+              controlPoint2:(QPointF)cp2;
 
 - (void)LOT_closePath;
 
@@ -30,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)LOT_appendPath:(LOTBezierPath *)bezierPath;
 
-- (void)trimPathFromT:(CGFloat)fromT toT:(CGFloat)toT offset:(CGFloat)offset;
+- (void)trimPathFromT:(qreal)fromT toT:(qreal)toT offset:(qreal)offset;
 
 - (void)LOT_applyTransform:(CGAffineTransform)transform;
 
@@ -39,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) CGFloat length;
 
 @property (nonatomic, readonly) CGPathRef CGPath;
-@property (nonatomic, readonly) CGPoint currentPoint;
+@property (nonatomic, readonly) QPointF currentPoint;
 @property (nonatomic) CGFloat lineWidth;
 @property (nonatomic) CGLineCap lineCapStyle;
 @property (nonatomic) CGLineJoin lineJoinStyle;
@@ -47,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat flatness;
 @property (nonatomic) BOOL usesEvenOddFillRule;
 @property (readonly, getter=isEmpty) BOOL empty;
-@property (nonatomic, readonly) CGRect bounds;
+@property (nonatomic, readonly) QRectF bounds;
 
 @end
 

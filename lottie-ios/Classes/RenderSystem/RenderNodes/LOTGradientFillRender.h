@@ -37,8 +37,8 @@ private:
     LOTRadialGradientLayer *_gradientLayer;
     NSInteger _numberOfPositions;
 
-    CGPoint _startPoint;
-    CGPoint _endPoint;
+    QPointF _startPoint;
+    QPointF _endPoint;
 
     QSharedPointer<LOTArrayInterpolator> _gradientInterpolator;
     QSharedPointer<LOTPointInterpolator> _startPointInterpolator;

@@ -39,20 +39,20 @@ void LOTCircleAnimator::performLocalUpdate()
     // Every Apple method constructs from the 3 o-clock position
     // After effects constructs from the Noon position.
     // After effects does clockwise, but also has a flag for reversed.
-    CGPoint center = _centerInterpolator->pointValueForFrame(currentFrame).toCGPoint();
-    CGPoint size = _sizeInterpolator->pointValueForFrame(currentFrame).toCGPoint();
+    QPointF center = _centerInterpolator->pointValueForFrame(currentFrame);
+    QPointF size = _sizeInterpolator->pointValueForFrame(currentFrame);
 
-    CGFloat halfWidth = size.x / 2;
-    CGFloat halfHeight = size.y / 2;
+    CGFloat halfWidth = size.x() / 2;
+    CGFloat halfHeight = size.y() / 2;
 
     if (_reversed) {
       halfWidth = halfWidth * -1;
     }
 
-    CGPoint circleQ1 = CGPointMake(center.x, center.y - halfHeight);
-    CGPoint circleQ2 = CGPointMake(center.x + halfWidth, center.y);
-    CGPoint circleQ3 = CGPointMake(center.x, center.y + halfHeight);
-    CGPoint circleQ4 = CGPointMake(center.x - halfWidth, center.y);
+    QPointF circleQ1(center.x(), center.y() - halfHeight);
+    QPointF circleQ2(center.x() + halfWidth, center.y());
+    QPointF circleQ3(center.x(), center.y() + halfHeight);
+    QPointF circleQ4(center.x() - halfWidth, center.y());
 
     CGFloat cpW = halfWidth * kLOTEllipseControlPointPercentage;
     CGFloat cpH = halfHeight * kLOTEllipseControlPointPercentage;
@@ -60,13 +60,13 @@ void LOTCircleAnimator::performLocalUpdate()
     LOTBezierPath *path = [[LOTBezierPath alloc] init];
     path.cacheLengths = pathShouldCacheLengths();
     [path LOT_moveToPoint:circleQ1];
-    [path LOT_addCurveToPoint:circleQ2 controlPoint1:CGPointMake(circleQ1.x + cpW, circleQ1.y) controlPoint2:CGPointMake(circleQ2.x, circleQ2.y - cpH)];
+    [path LOT_addCurveToPoint:circleQ2 controlPoint1:QPointF(circleQ1.x() + cpW, circleQ1.y()) controlPoint2:QPointF(circleQ2.x(), circleQ2.y() - cpH)];
 
-    [path LOT_addCurveToPoint:circleQ3 controlPoint1:CGPointMake(circleQ2.x, circleQ2.y + cpH) controlPoint2:CGPointMake(circleQ3.x + cpW, circleQ3.y)];
+    [path LOT_addCurveToPoint:circleQ3 controlPoint1:QPointF(circleQ2.x(), circleQ2.y() + cpH) controlPoint2:QPointF(circleQ3.x() + cpW, circleQ3.y())];
 
-    [path LOT_addCurveToPoint:circleQ4 controlPoint1:CGPointMake(circleQ3.x - cpW, circleQ3.y) controlPoint2:CGPointMake(circleQ4.x, circleQ4.y + cpH)];
+    [path LOT_addCurveToPoint:circleQ4 controlPoint1:QPointF(circleQ3.x() - cpW, circleQ3.y()) controlPoint2:QPointF(circleQ4.x(), circleQ4.y() + cpH)];
 
-    [path LOT_addCurveToPoint:circleQ1 controlPoint1:CGPointMake(circleQ4.x, circleQ4.y - cpH) controlPoint2:CGPointMake(circleQ1.x - cpW, circleQ1.y)];
+    [path LOT_addCurveToPoint:circleQ1 controlPoint1:QPointF(circleQ4.x(), circleQ4.y() - cpH) controlPoint2:QPointF(circleQ1.x() - cpW, circleQ1.y())];
 
     setLocalPath(path);
 }

@@ -50,11 +50,11 @@ bool LOTPolygonAnimator::needsUpdateForFrame(qreal frame)
 
 void LOTPolygonAnimator::performLocalUpdate()
 {
-    CGFloat outerRadius = _outerRadiusInterpolator->floatValueForFrame(currentFrame);
-    CGFloat outerRoundness = _outerRoundnessInterpolator->floatValueForFrame(currentFrame) / 100.f;
-    CGFloat points = _pointsInterpolator->floatValueForFrame(currentFrame);
-    CGFloat rotation = _rotationInterpolator->floatValueForFrame(currentFrame);
-    CGPoint position = _positionInterpolator->pointValueForFrame(currentFrame).toCGPoint();
+    qreal outerRadius = _outerRadiusInterpolator->floatValueForFrame(currentFrame);
+    qreal outerRoundness = _outerRoundnessInterpolator->floatValueForFrame(currentFrame) / 100.f;
+    qreal points = _pointsInterpolator->floatValueForFrame(currentFrame);
+    qreal rotation = _rotationInterpolator->floatValueForFrame(currentFrame);
+    QPointF position = _positionInterpolator->pointValueForFrame(currentFrame);
 
     LOTBezierPath *path = [[LOTBezierPath alloc] init];
     path.cacheLengths = pathShouldCacheLengths();
@@ -67,7 +67,7 @@ void LOTPolygonAnimator::performLocalUpdate()
     CGFloat previousY;
     x = (CGFloat) (outerRadius * cosf(currentAngle));
     y = (CGFloat) (outerRadius * sinf(currentAngle));
-    [path LOT_moveToPoint:CGPointMake(x, y)];
+    [path LOT_moveToPoint:QPointF(x, y)];
     currentAngle += anglePerPoint;
 
     double numPoints = ceil(points);
@@ -90,17 +90,17 @@ void LOTPolygonAnimator::performLocalUpdate()
         CGFloat cp1y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp1Dy;
         CGFloat cp2x = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dx;
         CGFloat cp2y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dy;
-        [path LOT_addCurveToPoint:CGPointMake(x, y)
-                    controlPoint1:CGPointMake(previousX - cp1x, previousY - cp1y)
-                    controlPoint2:CGPointMake(x + cp2x, y + cp2y)];
+        [path LOT_addCurveToPoint:QPointF(x, y)
+                    controlPoint1:QPointF(previousX - cp1x, previousY - cp1y)
+                    controlPoint2:QPointF(x + cp2x, y + cp2y)];
       } else {
-        [path LOT_addLineToPoint:CGPointMake(x, y)];
+        [path LOT_addLineToPoint:QPointF(x, y)];
       }
 
       currentAngle += anglePerPoint;
     }
     [path LOT_closePath];
-    [path LOT_applyTransform:CGAffineTransformMakeTranslation(position.x, position.y)];
+    [path LOT_applyTransform:CGAffineTransformMakeTranslation(position.x(), position.y())];
 
     setLocalPath(path);
 }

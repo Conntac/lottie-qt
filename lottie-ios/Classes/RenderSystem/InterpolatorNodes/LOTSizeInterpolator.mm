@@ -18,24 +18,24 @@ LOTSizeInterpolator::LOTSizeInterpolator(NSArray<LOTKeyframe *> *keyframes)
 QSizeF LOTSizeInterpolator::sizeValueForFrame(qreal frame)
 {
     CGFloat progress = progressForFrame(frame);
-    CGSize returnSize;
+    QSizeF returnSize;
     if (progress == 0) {
       returnSize = leadingKeyframe.sizeValue;
     }else if (progress == 1) {
       returnSize = trailingKeyframe.sizeValue;
     } else {
-      returnSize = CGSizeMake(LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.width, trailingKeyframe.sizeValue.width),
-                              LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.height, trailingKeyframe.sizeValue.height));
+      returnSize = QSizeF(LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.width(), trailingKeyframe.sizeValue.width()),
+                          LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.height(), trailingKeyframe.sizeValue.height()));
     }
     if (hasDelegateOverride()) {
-      returnSize = [delegate sizeForFrame:frame
+      returnSize = QSizeF::fromCGSize([delegate sizeForFrame:frame
                            startKeyframe:leadingKeyframe.keyframeTime.floatValue
                              endKeyframe:trailingKeyframe.keyframeTime.floatValue
-                    interpolatedProgress:progress startSize:leadingKeyframe.sizeValue
-                                 endSize:trailingKeyframe.sizeValue
-                             currentSize:returnSize];
+                    interpolatedProgress:progress startSize:leadingKeyframe.sizeValue.toCGSize()
+                                 endSize:trailingKeyframe.sizeValue.toCGSize()
+                             currentSize:returnSize.toCGSize()]);
     }
-    return QSizeF::fromCGSize(returnSize);
+    return returnSize;
 }
 
 bool LOTSizeInterpolator::hasDelegateOverride() const

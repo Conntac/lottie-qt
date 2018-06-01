@@ -15,10 +15,10 @@
   self = [super init];
   if (self) {
     _keyframeTime = keyframe[@"t"];
-    _inTangent = CGPointZero;
-    _outTangent = CGPointZero;
-    _spatialInTangent = CGPointZero;
-    _spatialOutTangent = CGPointZero;
+    _inTangent = QPointF();
+    _outTangent = QPointF();
+    _spatialInTangent = QPointF();
+    _spatialOutTangent = QPointF();
     NSDictionary *timingOutTangent = keyframe[@"o"];
     NSDictionary *timingInTangent = keyframe[@"i"];
     if (timingInTangent) {
@@ -81,8 +81,8 @@
 
 - (void)remapValueWithBlock:(CGFloat (^)(CGFloat inValue))remapBlock {
   _floatValue = remapBlock(_floatValue);
-  _pointValue = CGPointMake(remapBlock(_pointValue.x), remapBlock(_pointValue.y));
-  _sizeValue = CGSizeMake(remapBlock(_sizeValue.width), remapBlock(_sizeValue.height));
+  _pointValue = QPointF(remapBlock(_pointValue.x()), remapBlock(_pointValue.y()));
+  _sizeValue = QSizeF(remapBlock(_sizeValue.width()), remapBlock(_sizeValue.height()));
 }
 
 - (void)setupOutputWithData:(id)data {
@@ -96,9 +96,9 @@
       _floatValue = [(NSNumber *)numberArray[0] floatValue];
     }
     if (numberArray.count > 1) {
-      _pointValue = CGPointMake(_floatValue = [(NSNumber *)numberArray[0] floatValue],
+      _pointValue = QPointF(_floatValue = [(NSNumber *)numberArray[0] floatValue],
                                 _floatValue = [(NSNumber *)numberArray[1] floatValue]);
-      _sizeValue = CGSizeMake(_pointValue.x, _pointValue.y);
+      _sizeValue = QSizeF(_pointValue.x(), _pointValue.y());
     }
     if (numberArray.count > 3) {
       _colorValue = [self _colorValueFromArray:numberArray];
@@ -106,22 +106,22 @@
     _arrayValue = numberArray;
   } else if ([data isKindOfClass:[NSArray class]] &&
       [[(NSArray *)data firstObject] isKindOfClass:[NSDictionary class]]) {
-    _pathData = [[LOTBezierData alloc] initWithData:[(NSArray *)data firstObject]];
+    _pathData = _pathData.create([(NSArray *)data firstObject]);
   } else if ([data isKindOfClass:[NSDictionary class]]) {
-    _pathData = [[LOTBezierData alloc] initWithData:data];
+    _pathData = _pathData.create(data);
   }
 }
 
-- (CGPoint)_pointFromValueArray:(NSArray *)values {
-  CGPoint returnPoint = CGPointZero;
+- (QPointF)_pointFromValueArray:(NSArray *)values {
+  QPointF returnPoint;
   if (values.count > 1) {
-    returnPoint.x = [(NSNumber *)values[0] floatValue];
-    returnPoint.y = [(NSNumber *)values[1] floatValue];
+    returnPoint.setX([(NSNumber *)values[0] floatValue]);
+    returnPoint.setY([(NSNumber *)values[1] floatValue]);
   }
   return returnPoint;
 }
 
-- (CGPoint)_pointFromValueDict:(NSDictionary *)values {
+- (QPointF)_pointFromValueDict:(NSDictionary *)values {
   NSNumber *xValue = @0, *yValue = @0;
   if ([values[@"x"] isKindOfClass:[NSNumber class]]) {
     xValue = values[@"x"];
@@ -135,7 +135,7 @@
     yValue = values[@"y"][0];
   }
   
-  return CGPointMake([xValue floatValue], [yValue floatValue]);
+  return QPointF([xValue floatValue], [yValue floatValue]);
 }
 
 - (UIColor *)_colorValueFromArray:(NSArray<NSNumber *>  *)colorArray {

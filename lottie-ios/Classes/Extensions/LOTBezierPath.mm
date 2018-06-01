@@ -14,10 +14,10 @@ typedef void(^LOTBezierPathEnumerationHandler)(const CGPathElement *element);
 
 struct LOT_Subpath {
   CGPathElementType type;
-  CGFloat length;
-  CGPoint endPoint;
-  CGPoint controlPoint1;
-  CGPoint controlPoint2;
+  qreal length;
+  QPointF endPoint;
+  QPointF controlPoint1;
+  QPointF controlPoint2;
   LOT_Subpath *nextSubpath;
 };
 
@@ -28,10 +28,10 @@ struct LOT_Subpath {
 @implementation LOTBezierPath {
   LOT_Subpath *headSubpath_;
   LOT_Subpath *tailSubpath_;
-  CGPoint subpathStartPoint_;
-  CGFloat *_lineDashPattern;
-  NSInteger _lineDashCount;
-  CGFloat _lineDashPhase;
+  QPointF subpathStartPoint_;
+  qreal *_lineDashPattern;
+  int _lineDashCount;
+  qreal _lineDashPhase;
   CGMutablePathRef _path;
 }
 
@@ -105,11 +105,11 @@ struct LOT_Subpath {
 }
 
 - (void)addSubpathWithType:(CGPathElementType)type
-                    length:(CGFloat)length
-                  endPoint:(CGPoint)endPoint
-             controlPoint1:(CGPoint)controlPoint1
-             controlPoint1:(CGPoint)controlPoint2 {
-  LOT_Subpath *subPath = (LOT_Subpath *)malloc(sizeof(LOT_Subpath));
+                    length:(qreal)length
+                  endPoint:(QPointF)endPoint
+             controlPoint1:(QPointF)controlPoint1
+             controlPoint1:(QPointF)controlPoint2 {
+  LOT_Subpath *subPath = new LOT_Subpath;
   subPath->type = type;
   subPath->length = length;
   subPath->endPoint = endPoint;
@@ -127,8 +127,8 @@ struct LOT_Subpath {
 
 // MARK Getters Setters
 
-- (CGPoint)currentPoint {
-  CGPoint previousPoint = tailSubpath_ ? tailSubpath_->endPoint : CGPointZero;
+- (QPointF)currentPoint {
+  QPointF previousPoint = tailSubpath_ ? tailSubpath_->endPoint : QPointF();
   return previousPoint;
 }
 
@@ -142,47 +142,47 @@ struct LOT_Subpath {
 
 // MARK - External
 
-- (void)LOT_moveToPoint:(CGPoint)point {
+- (void)LOT_moveToPoint:(QPointF)point {
   subpathStartPoint_ = point;
-  [self addSubpathWithType:kCGPathElementMoveToPoint length:0 endPoint:point controlPoint1:CGPointZero controlPoint1:CGPointZero];
-  CGPathMoveToPoint(_path, NULL, point.x, point.y);
+  [self addSubpathWithType:kCGPathElementMoveToPoint length:0 endPoint:point controlPoint1:QPointF() controlPoint1:QPointF()];
+  CGPathMoveToPoint(_path, NULL, point.x(), point.y());
 }
 
-- (void)LOT_addLineToPoint:(CGPoint)point {
-  CGFloat length = 0;
+- (void)LOT_addLineToPoint:(QPointF)point {
+  qreal length = 0;
   if (_cacheLengths) {
     length = LOT_PointDistanceFromPoint(self.currentPoint, point);
     _length = _length + length;
   }
-  [self addSubpathWithType:kCGPathElementAddLineToPoint length:length endPoint:point controlPoint1:CGPointZero controlPoint1:CGPointZero];
-  CGPathAddLineToPoint(_path, NULL, point.x, point.y);
+  [self addSubpathWithType:kCGPathElementAddLineToPoint length:length endPoint:point controlPoint1:QPointF() controlPoint1:QPointF()];
+  CGPathAddLineToPoint(_path, NULL, point.x(), point.y());
 }
 
-- (void)LOT_addCurveToPoint:(CGPoint)point
-              controlPoint1:(CGPoint)cp1
-              controlPoint2:(CGPoint)cp2 {
-  CGFloat length = 0;
+- (void)LOT_addCurveToPoint:(QPointF)point
+              controlPoint1:(QPointF)cp1
+              controlPoint2:(QPointF)cp2 {
+  qreal length = 0;
   if (_cacheLengths) {
     length = LOT_CubicLengthWithPrecision(self.currentPoint, point, cp1, cp2, 5);
     _length = _length + length;
   }
   [self addSubpathWithType:kCGPathElementAddCurveToPoint length:length endPoint:point controlPoint1:cp1 controlPoint1:cp2];
-  CGPathAddCurveToPoint(_path, NULL, cp1.x, cp1.y, cp2.x, cp2.y, point.x, point.y);
+  CGPathAddCurveToPoint(_path, NULL, cp1.x(), cp1.y(), cp2.x(), cp2.y(), point.x(), point.y());
 }
 
 - (void)LOT_closePath {
-  CGFloat length = 0;
+  qreal length = 0;
   if (_cacheLengths) {
     length = LOT_PointDistanceFromPoint(self.currentPoint, subpathStartPoint_);
     _length = _length + length;
   }
-  [self addSubpathWithType:kCGPathElementCloseSubpath length:length endPoint:subpathStartPoint_ controlPoint1:CGPointZero controlPoint1:CGPointZero];
+  [self addSubpathWithType:kCGPathElementCloseSubpath length:length endPoint:subpathStartPoint_ controlPoint1:QPointF() controlPoint1:QPointF()];
   CGPathCloseSubpath(_path);
 }
 
 - (void)_clearPathData {
   _length = 0;
-  subpathStartPoint_ = CGPointZero;
+  subpathStartPoint_ = QPointF();
   CGPathRelease(_path);
   _path = CGPathCreateMutable();
 }
@@ -246,14 +246,14 @@ struct LOT_Subpath {
   fromT = MIN(MAX(0, fromT), 1);
   toT = MIN(MAX(0, toT), 1);
   if (fromT > toT) {
-    CGFloat to = fromT;
+    qreal to = fromT;
     fromT = toT;
     toT = to;
   }
   
   offset = offset - floor(offset);
-  CGFloat fromLength = fromT + offset;
-  CGFloat toLength = toT + offset;
+  qreal fromLength = fromT + offset;
+  qreal toLength = toT + offset;
   
   if (toT - fromT == 1) {
     // Do Nothing, Full Path returned.
@@ -285,7 +285,7 @@ struct LOT_Subpath {
     return;
   }
   
-  CGFloat totalLength = _length;
+  qreal totalLength = _length;
   
   [self _clearPathData];
 
@@ -296,11 +296,11 @@ struct LOT_Subpath {
   fromLength = fromLength * totalLength;
   toLength = toLength * totalLength;
   
-  CGFloat currentStartLength = fromLength < toLength ? fromLength : 0;
-  CGFloat currentEndLength = toLength;
+  qreal currentStartLength = fromLength < toLength ? fromLength : 0;
+  qreal currentEndLength = toLength;
 
-  CGFloat subpathBeginningLength = 0;
-  CGPoint currentPoint = CGPointZero;
+  qreal subpathBeginningLength = 0;
+  QPointF currentPoint;
 
   while (subpath) {
     
@@ -324,8 +324,8 @@ struct LOT_Subpath {
       // ---------------ooooooooooooooooooooooooooooooooooooooooooooooooo-------------------
       // Start          |currentStartLength             currentEndLength|                End
       
-      CGFloat currentSpanStartT = LOT_RemapValue(currentStartLength, subpathBeginningLength, subpathEndLength, 0, 1);
-      CGFloat currentSpanEndT = LOT_RemapValue(currentEndLength, subpathBeginningLength, subpathEndLength, 0, 1);
+      qreal currentSpanStartT = LOT_RemapValue(currentStartLength, subpathBeginningLength, subpathEndLength, 0, 1);
+      qreal currentSpanEndT = LOT_RemapValue(currentEndLength, subpathBeginningLength, subpathEndLength, 0, 1);
       
       // At this point currentSpan start and end T can be less than 0 or greater than 1
       
@@ -341,7 +341,7 @@ struct LOT_Subpath {
           // Now we are ready to draw a line
         }
         
-        CGPoint toPoint = subpath->endPoint;
+        QPointF toPoint = subpath->endPoint;
         if (currentSpanEndT < 1) {
           // The end of the span is inside of the current subpath. Find it.
           toPoint = LOT_PointInLine(currentPoint, subpath->endPoint, currentSpanEndT);
@@ -350,7 +350,7 @@ struct LOT_Subpath {
         currentPoint = toPoint;
       } else if (subpath->type == kCGPathElementAddCurveToPoint) {
 
-        CGPoint cp1, cp2, end;
+        QPointF cp1, cp2, end;
         cp1 = subpath->controlPoint1;
         cp2 = subpath->controlPoint2;
         end = subpath->endPoint;
@@ -360,12 +360,12 @@ struct LOT_Subpath {
           // If this is the middle of a segment then currentSpanStartT would be less than 0
           // Beginning of a segment Move start point and calculate cp1 and 2 is necessary
           if (currentSpanStartT > 0) {
-            CGPoint A = LOT_PointInLine(currentPoint, cp1, currentSpanStartT);
-            CGPoint B = LOT_PointInLine(cp1, cp2, currentSpanStartT);
-            CGPoint C = LOT_PointInLine(cp2, end, currentSpanStartT);
-            CGPoint D = LOT_PointInLine(A, B, currentSpanStartT);
-            CGPoint E = LOT_PointInLine(B, C, currentSpanStartT);
-            CGPoint F = LOT_PointInLine(D, E, currentSpanStartT);
+            QPointF A = LOT_PointInLine(currentPoint, cp1, currentSpanStartT);
+            QPointF B = LOT_PointInLine(cp1, cp2, currentSpanStartT);
+            QPointF C = LOT_PointInLine(cp2, end, currentSpanStartT);
+            QPointF D = LOT_PointInLine(A, B, currentSpanStartT);
+            QPointF E = LOT_PointInLine(B, C, currentSpanStartT);
+            QPointF F = LOT_PointInLine(D, E, currentSpanStartT);
             currentPoint = F;
             cp1 = E;
             cp2 = C;
@@ -375,12 +375,12 @@ struct LOT_Subpath {
         }
         
         if (currentSpanEndT < 1) {
-          CGPoint A = LOT_PointInLine(currentPoint, cp1, currentSpanEndT);
-          CGPoint B = LOT_PointInLine(cp1, cp2, currentSpanEndT);
-          CGPoint C = LOT_PointInLine(cp2, end, currentSpanEndT);
-          CGPoint D = LOT_PointInLine(A, B, currentSpanEndT);
-          CGPoint E = LOT_PointInLine(B, C, currentSpanEndT);
-          CGPoint F = LOT_PointInLine(D, E, currentSpanEndT);
+          QPointF A = LOT_PointInLine(currentPoint, cp1, currentSpanEndT);
+          QPointF B = LOT_PointInLine(cp1, cp2, currentSpanEndT);
+          QPointF C = LOT_PointInLine(cp2, end, currentSpanEndT);
+          QPointF D = LOT_PointInLine(A, B, currentSpanEndT);
+          QPointF E = LOT_PointInLine(B, C, currentSpanEndT);
+          QPointF F = LOT_PointInLine(D, E, currentSpanEndT);
           cp1 = A;
           cp2 = D;
           end = F;
@@ -428,12 +428,12 @@ struct LOT_Subpath {
   [self lot_enumeratePath:path elementsUsingBlock:^(const CGPathElement *element) {
     switch (element->type) {
       case kCGPathElementMoveToPoint: {
-        CGPoint point = element ->points[0];
+        QPointF point = QPointF::fromCGPoint(element ->points[0]);
         [self LOT_moveToPoint:point];
         break;
       }
       case kCGPathElementAddLineToPoint: {
-        CGPoint point = element ->points[0];
+        QPointF point = QPointF::fromCGPoint(element ->points[0]);
         [self LOT_addLineToPoint:point];
         break;
       }
@@ -441,9 +441,9 @@ struct LOT_Subpath {
         break;
       }
       case kCGPathElementAddCurveToPoint: {
-        CGPoint point1 = element->points[0];
-        CGPoint point2 = element->points[1];
-        CGPoint point3 = element->points[2];
+        QPointF point1 = QPointF::fromCGPoint(element->points[0]);
+        QPointF point2 = QPointF::fromCGPoint(element->points[1]);
+        QPointF point3 = QPointF::fromCGPoint(element->points[2]);
         [self LOT_addCurveToPoint:point3 controlPoint1:point1 controlPoint2:point2];
         break;
       }

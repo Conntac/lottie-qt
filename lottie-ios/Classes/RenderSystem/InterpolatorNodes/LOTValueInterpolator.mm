@@ -83,14 +83,14 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
       return 1;
     }
 
-    CGFloat progession = LOT_RemapValue(frame, leadingKeyframe.keyframeTime.floatValue, trailingKeyframe.keyframeTime.floatValue, 0, 1);
+    qreal progession = LOT_RemapValue(frame, leadingKeyframe.keyframeTime.floatValue, trailingKeyframe.keyframeTime.floatValue, 0, 1);
 
-    if ((leadingKeyframe.outTangent.x != leadingKeyframe.outTangent.y ||
-        trailingKeyframe.inTangent.x != trailingKeyframe.inTangent.y) &&
-        (!LOT_CGPointIsZero(leadingKeyframe.outTangent) &&
-         !LOT_CGPointIsZero(trailingKeyframe.inTangent))) {
+    if ((leadingKeyframe.outTangent.x() != leadingKeyframe.outTangent.y() ||
+        trailingKeyframe.inTangent.x() != trailingKeyframe.inTangent.y()) &&
+        (!leadingKeyframe.outTangent.isNull() &&
+         !trailingKeyframe.inTangent.isNull())) {
       // Bezier Time Curve
-      progession = LOT_CubicBezeirInterpolate(CGPointMake(0, 0), leadingKeyframe.outTangent, trailingKeyframe.inTangent, CGPointMake(1, 1), progession);
+      progession = LOT_CubicBezeirInterpolate(QPointF(0, 0), leadingKeyframe.outTangent, trailingKeyframe.inTangent, QPointF(1, 1), progession);
     }
 
     return progession;

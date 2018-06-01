@@ -8,10 +8,12 @@
 #import <QuartzCore/QuartzCore.h>
 #import <Foundation/Foundation.h>
 
+#include <QPointF>
+
 @interface LOTRadialGradientLayer : CALayer
 
-@property CGPoint startPoint;
-@property CGPoint endPoint;
+@property QPointF startPoint;
+@property QPointF endPoint;
 
 @property (nonatomic, copy) NSArray *colors;
 @property (nonatomic, copy) NSArray<NSNumber *> *locations;
