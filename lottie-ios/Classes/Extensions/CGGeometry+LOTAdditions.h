@@ -4,6 +4,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 
 #include <QPointF>
+#include <QRectF>
 
 //
 // Core Graphics Geometry Additions
@@ -23,7 +24,7 @@ CGRect LOT_RectIntegral(CGRect rect);
 CGRect LOT_RectCenteredAtPoint(CGPoint center, CGSize size, BOOL integral);
 
 // Returns the center point of a CGRect
-CGPoint LOT_RectGetCenterPoint(CGRect rect);
+QPointF LOT_RectGetCenterPoint(const QRectF &rect);
 
 // Insetting
 

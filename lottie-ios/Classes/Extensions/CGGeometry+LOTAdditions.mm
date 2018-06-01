@@ -31,8 +31,8 @@ CGRect LOT_RectCenteredAtPoint(CGPoint center, CGSize size, BOOL integral) {
 }
 
 // Returns the center point of a CGRect
-CGPoint LOT_RectGetCenterPoint(CGRect rect) {
-	return CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
+QPointF LOT_RectGetCenterPoint(const QRectF &rect) {
+    return rect.center();
 }
 
 //

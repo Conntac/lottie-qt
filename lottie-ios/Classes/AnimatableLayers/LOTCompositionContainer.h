@@ -9,38 +9,59 @@
 #import "LOTLayerContainer.h"
 #import "LOTAssetGroup.h"
 
-@interface LOTCompositionContainer : LOTLayerContainer
+class LOTNumberInterpolator;
 
-- (instancetype _Nonnull)initWithModel:(LOTLayer * _Nullable)layer
-                          inLayerGroup:(LOTLayerGroup * _Nullable)layerGroup
-                        withLayerGroup:(LOTLayerGroup * _Nullable)childLayerGroup
-                       withAssestGroup:(LOTAssetGroup * _Nullable)assetGroup;
+class LOTCompositionContainer : public LOTLayerContainer
+{
+public:
+    explicit LOTCompositionContainer(LOTLayer * _Nullable layer,
+                                     LOTLayerGroup * _Nullable layerGroup,
+                                     LOTLayerGroup * _Nullable childLayerGroup,
+                                     LOTAssetGroup * _Nullable assetGroup);
 
-- (nullable NSArray *)keysForKeyPath:(nonnull LOTKeypath *)keypath;
+    NSArray *_Nullable keysForKeyPath(LOTKeypath *_Nonnull keypath);
 
-- (CGPoint)convertPoint:(CGPoint)point
-         toKeypathLayer:(nonnull LOTKeypath *)keypath
-        withParentLayer:(CALayer *_Nonnull)parent;
+    CGPoint convertPointToKeypathLayer(CGPoint point,
+                         LOTKeypath *_Nonnull keypath,
+                         CALayer *_Nonnull parent);
 
-- (CGRect)convertRect:(CGRect)rect
-       toKeypathLayer:(nonnull LOTKeypath *)keypath
-      withParentLayer:(CALayer *_Nonnull)parent;
+    CGRect convertRectToKeypathLayer(CGRect rect,
+                       LOTKeypath *_Nonnull keypath,
+                       CALayer *_Nonnull parent);
 
-- (CGPoint)convertPoint:(CGPoint)point
-       fromKeypathLayer:(nonnull LOTKeypath *)keypath
-        withParentLayer:(CALayer *_Nonnull)parent;
+    CGPoint convertPointFromKeypathLayer(CGPoint point,
+                         LOTKeypath *_Nonnull keypath,
+                         CALayer *_Nonnull parent);
 
-- (CGRect)convertRect:(CGRect)rect
-     fromKeypathLayer:(nonnull LOTKeypath *)keypath
-      withParentLayer:(CALayer *_Nonnull)parent;
+    CGRect convertRectFromKeypathLayer(CGRect rect,
+                       LOTKeypath *_Nonnull keypath,
+                       CALayer *_Nonnull parent);
 
-- (void)addSublayer:(nonnull CALayer *)subLayer
-    toKeypathLayer:(nonnull LOTKeypath *)keypath;
+    void addSublayer(CALayer *subLayer,
+                     LOTKeypath *_Nonnull keypath);
 
-- (void)maskSublayer:(nonnull CALayer *)subLayer
-     toKeypathLayer:(nonnull LOTKeypath *)keypath;
+    void maskSublayer(CALayer *_Nonnull subLayer,
+                      LOTKeypath *_Nonnull keypath);
 
-@property (nonatomic, readonly, nonnull) NSArray<LOTLayerContainer *> *childLayers;
-@property (nonatomic, readonly, nonnull)  NSDictionary *childMap;
+//    @property (nonatomic, readonly, nonnull)
+    QList<QSharedPointer<LOTLayerContainer>> childLayers;
+//    @property (nonatomic, readonly, nonnull)
+    QMap<QString, QSharedPointer<LOTLayerContainer>> childMap;
 
-@end
+    // LOTLayerContainer interface
+    void setViewportBounds(const QRectF &viewportBounds) override;
+    void displayWithFrame(qreal frame, bool forceUpdate) override;
+    void searchNodesForKeypath(LOTKeypath *keypath) override;
+    void setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath) override;
+
+private:
+    void initializeWithChildGroup(LOTLayerGroup *childGroup,
+                                  LOTAssetGroup *assetGroup);
+
+    CALayer *_layerForKeypath(LOTKeypath *_Nonnull keypath);
+
+    qreal _frameOffset = 0.0;
+    QSharedPointer<QQuickLottieLayer> DEBUG_Center;
+    NSMutableDictionary *_keypathCache;
+    QSharedPointer<LOTNumberInterpolator> _timeInterpolator;
+};

@@ -10,98 +10,89 @@
 #import "LOTPathInterpolator.h"
 #import "LOTNumberInterpolator.h"
 
-@interface LOTMaskNodeLayer : CAShapeLayer
-
-@property (nonatomic, readonly) LOTMask *maskNode;
-
-- (instancetype)initWithMask:(LOTMask *)maskNode;
-- (BOOL)hasUpdateForFrame:(NSNumber *)frame;
-
-@end
-
-@implementation LOTMaskNodeLayer {
-  QSharedPointer<LOTPathInterpolator> _pathInterpolator;
-  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
-  QSharedPointer<LOTNumberInterpolator> _expansionInterpolator;
-}
-
-- (instancetype)initWithMask:(LOTMask *)maskNode {
-  self = [super init];
-  if (self) {
-    _pathInterpolator = _pathInterpolator.create(maskNode.maskPath.keyframes);
-    _opacityInterpolator = _opacityInterpolator.create(maskNode.opacity.keyframes);
-    _expansionInterpolator = _expansionInterpolator.create(maskNode.expansion.keyframes);
-    _maskNode = maskNode;
-    self.fillColor = [UIColor blueColor].CGColor;
-  }
-  return self;
-}
-
-- (void)updateForFrame:(NSNumber *)frame withViewBounds:(CGRect)viewBounds {
-  if ([self hasUpdateForFrame:frame]) {
-    QSharedPointer<LOTBezierPath> path = _pathInterpolator->pathForFrame(frame.floatValue, false);
-    
-    if (self.maskNode.maskMode == LOTMaskModeSubtract) {
-      CGMutablePathRef pathRef = CGPathCreateMutable();
-      CGPathAddRect(pathRef, NULL, viewBounds);
-      CGPathAddPath(pathRef, NULL, path->CGPath());
-      self.path = pathRef;
-      self.fillRule = @"even-odd";
-      CGPathRelease(pathRef);
-    } else {
-      self.path = path->CGPath();
+class LOTMaskNodeLayer : public QQuickLottieShapeLayer
+{
+public:
+    explicit LOTMaskNodeLayer(LOTMask *maskNode)
+    {
+        _pathInterpolator = _pathInterpolator.create(maskNode.maskPath.keyframes);
+        _opacityInterpolator = _opacityInterpolator.create(maskNode.opacity.keyframes);
+        _expansionInterpolator = _expansionInterpolator.create(maskNode.expansion.keyframes);
+        this->maskNode = maskNode;
+        fillColor = QColor(Qt::blue);
     }
-    
-    self.opacity = _opacityInterpolator->floatValueForFrame(frame.floatValue);
-  }
-}
 
-- (BOOL)hasUpdateForFrame:(NSNumber *)frame {
-  return (_pathInterpolator->hasUpdateForFrame(frame.floatValue) ||
-          _opacityInterpolator->hasUpdateForFrame(frame.floatValue));
-}
+//    @property (nonatomic, readonly)
+    LOTMask *maskNode;
 
-@end
+    void updateForFrame(qreal frame, QRectF viewBounds)
+    {
+      if (hasUpdateForFrame(frame)) {
+        QSharedPointer<LOTBezierPath> path = _pathInterpolator->pathForFrame(frame, false);
 
-@implementation LOTMaskContainer {
-  NSArray<LOTMaskNodeLayer *> *_masks;
-}
+        Q_ASSERT(false);
+        if (maskNode.maskMode == LOTMaskModeSubtract) {
+          CGMutablePathRef pathRef = CGPathCreateMutable();
+          CGPathAddRect(pathRef, NULL, viewBounds.toCGRect());
+          CGPathAddPath(pathRef, NULL, path->CGPath());
+//          path = pathRef;
+          fillRule = "even-odd";
+          CGPathRelease(pathRef);
+        } else {
+//          path = path->CGPath();
+        }
 
-- (instancetype)initWithMasks:(NSArray<LOTMask *> *)masks {
-  self = [super init];
-  if (self) {
-    NSMutableArray *maskNodes = [NSMutableArray array];
-    CALayer *containerLayer = [CALayer layer];
-    
+        opacity = _opacityInterpolator->floatValueForFrame(frame);
+      }
+    }
+
+    bool hasUpdateForFrame(qreal frame)
+    {
+      return (_pathInterpolator->hasUpdateForFrame(frame) ||
+              _opacityInterpolator->hasUpdateForFrame(frame));
+    }
+
+private:
+    QSharedPointer<LOTPathInterpolator> _pathInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
+    QSharedPointer<LOTNumberInterpolator> _expansionInterpolator;
+};
+
+LOTMaskContainer::LOTMaskContainer(NSArray<LOTMask *> *masks)
+{
+    QList<QSharedPointer<LOTMaskNodeLayer>> maskNodes;
+    QSharedPointer<QQuickLottieLayer> containerLayer = containerLayer.create();;
+
     for (LOTMask *mask in masks) {
-      LOTMaskNodeLayer *node = [[LOTMaskNodeLayer alloc] initWithMask:mask];
-      [maskNodes addObject:node];
+      QSharedPointer<LOTMaskNodeLayer> node = node.create(mask);;
+      maskNodes.append(node);
       if (mask.maskMode == LOTMaskModeAdd ||
           mask == masks.firstObject) {
-        [containerLayer addSublayer:node];
+        containerLayer->addSublayer(node);
       } else {
-        containerLayer.mask = node;
-        CALayer *newContainer = [CALayer layer];
-        [newContainer addSublayer:containerLayer];
+        containerLayer->mask = node;
+        QSharedPointer<QQuickLottieLayer> newContainer = newContainer.create();
+        newContainer->addSublayer(containerLayer);
         containerLayer = newContainer;
       }
     }
-    [self addSublayer:containerLayer];
+    addSublayer(containerLayer);
     _masks = maskNodes;
-
-  }
-  return self;
 }
 
-- (void)setCurrentFrame:(NSNumber *)currentFrame {
-  if (_currentFrame == currentFrame) {
-    return;
-  }
-  _currentFrame = currentFrame;
-  
-  for (LOTMaskNodeLayer *nodeLayer in _masks) {
-    [nodeLayer updateForFrame:currentFrame withViewBounds:self.bounds];
-  }
+void LOTMaskContainer::setCurrentFrame(qreal currentFrame)
+{
+    if (_currentFrame == currentFrame) {
+      return;
+    }
+    _currentFrame = currentFrame;
+
+    for (auto nodeLayer : _masks) {
+      nodeLayer->updateForFrame(currentFrame, bounds);
+    }
 }
 
-@end
+qreal LOTMaskContainer::currentFrame() const
+{
+    return _currentFrame;
+}

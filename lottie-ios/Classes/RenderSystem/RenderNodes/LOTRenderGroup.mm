@@ -29,9 +29,11 @@
 LOTRenderGroup::LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray *contents, NSString *keyname)
 : LOTRenderNode(inputNode, keyname)
 {
-    containerLayer = [CALayer layer];
-    containerLayer.actions = @{@"transform": [NSNull null],
-                                @"opacity": [NSNull null]};
+//    containerLayer = [CALayer layer];
+//    containerLayer.actions = @{@"transform": [NSNull null],
+//                                @"opacity": [NSNull null]};
+
+    containerLayer = containerLayer.create();
 
     buildContents(contents);
 }
@@ -125,11 +127,11 @@ void LOTRenderGroup::buildContents(NSArray *contents)
     for (id item in contents) {
       if ([item isKindOfClass:[LOTShapeFill class]]) {
         QSharedPointer<LOTFillRenderer> fillRenderer = fillRenderer.create(previousNode, (LOTShapeFill *)item);
-        [containerLayer insertSublayer:fillRenderer->outputLayer atIndex:0];
+        containerLayer->insertSublayer(fillRenderer->outputLayer, 0);
         previousNode = fillRenderer;
       } else if ([item isKindOfClass:[LOTShapeStroke class]]) {
         QSharedPointer<LOTStrokeRenderer> strokRenderer = strokRenderer.create(previousNode, (LOTShapeStroke *)item);
-        [containerLayer insertSublayer:strokRenderer->outputLayer atIndex:0];
+        containerLayer->insertSublayer(strokRenderer->outputLayer, 0);
         previousNode = strokRenderer;
       } else if ([item isKindOfClass:[LOTShapePath class]]) {
         QSharedPointer<LOTPathAnimator> pathAnimator = pathAnimator.create(previousNode, (LOTShapePath *)item);
@@ -143,7 +145,7 @@ void LOTRenderGroup::buildContents(NSArray *contents)
       } else if ([item isKindOfClass:[LOTShapeGroup class]]) {
         LOTShapeGroup *shapeGroup = (LOTShapeGroup *)item;
         QSharedPointer<LOTRenderGroup> renderGroup = renderGroup.create(previousNode, shapeGroup.items, shapeGroup.keyname);
-        [containerLayer insertSublayer:renderGroup->containerLayer atIndex:0];
+        containerLayer->insertSublayer(renderGroup->containerLayer, 0);
         previousNode = renderGroup;
       } else if ([item isKindOfClass:[LOTShapeTransform class]]) {
         transform = (LOTShapeTransform *)item;
@@ -163,11 +165,11 @@ void LOTRenderGroup::buildContents(NSArray *contents)
       } else if ([item isKindOfClass:[LOTShapeGradientFill class]]) {
         QSharedPointer<LOTGradientFillRender> gradientFill = gradientFill.create(previousNode, (LOTShapeGradientFill *)item);
         previousNode = gradientFill;
-        [containerLayer insertSublayer:gradientFill->outputLayer atIndex:0];
+        containerLayer->insertSublayer(gradientFill->outputLayer, 0);
       } else if ([item isKindOfClass:[LOTShapeRepeater class]]) {
         QSharedPointer<LOTRepeaterRenderer> repeater = repeater.create(previousNode, (LOTShapeRepeater *)item);
         previousNode = repeater;
-        [containerLayer insertSublayer:repeater->outputLayer atIndex:0];
+        containerLayer->insertSublayer(repeater->outputLayer, 0);
       }
     }
     if (transform) {

@@ -18,14 +18,14 @@ LOTFillRenderer::LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNod
 {
     colorInterpolator_ = colorInterpolator_.create(fill.color.keyframes);
     opacityInterpolator_ = opacityInterpolator_.create(fill.opacity.keyframes);
-    centerPoint_DEBUG = [CALayer layer];
-    centerPoint_DEBUG.bounds = CGRectMake(0, 0, 20, 20);
+    centerPoint_DEBUG = centerPoint_DEBUG.create();
+    centerPoint_DEBUG->bounds = QRectF(0, 0, 20, 20);
     if (ENABLE_DEBUG_SHAPES) {
-        [outputLayer addSublayer:centerPoint_DEBUG];
+        outputLayer->addSublayer(centerPoint_DEBUG);
     }
     _evenOddFillRule = fill.evenOddFillRule;
 
-    outputLayer.fillRule = _evenOddFillRule ? @"even-odd" : @"non-zero";
+    outputLayer->fillRule = _evenOddFillRule ? "even-odd" : "non-zero";
 }
 
 NSDictionary *LOTFillRenderer::actionsForRenderLayer() const
@@ -50,14 +50,14 @@ bool LOTFillRenderer::needsUpdateForFrame(qreal frame)
 
 void LOTFillRenderer::performLocalUpdate()
 {
-    centerPoint_DEBUG.backgroundColor =  colorInterpolator_->colorForFrame(currentFrame);
-    centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
-    centerPoint_DEBUG.borderWidth = 2.f;
-    outputLayer.fillColor = colorInterpolator_->colorForFrame(currentFrame);
-    outputLayer.opacity = opacityInterpolator_->floatValueForFrame(currentFrame);
+    centerPoint_DEBUG->backgroundColor =  colorInterpolator_->colorForFrame(currentFrame);
+    centerPoint_DEBUG->borderColor = QColor(Qt::lightGray);
+    centerPoint_DEBUG->borderWidth = 2.f;
+    outputLayer->fillColor = colorInterpolator_->colorForFrame(currentFrame);
+    outputLayer->opacity = opacityInterpolator_->floatValueForFrame(currentFrame);
 }
 
 void LOTFillRenderer::rebuildOutputs()
 {
-    outputLayer.path = inputNode->outputPath()->CGPath();
+//    outputLayer->path = inputNode->outputPath()->CGPath();
 }

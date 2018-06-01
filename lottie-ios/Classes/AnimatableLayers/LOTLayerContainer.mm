@@ -15,308 +15,254 @@
 #import "LOTMaskContainer.h"
 #import "LOTAsset.h"
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "LOTCacheProvider.h"
-#endif
-
 #include <QSharedPointer>
 #include <QMap>
 
-@implementation LOTLayerContainer {
-  QSharedPointer<LOTTransformInterpolator> _transformInterpolator;
-  QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
-  NSNumber *_inFrame;
-  NSNumber *_outFrame;
-  CALayer *DEBUG_Center;
-  QSharedPointer<LOTRenderGroup> _contentsGroup;
-  LOTMaskContainer *_maskLayer;
-}
-
-@dynamic currentFrame;
-
-- (instancetype)initWithModel:(LOTLayer *)layer
-                 inLayerGroup:(LOTLayerGroup *)layerGroup {
-  self = [super init];
-  if (self) {
-    _wrapperLayer = [CALayer new];
-    [self addSublayer:_wrapperLayer];
-    DEBUG_Center = [CALayer layer];
-    
-    DEBUG_Center.bounds = CGRectMake(0, 0, 20, 20);
-    DEBUG_Center.borderColor = [UIColor blueColor].CGColor;
-    DEBUG_Center.borderWidth = 2;
-    DEBUG_Center.masksToBounds = YES;
-    
-    if (ENABLE_DEBUG_SHAPES) {
-      [_wrapperLayer addSublayer:DEBUG_Center];
-    } 
-    self.actions = @{@"hidden" : [NSNull null], @"opacity" : [NSNull null], @"transform" : [NSNull null]};
-    _wrapperLayer.actions = [self.actions copy];
-    _timeStretchFactor = @1;
-    [self commonInitializeWith:layer inLayerGroup:layerGroup];
-  }
-  return self;
-}
-
-- (void)commonInitializeWith:(LOTLayer *)layer
-                inLayerGroup:(LOTLayerGroup *)layerGroup {
-  if (layer == nil) {
-    return;
-  }
-  _layerName = layer.layerName;
-  if (layer.layerType == LOTLayerTypeImage ||
-      layer.layerType == LOTLayerTypeSolid ||
-      layer.layerType == LOTLayerTypePrecomp) {
-    _wrapperLayer.bounds = CGRectMake(0, 0, layer.layerWidth.floatValue, layer.layerHeight.floatValue);
-    _wrapperLayer.anchorPoint = CGPointMake(0, 0);
-    _wrapperLayer.masksToBounds = YES;
-    DEBUG_Center.position = LOT_RectGetCenterPoint(self.bounds);
-  }
-  
-  if (layer.layerType == LOTLayerTypeImage) {
-    [self _setImageForAsset:layer.imageAsset];
-  }
-  
-  _inFrame = [layer.inFrame copy];
-  _outFrame = [layer.outFrame copy];
-
-  _timeStretchFactor = [layer.timeStretch copy];
-  _transformInterpolator = LOTTransformInterpolator::transformForLayer(layer);
-
-  if (layer.parentID) {
-    NSNumber *parentID = layer.parentID;
-    QSharedPointer<LOTTransformInterpolator> childInterpolator = _transformInterpolator;
-    while (parentID != nil) {
-      LOTLayer *parentModel = [layerGroup layerModelForID:parentID];
-      QSharedPointer<LOTTransformInterpolator> interpolator = LOTTransformInterpolator::transformForLayer(parentModel);
-      childInterpolator->inputNode = interpolator;
-      childInterpolator = interpolator;
-      parentID = parentModel.parentID;
-    }
-  }
-  _opacityInterpolator = _opacityInterpolator.create(layer.opacity.keyframes);
-  if (layer.layerType == LOTLayerTypeShape &&
-      layer.shapes.count) {
-    [self buildContents:layer.shapes];
-  }
-  if (layer.layerType == LOTLayerTypeSolid) {
-    _wrapperLayer.backgroundColor = layer.solidColor.CGColor;
-  }
-  if (layer.masks.count) {
-    _maskLayer = [[LOTMaskContainer alloc] initWithMasks:layer.masks];
-    _wrapperLayer.mask = _maskLayer;
-  }
-  
-  QMap<QString, QSharedPointer<LOTValueInterpolator>> interpolators;
-  interpolators["Opacity"] = _opacityInterpolator;
-  interpolators["Anchor Point"] = _transformInterpolator->anchorInterpolator;
-  interpolators["Scale"] = _transformInterpolator->scaleInterpolator;
-  interpolators["Rotation"] = _transformInterpolator->rotationInterpolator;
-  if (_transformInterpolator->positionXInterpolator &&
-      _transformInterpolator->positionYInterpolator) {
-    interpolators["X Position"] = _transformInterpolator->positionXInterpolator;
-    interpolators["Y Position"] = _transformInterpolator->positionYInterpolator;
-  } else if (_transformInterpolator->positionInterpolator) {
-    interpolators["Position"] = _transformInterpolator->positionInterpolator;
-  }
-
-  // Deprecated
-  interpolators["Transform.Opacity"] = _opacityInterpolator;
-  interpolators["Transform.Anchor Point"] = _transformInterpolator->anchorInterpolator;
-  interpolators["Transform.Scale"] = _transformInterpolator->scaleInterpolator;
-  interpolators["Transform.Rotation"] = _transformInterpolator->rotationInterpolator;
-  if (_transformInterpolator->positionXInterpolator &&
-      _transformInterpolator->positionYInterpolator) {
-    interpolators["Transform.X Position"] = _transformInterpolator->positionXInterpolator;
-    interpolators["Transform.Y Position"] = _transformInterpolator->positionYInterpolator;
-  } else if (_transformInterpolator->positionInterpolator) {
-    interpolators["Transform.Position"] = _transformInterpolator->positionInterpolator;
-  }
-  _valueInterpolators = interpolators;
-}
-
-- (void)buildContents:(NSArray *)contents {
-  _contentsGroup = _contentsGroup.create(nil, contents, _layerName);
-  [_wrapperLayer addSublayer:_contentsGroup->containerLayer];
-}
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-
-- (void)_setImageForAsset:(LOTAsset *)asset {
-  if (asset.imageName) {
-    UIImage *image;
-    if (asset.rootDirectory.length > 0) {
-      NSString *rootDirectory  = asset.rootDirectory;
-      if (asset.imageDirectory.length > 0) {
-        rootDirectory = [rootDirectory stringByAppendingPathComponent:asset.imageDirectory];
-      }
-      NSString *imagePath = [rootDirectory stringByAppendingPathComponent:asset.imageName];
-        
-      id<LOTImageCache> imageCache = [LOTCacheProvider imageCache];
-      if (imageCache) {
-        image = [imageCache imageForKey:imagePath];
-        if (!image) {
-          image = [UIImage imageWithContentsOfFile:imagePath];
-          [imageCache setImage:image forKey:imagePath];
-        }
-      } else {
-        image = [UIImage imageWithContentsOfFile:imagePath];
-      }
-    } else {
-        NSString *imagePath = [asset.assetBundle pathForResource:asset.imageName ofType:nil];
-        image = [UIImage imageWithContentsOfFile:imagePath];
-        if(!image) {
-            image = [UIImage imageNamed:asset.imageName inBundle: asset.assetBundle compatibleWithTraitCollection:nil];
-        }
-    }
-    
-    if (image) {
-      _wrapperLayer.contents = (__bridge id _Nullable)(image.CGImage);
-    } else {
-      NSLog(@"%s: Warn: image not found: %@", __PRETTY_FUNCTION__, asset.imageName);
-    }
-  }
-}
-
-#else
-
-- (void)_setImageForAsset:(LOTAsset *)asset {
-  if (asset.imageName) {
-    NSArray *components = [asset.imageName componentsSeparatedByString:@"."];
-    NSImage *image = [NSImage imageNamed:components.firstObject];
-    if (image) {
-      NSWindow *window = [NSApp mainWindow];
-      CGFloat desiredScaleFactor = [window backingScaleFactor];
-      CGFloat actualScaleFactor = [image recommendedLayerContentsScale:desiredScaleFactor];
-      id layerContents = [image layerContentsForContentsScale:actualScaleFactor];
-      _wrapperLayer.contents = layerContents;
-    }
-  }
-  
-}
-
-#endif
+//- (void)_setImageForAsset:(LOTAsset *)asset {
+//  if (asset.imageName) {
+//    NSArray *components = [asset.imageName componentsSeparatedByString:@"."];
+//    NSImage *image = [NSImage imageNamed:components.firstObject];
+//    if (image) {
+//      NSWindow *window = [NSApp mainWindow];
+//      CGFloat desiredScaleFactor = [window backingScaleFactor];
+//      CGFloat actualScaleFactor = [image recommendedLayerContentsScale:desiredScaleFactor];
+//      id layerContents = [image layerContentsForContentsScale:actualScaleFactor];
+//      _wrapperLayer.contents = layerContents;
+//    }
+//  }
+//}
 
 // MARK - Animation
 
-+ (BOOL)needsDisplayForKey:(NSString *)key {
-  if ([key isEqualToString:@"currentFrame"]) {
-    return YES;
-  }
-  return [super needsDisplayForKey:key];
-}
+//+ (BOOL)needsDisplayForKey:(NSString *)key {
+//  if ([key isEqualToString:@"currentFrame"]) {
+//    return YES;
+//  }
+//  return [super needsDisplayForKey:key];
+//}
 
-- (id<CAAction>)actionForKey:(NSString *)event {
-  if ([event isEqualToString:@"currentFrame"]) {
-    CABasicAnimation *theAnimation = [CABasicAnimation
-                                      animationWithKeyPath:event];
-    theAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    theAnimation.fromValue = [[self presentationLayer] valueForKey:event];
-    return theAnimation;
-  }
-  return [super actionForKey:event];
-}
+extern QColor qcolorFromCGColor(CGColorRef cgcolor);
 
-- (id)initWithLayer:(id)layer {
-  if (self = [super initWithLayer:layer]) {
-    if ([layer isKindOfClass:[LOTLayerContainer class]]) {
-      LOTLayerContainer *other = (LOTLayerContainer *)layer;
-      self.currentFrame = [other.currentFrame copy];
+LOTLayerContainer::LOTLayerContainer(LOTLayer *layer, LOTLayerGroup *layerGroup)
+{
+    wrapperLayer = wrapperLayer.create();
+    addSublayer(wrapperLayer);
+    DEBUG_Center = DEBUG_Center.create();
+
+    DEBUG_Center->bounds = QRectF(0, 0, 20, 20);
+    DEBUG_Center->borderColor = QColor("blue");
+    DEBUG_Center->borderWidth = 2;
+    DEBUG_Center->masksToBounds = YES;
+
+    if (ENABLE_DEBUG_SHAPES) {
+      wrapperLayer->addSublayer(DEBUG_Center);
     }
-  }
-  return self;
+    actions = QVariantMap{{"hidden", QVariant()}, {"opacity", QVariant()}, {"transform", QVariant()}};
+    wrapperLayer->actions = actions;
+    timeStretchFactor = 1.0;
+    commonInitializeWith(layer, layerGroup);
 }
 
-- (void)display {
-  @synchronized(self) {
-    LOTLayerContainer *presentation = self;
-    if (self.animationKeys.count &&
-      self.presentationLayer) {
-        presentation = (LOTLayerContainer *)self.presentationLayer;
+LOTLayerContainer::LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer)
+: QQuickLottieLayer(layer)
+{
+    QSharedPointer<LOTLayerContainer> other = layer.dynamicCast<LOTLayerContainer>();
+    if (other) {
+        currentFrame = other->currentFrame;
     }
-    [self displayWithFrame:presentation.currentFrame];
-  }
 }
 
-- (void)displayWithFrame:(NSNumber *)frame {
-  [self displayWithFrame:frame forceUpdate:NO];
+void LOTLayerContainer::setViewportBounds(const QRectF &viewportBounds)
+{
+    _viewportBounds = viewportBounds;
+    if (_maskLayer) {
+      QPointF center = LOT_RectGetCenterPoint(viewportBounds);
+      QRectF viewportBoundsCopy = viewportBounds;
+      viewportBoundsCopy.setX(-center.x());
+      viewportBoundsCopy.setY(-center.y());
+      _maskLayer->bounds = viewportBoundsCopy;
+    }
 }
 
-- (void)displayWithFrame:(NSNumber *)frame forceUpdate:(BOOL)forceUpdate {
-  NSNumber *newFrame = @(frame.floatValue / self.timeStretchFactor.floatValue);
-  if (ENABLE_DEBUG_LOGGING) NSLog(@"View %@ Displaying Frame %@, with local time %@", self, frame, newFrame);
-  BOOL hidden = NO;
-  if (_inFrame && _outFrame) {
-    hidden = (frame.floatValue < _inFrame.floatValue ||
-              frame.floatValue > _outFrame.floatValue);
-  }
-  self.hidden = hidden;
-  if (hidden) {
-    return;
-  }
-  if (_opacityInterpolator && _opacityInterpolator->hasUpdateForFrame(newFrame.floatValue)) {
-    self.opacity = _opacityInterpolator->floatValueForFrame(newFrame.floatValue);
-  }
-  if (_transformInterpolator && _transformInterpolator->hasUpdateForFrame(newFrame.floatValue)) {
-    _wrapperLayer.transform = _transformInterpolator->transformForFrame(newFrame.floatValue);
-  }
-  if (_contentsGroup) {
-    _contentsGroup->updateWithFrame(newFrame.floatValue, nullptr, forceUpdate);
-  }
-  
-  _maskLayer.currentFrame = newFrame;
+void LOTLayerContainer::displayWithFrame(qreal frame)
+{
+    displayWithFrame(frame, false);
 }
 
-- (void)setViewportBounds:(CGRect)viewportBounds {
-  _viewportBounds = viewportBounds;
-  if (_maskLayer) {
-    CGPoint center = LOT_RectGetCenterPoint(viewportBounds);
-    viewportBounds.origin = CGPointMake(-center.x, -center.y);
-    _maskLayer.bounds = viewportBounds;
-  }
+void LOTLayerContainer::displayWithFrame(qreal frame, bool forceUpdate)
+{
+    qreal newFrame = frame / timeStretchFactor;
+    if (ENABLE_DEBUG_LOGGING) NSLog(@"View %@ Displaying Frame %d, with local time %d", this, frame, newFrame);
+    BOOL hidden = NO;
+    if (_inFrame && _outFrame) {
+      hidden = (frame < _inFrame.floatValue ||
+                frame > _outFrame.floatValue);
+    }
+    this->hidden = hidden;
+    if (hidden) {
+      return;
+    }
+    if (_opacityInterpolator && _opacityInterpolator->hasUpdateForFrame(newFrame)) {
+      opacity = _opacityInterpolator->floatValueForFrame(newFrame);
+    }
+    if (_transformInterpolator && _transformInterpolator->hasUpdateForFrame(newFrame)) {
+      wrapperLayer->transform = _transformInterpolator->transformForFrame(newFrame);
+    }
+    if (_contentsGroup) {
+      _contentsGroup->updateWithFrame(newFrame, nullptr, forceUpdate);
+    }
+
+    _maskLayer->setCurrentFrame(newFrame);
 }
 
-- (void)searchNodesForKeypath:(LOTKeypath * _Nonnull)keypath {
-  if (_contentsGroup == nil && [keypath pushKey:self.layerName]) {
-    // Matches self.
-    if ([keypath pushKey:@"Transform"]) {
-      // Is a transform node, check interpolators
-      QSharedPointer<LOTValueInterpolator> interpolator = _valueInterpolators[QString::fromNSString(keypath.currentKey)];
-      if (interpolator) {
-        // We have a match!
-        [keypath pushKey:keypath.currentKey];
-        [keypath addSearchResultForCurrentPath:_wrapperLayer];
+void LOTLayerContainer::searchNodesForKeypath(LOTKeypath *keypath)
+{
+    if (_contentsGroup == nil && [keypath pushKey:layerName]) {
+      // Matches self.
+      if ([keypath pushKey:@"Transform"]) {
+        // Is a transform node, check interpolators
+        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators[QString::fromNSString(keypath.currentKey)];
+        if (interpolator) {
+          // We have a match!
+          [keypath pushKey:keypath.currentKey];
+//          [keypath addSearchResultForCurrentPath:_wrapperLayer];
+          [keypath popKey];
+        }
+        if (keypath.endOfKeypath) {
+//          [keypath addSearchResultForCurrentPath:_wrapperLayer];
+        }
         [keypath popKey];
       }
       if (keypath.endOfKeypath) {
-        [keypath addSearchResultForCurrentPath:_wrapperLayer];
+//        [keypath addSearchResultForCurrentPath:_wrapperLayer];
       }
       [keypath popKey];
     }
-    if (keypath.endOfKeypath) {
-      [keypath addSearchResultForCurrentPath:_wrapperLayer];
-    }
-    [keypath popKey];
-  }
-  _contentsGroup->searchNodesForKeypath(keypath);
+    _contentsGroup->searchNodesForKeypath(keypath);
 }
 
-- (void)setValueDelegate:(id<LOTValueDelegate> _Nonnull)delegate
-              forKeypath:(LOTKeypath * _Nonnull)keypath {
-  if ([keypath pushKey:self.layerName]) {
-    // Matches self.
-    if ([keypath pushKey:@"Transform"]) {
-      // Is a transform node, check interpolators
-      QSharedPointer<LOTValueInterpolator> interpolator = _valueInterpolators[QString::fromNSString(keypath.currentKey)];
-      if (interpolator) {
-        // We have a match!
-        interpolator->setValueDelegate(delegate);
+void LOTLayerContainer::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
+{
+    if ([keypath pushKey:layerName]) {
+      // Matches self.
+      if ([keypath pushKey:@"Transform"]) {
+        // Is a transform node, check interpolators
+        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators[QString::fromNSString(keypath.currentKey)];
+        if (interpolator) {
+          // We have a match!
+          interpolator->setValueDelegate(delegate);
+        }
+        [keypath popKey];
       }
       [keypath popKey];
     }
-    [keypath popKey];
-  }
-  _contentsGroup->setValueDelegate(delegate, keypath);
+    _contentsGroup->setValueDelegate(delegate, keypath);
 }
 
-@end
+void LOTLayerContainer::actionForKey(const QString &event)
+{
+    if (event == "currentFrame") {
+//      CABasicAnimation *theAnimation = [CABasicAnimation
+//                                        animationWithKeyPath:event];
+//      theAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+//      theAnimation.fromValue = [[self presentationLayer] valueForKey:event];
+//      return theAnimation;
+    }
+    return QQuickLottieLayer::actionForKey(event);
+}
+
+void LOTLayerContainer::display()
+{
+//    @synchronized(self) {
+      LOTLayerContainer *presentation = this;
+      if (animationKeys.size() &&
+        presentationLayer) {
+          presentation = dynamic_cast<LOTLayerContainer *>(presentationLayer.data());
+      }
+      displayWithFrame(presentation->currentFrame);
+//    }
+}
+
+void LOTLayerContainer::commonInitializeWith(LOTLayer *layer, LOTLayerGroup *layerGroup)
+{
+    if (layer == nil) {
+      return;
+    }
+    layerName = layer.layerName;
+    if (layer.layerType == LOTLayerTypeImage ||
+        layer.layerType == LOTLayerTypeSolid ||
+        layer.layerType == LOTLayerTypePrecomp) {
+      wrapperLayer->bounds = QRectF(0, 0, layer.layerWidth.floatValue, layer.layerHeight.floatValue);
+      wrapperLayer->anchorPoint = QPointF(0, 0);
+      wrapperLayer->masksToBounds = true;
+      DEBUG_Center->position = LOT_RectGetCenterPoint(bounds);
+    }
+
+    if (layer.layerType == LOTLayerTypeImage) {
+        Q_ASSERT(false);
+//      [self _setImageForAsset:layer.imageAsset];
+    }
+
+    _inFrame = [layer.inFrame copy];
+    _outFrame = [layer.outFrame copy];
+
+    timeStretchFactor = layer.timeStretch.floatValue;
+    _transformInterpolator = LOTTransformInterpolator::transformForLayer(layer);
+
+    if (layer.parentID) {
+      NSNumber *parentID = layer.parentID;
+      QSharedPointer<LOTTransformInterpolator> childInterpolator = _transformInterpolator;
+      while (parentID != nil) {
+        LOTLayer *parentModel = [layerGroup layerModelForID:parentID];
+        QSharedPointer<LOTTransformInterpolator> interpolator = LOTTransformInterpolator::transformForLayer(parentModel);
+        childInterpolator->inputNode = interpolator;
+        childInterpolator = interpolator;
+        parentID = parentModel.parentID;
+      }
+    }
+    _opacityInterpolator = _opacityInterpolator.create(layer.opacity.keyframes);
+    if (layer.layerType == LOTLayerTypeShape &&
+        layer.shapes.count) {
+      buildContents(layer.shapes);
+    }
+    if (layer.layerType == LOTLayerTypeSolid) {
+      wrapperLayer->backgroundColor = qcolorFromCGColor(layer.solidColor.CGColor);
+    }
+    if (layer.masks.count) {
+      _maskLayer = _maskLayer.create(layer.masks);
+      wrapperLayer->mask = _maskLayer;
+    }
+
+    QMap<QString, QSharedPointer<LOTValueInterpolator>> interpolators;
+    interpolators["Opacity"] = _opacityInterpolator;
+    interpolators["Anchor Point"] = _transformInterpolator->anchorInterpolator;
+    interpolators["Scale"] = _transformInterpolator->scaleInterpolator;
+    interpolators["Rotation"] = _transformInterpolator->rotationInterpolator;
+    if (_transformInterpolator->positionXInterpolator &&
+        _transformInterpolator->positionYInterpolator) {
+      interpolators["X Position"] = _transformInterpolator->positionXInterpolator;
+      interpolators["Y Position"] = _transformInterpolator->positionYInterpolator;
+    } else if (_transformInterpolator->positionInterpolator) {
+      interpolators["Position"] = _transformInterpolator->positionInterpolator;
+    }
+
+    // Deprecated
+    interpolators["Transform.Opacity"] = _opacityInterpolator;
+    interpolators["Transform.Anchor Point"] = _transformInterpolator->anchorInterpolator;
+    interpolators["Transform.Scale"] = _transformInterpolator->scaleInterpolator;
+    interpolators["Transform.Rotation"] = _transformInterpolator->rotationInterpolator;
+    if (_transformInterpolator->positionXInterpolator &&
+        _transformInterpolator->positionYInterpolator) {
+      interpolators["Transform.X Position"] = _transformInterpolator->positionXInterpolator;
+      interpolators["Transform.Y Position"] = _transformInterpolator->positionYInterpolator;
+    } else if (_transformInterpolator->positionInterpolator) {
+      interpolators["Transform.Position"] = _transformInterpolator->positionInterpolator;
+    }
+    valueInterpolators = interpolators;
+}
+
+void LOTLayerContainer::buildContents(NSArray *contents)
+{
+    _contentsGroup = _contentsGroup.create(nil, contents, layerName);
+    wrapperLayer->addSublayer(_contentsGroup->containerLayer);
+}

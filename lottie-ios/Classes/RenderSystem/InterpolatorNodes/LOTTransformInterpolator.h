@@ -45,7 +45,7 @@ public:
     NSString *parentKeyName;
 
     // Functions
-    CATransform3D transformForFrame(qreal frame);
+    QTransform transformForFrame(qreal frame);
     bool hasUpdateForFrame(qreal frame);
 
 private:

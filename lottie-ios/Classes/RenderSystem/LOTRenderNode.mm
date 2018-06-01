@@ -11,8 +11,10 @@
 LOTRenderNode::LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *keyname)
 : LOTAnimatorNode(inputNode, keyname)
 {
-    outputLayer = [CAShapeLayer new];
-    outputLayer.actions = actionsForRenderLayer();
+//    outputLayer = [CAShapeLayer new];
+    outputLayer = outputLayer.create();
+    // TODO: Comment me in and don't use virtuals
+//    outputLayer.actions = actionsForRenderLayer();
 }
 
 /// Layer Properties that need to disable implicit animations

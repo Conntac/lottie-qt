@@ -48,12 +48,12 @@ LOTGradientFillRender::LOTGradientFillRender(const QSharedPointer<LOTAnimatorNod
   _gradientLayer.isRadial = (fill.type == LOTGradientTypeRadial);
   _gradientLayer.mask = wrapperLayer;
   _gradientLayer.actions = [_gradientOpacityLayer.actions copy];
-  [outputLayer addSublayer:_gradientLayer];
+//  [outputLayer addSublayer:_gradientLayer];
 
   centerPoint_DEBUG = [CALayer layer];
   centerPoint_DEBUG.bounds = CGRectMake(0, 0, 20, 20);
   if (ENABLE_DEBUG_SHAPES) {
-    [outputLayer addSublayer:centerPoint_DEBUG];
+//    [outputLayer addSublayer:centerPoint_DEBUG];
   }
 }
 
@@ -83,47 +83,47 @@ bool LOTGradientFillRender::needsUpdateForFrame(qreal frame)
 
 void LOTGradientFillRender::performLocalUpdate()
 {
-    centerPoint_DEBUG.backgroundColor =  [UIColor magentaColor].CGColor;
-    centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
-    centerPoint_DEBUG.borderWidth = 2.f;
-    _startPoint = _startPointInterpolator->pointValueForFrame(currentFrame);
-    _endPoint = _endPointInterpolator->pointValueForFrame(currentFrame);
-    outputLayer.opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
-    NSArray *numberArray = _gradientInterpolator->numberArrayForFrame(currentFrame);
-    NSMutableArray *colorArray = [NSMutableArray array];
-    NSMutableArray *locationsArray = [NSMutableArray array];
+//    centerPoint_DEBUG.backgroundColor =  [UIColor magentaColor].CGColor;
+//    centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
+//    centerPoint_DEBUG.borderWidth = 2.f;
+//    _startPoint = _startPointInterpolator->pointValueForFrame(currentFrame);
+//    _endPoint = _endPointInterpolator->pointValueForFrame(currentFrame);
+//    outputLayer.opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
+//    NSArray *numberArray = _gradientInterpolator->numberArrayForFrame(currentFrame);
+//    NSMutableArray *colorArray = [NSMutableArray array];
+//    NSMutableArray *locationsArray = [NSMutableArray array];
 
-    NSMutableArray *opacityArray = [NSMutableArray array];
-    NSMutableArray *opacitylocationsArray = [NSMutableArray array];
-    for (int i = 0; i < _numberOfPositions; i++) {
-      int ix = i * 4;
-      NSNumber *location = numberArray[ix];
-      NSNumber *r = numberArray[(ix + 1)];
-      NSNumber *g = numberArray[(ix + 2)];
-      NSNumber *b = numberArray[(ix + 3)];
-      [locationsArray addObject:location];
-      UIColor *color = [UIColor colorWithRed:r.floatValue green:g.floatValue blue:b.floatValue alpha:1];
-      [colorArray addObject:(id)(color.CGColor)];
-    }
-    for (NSInteger i = (_numberOfPositions * 4); i < numberArray.count; i = i + 2) {
-      NSNumber *opacityLocation = numberArray[i];
-      [opacitylocationsArray addObject:opacityLocation];
-      NSNumber *opacity = numberArray[i + 1];
-      UIColor *opacityColor = [UIColor colorWithWhite:1 alpha:opacity.floatValue];
-      [opacityArray addObject:(id)(opacityColor.CGColor)];
-    }
-    if (opacityArray.count == 0) {
-      _gradientOpacityLayer.backgroundColor = [UIColor whiteColor].CGColor;
-    } else {
-      _gradientOpacityLayer.startPoint = _startPoint;
-      _gradientOpacityLayer.endPoint = _endPoint;
-      _gradientOpacityLayer.locations = opacitylocationsArray;
-      _gradientOpacityLayer.colors = opacityArray;
-    }
-    _gradientLayer.startPoint = _startPoint;
-    _gradientLayer.endPoint = _endPoint;
-    _gradientLayer.locations = locationsArray;
-    _gradientLayer.colors = colorArray;
+//    NSMutableArray *opacityArray = [NSMutableArray array];
+//    NSMutableArray *opacitylocationsArray = [NSMutableArray array];
+//    for (int i = 0; i < _numberOfPositions; i++) {
+//      int ix = i * 4;
+//      NSNumber *location = numberArray[ix];
+//      NSNumber *r = numberArray[(ix + 1)];
+//      NSNumber *g = numberArray[(ix + 2)];
+//      NSNumber *b = numberArray[(ix + 3)];
+//      [locationsArray addObject:location];
+//      UIColor *color = [UIColor colorWithRed:r.floatValue green:g.floatValue blue:b.floatValue alpha:1];
+//      [colorArray addObject:(id)(color.CGColor)];
+//    }
+//    for (NSInteger i = (_numberOfPositions * 4); i < numberArray.count; i = i + 2) {
+//      NSNumber *opacityLocation = numberArray[i];
+//      [opacitylocationsArray addObject:opacityLocation];
+//      NSNumber *opacity = numberArray[i + 1];
+//      UIColor *opacityColor = [UIColor colorWithWhite:1 alpha:opacity.floatValue];
+//      [opacityArray addObject:(id)(opacityColor.CGColor)];
+//    }
+//    if (opacityArray.count == 0) {
+//      _gradientOpacityLayer.backgroundColor = [UIColor whiteColor].CGColor;
+//    } else {
+//      _gradientOpacityLayer.startPoint = _startPoint;
+//      _gradientOpacityLayer.endPoint = _endPoint;
+//      _gradientOpacityLayer.locations = opacitylocationsArray;
+//      _gradientOpacityLayer.colors = opacityArray;
+//    }
+//    _gradientLayer.startPoint = _startPoint;
+//    _gradientLayer.endPoint = _endPoint;
+//    _gradientLayer.locations = locationsArray;
+//    _gradientLayer.colors = colorArray;
 }
 
 void LOTGradientFillRender::rebuildOutputs()

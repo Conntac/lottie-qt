@@ -10,12 +10,33 @@
 #import "LOTPlatformCompat.h"
 #import "UIColor+Expanded.h"
 
+#include <QColor>
+
+QColor qcolorFromCGColor(CGColorRef cgcolor)
+{
+    QColor pc;
+    CGColorSpaceModel model = CGColorSpaceGetModel(CGColorGetColorSpace(cgcolor));
+    const CGFloat *components = CGColorGetComponents(cgcolor);
+    if (model == kCGColorSpaceModelRGB) {
+        pc.setRgbF(components[0], components[1], components[2], components[3]);
+    } else if (model == kCGColorSpaceModelCMYK) {
+        pc.setCmykF(components[0], components[1], components[2], components[3]);
+    } else if (model == kCGColorSpaceModelMonochrome) {
+        pc.setRgbF(components[0], components[0], components[0], components[1]);
+    } else {
+        // Colorspace we can't deal with.
+        qWarning("Qt: qcolorFromCGColor: cannot convert from colorspace model: %d", model);
+        Q_ASSERT(false);
+    }
+    return pc;
+}
+
 LOTColorInterpolator::LOTColorInterpolator(NSArray<LOTKeyframe *> *keyframes)
 : LOTValueInterpolator(keyframes)
 {
 }
 
-CGColorRef LOTColorInterpolator::colorForFrame(qreal frame)
+QColor LOTColorInterpolator::colorForFrame(qreal frame)
 {
     CGFloat progress = progressForFrame(frame);
     UIColor *returnColor;
@@ -28,16 +49,16 @@ CGColorRef LOTColorInterpolator::colorForFrame(qreal frame)
       returnColor = [UIColor LOT_colorByLerpingFromColor:leadingKeyframe.colorValue toColor:trailingKeyframe.colorValue amount:progress];
     }
     if (hasDelegateOverride()) {
-      return [delegate colorForFrame:frame
+      return qcolorFromCGColor([delegate colorForFrame:frame
                        startKeyframe:leadingKeyframe.keyframeTime.floatValue
                          endKeyframe:trailingKeyframe.keyframeTime.floatValue
                 interpolatedProgress:progress
                           startColor:leadingKeyframe.colorValue.CGColor
                             endColor:trailingKeyframe.colorValue.CGColor
-                        currentColor:returnColor.CGColor];
+                        currentColor:returnColor.CGColor]);
     }
 
-    return returnColor.CGColor;
+    return qcolorFromCGColor(returnColor.CGColor);
 }
 
 void LOTColorInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)

@@ -9,10 +9,19 @@
 #import <QuartzCore/QuartzCore.h>
 #import "LOTMask.h"
 
-@interface LOTMaskContainer : CALayer
+#include "qquicklottielayer.h"
 
-- (instancetype _Nonnull)initWithMasks:(NSArray<LOTMask *> * _Nonnull)masks;
+class LOTMaskNodeLayer;
 
-@property (nonatomic, strong, nullable) NSNumber *currentFrame;
+class LOTMaskContainer : public QQuickLottieLayer
+{
+public:
+    explicit LOTMaskContainer(NSArray<LOTMask *> * _Nonnull masks);
 
-@end
+    void setCurrentFrame(qreal currentFrame);
+    qreal currentFrame() const;
+
+private:
+    qreal _currentFrame = 0.0;
+    QList<QSharedPointer<LOTMaskNodeLayer>> _masks;
+};

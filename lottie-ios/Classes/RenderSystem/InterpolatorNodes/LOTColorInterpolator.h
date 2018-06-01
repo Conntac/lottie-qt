@@ -17,7 +17,7 @@ class LOTColorInterpolator : public LOTValueInterpolator
 public:
     LOTColorInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-    CGColorRef colorForFrame(qreal frame);
+    QColor colorForFrame(qreal frame);
 
 //    @property (nonatomic, weak, nullable)
     id<LOTColorValueDelegate> delegate = nil;

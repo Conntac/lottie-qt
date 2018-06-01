@@ -17,7 +17,8 @@ public:
     explicit LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray * _Nonnull contents, NSString *_Nullable keyname);
 
 //@property (nonatomic, strong, readonly)
-    CALayer * _Nonnull containerLayer;
+//    CALayer * _Nonnull containerLayer;
+    QSharedPointer<QQuickLottieLayer> containerLayer;
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator>> valueInterpolators() const override;

@@ -8,13 +8,16 @@
 
 #import "LOTAnimatorNode.h"
 
+#include "qquicklottielayer.h"
+
 class LOTRenderNode : public LOTAnimatorNode
 {
 public:
     explicit LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *_Nullable keyname);
 
 //@property (nonatomic, readonly, strong)
-    CAShapeLayer * _Nonnull outputLayer;
+//    CAShapeLayer * _Nonnull outputLayer;
+    QSharedPointer<QQuickLottieLayer> outputLayer;
 
     virtual NSDictionary *actionsForRenderLayer() const;
 

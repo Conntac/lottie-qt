@@ -30,5 +30,5 @@ private:
     QSharedPointer<LOTColorInterpolator> colorInterpolator_;
     QSharedPointer<LOTNumberInterpolator> opacityInterpolator_;
     BOOL _evenOddFillRule;
-    CALayer *centerPoint_DEBUG;
+    QSharedPointer<QQuickLottieLayer> centerPoint_DEBUG;
 };
