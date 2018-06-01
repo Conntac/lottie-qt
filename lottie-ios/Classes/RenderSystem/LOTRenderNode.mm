@@ -21,13 +21,13 @@ NSDictionary * _Nonnull LOTRenderNode::actionsForRenderLayer() const
     return @{@"path": [NSNull null]};
 }
 
-LOTBezierPath *LOTRenderNode::localPath() const
+QSharedPointer<LOTBezierPath> LOTRenderNode::localPath() const
 {
     return inputNode->localPath();
 }
 
 /// Forwards its input node's output path forwards downstream
-LOTBezierPath *LOTRenderNode::outputPath() const
+QSharedPointer<LOTBezierPath> LOTRenderNode::outputPath() const
 {
     return inputNode->outputPath();
 }

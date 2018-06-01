@@ -56,8 +56,8 @@ void LOTPolygonAnimator::performLocalUpdate()
     qreal rotation = _rotationInterpolator->floatValueForFrame(currentFrame);
     QPointF position = _positionInterpolator->pointValueForFrame(currentFrame);
 
-    LOTBezierPath *path = [[LOTBezierPath alloc] init];
-    path.cacheLengths = pathShouldCacheLengths();
+    QSharedPointer<LOTBezierPath> path = path.create();
+    path->cacheLengths = pathShouldCacheLengths();
     CGFloat currentAngle = LOT_DegreesToRadians(rotation - 90);
     CGFloat anglePerPoint = (CGFloat)((2 * M_PI) / points);
 
@@ -67,7 +67,7 @@ void LOTPolygonAnimator::performLocalUpdate()
     CGFloat previousY;
     x = (CGFloat) (outerRadius * cosf(currentAngle));
     y = (CGFloat) (outerRadius * sinf(currentAngle));
-    [path LOT_moveToPoint:QPointF(x, y)];
+    path->LOT_moveToPoint(QPointF(x, y));
     currentAngle += anglePerPoint;
 
     double numPoints = ceil(points);
@@ -90,17 +90,17 @@ void LOTPolygonAnimator::performLocalUpdate()
         CGFloat cp1y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp1Dy;
         CGFloat cp2x = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dx;
         CGFloat cp2y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dy;
-        [path LOT_addCurveToPoint:QPointF(x, y)
-                    controlPoint1:QPointF(previousX - cp1x, previousY - cp1y)
-                    controlPoint2:QPointF(x + cp2x, y + cp2y)];
+        path->LOT_addCurveToPoint(QPointF(x, y),
+                                  QPointF(previousX - cp1x, previousY - cp1y),
+                                  QPointF(x + cp2x, y + cp2y));
       } else {
-        [path LOT_addLineToPoint:QPointF(x, y)];
+        path->LOT_addLineToPoint(QPointF(x, y));
       }
 
       currentAngle += anglePerPoint;
     }
-    [path LOT_closePath];
-    [path LOT_applyTransform:CGAffineTransformMakeTranslation(position.x(), position.y())];
+    path->LOT_closePath();
+    path->LOT_applyTransform(CGAffineTransformMakeTranslation(position.x(), position.y()));
 
     setLocalPath(path);
 }

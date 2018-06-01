@@ -57,12 +57,12 @@ QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTRenderGroup::valueInterp
     return map;
 }
 
-LOTBezierPath *LOTRenderGroup::localPath() const
+QSharedPointer<LOTBezierPath> LOTRenderGroup::localPath() const
 {
     return _localPath;
 }
 
-LOTBezierPath *LOTRenderGroup::outputPath() const
+QSharedPointer<LOTBezierPath> LOTRenderGroup::outputPath() const
 {
     return _outputPath;
 }
@@ -101,18 +101,18 @@ void LOTRenderGroup::performLocalUpdate()
       containerLayer.transform = xform;
 
       CGAffineTransform appliedXform = CATransform3DGetAffineTransform(xform);
-      _localPath = [_rootNode->outputPath() copy];
-      [_localPath LOT_applyTransform:appliedXform];
+      _localPath = _rootNode->outputPath()->copy();
+      _localPath->LOT_applyTransform(appliedXform);
     } else {
-      _localPath = [_rootNode->outputPath() copy];
+      _localPath = _rootNode->outputPath()->copy();
     }
 }
 
 void LOTRenderGroup::rebuildOutputs()
 {
     if (inputNode) {
-      _outputPath = [inputNode->outputPath() copy];
-      [_outputPath LOT_appendPath:localPath()];
+      _outputPath = inputNode->outputPath()->copy();
+      _outputPath->LOT_appendPath(localPath());
     } else {
       _outputPath = localPath();
     }

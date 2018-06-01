@@ -100,7 +100,7 @@ void LOTStrokeRenderer::performLocalUpdate()
 
 void LOTStrokeRenderer::rebuildOutputs()
 {
-    outputLayer.path = inputNode->outputPath().CGPath;
+    outputLayer.path = inputNode->outputPath()->CGPath();
 }
 
 void LOTStrokeRenderer::_updateLineDashPatternsForFrame(qreal frame)

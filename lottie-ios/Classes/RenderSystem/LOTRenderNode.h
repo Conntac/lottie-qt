@@ -19,8 +19,8 @@ public:
     virtual NSDictionary *actionsForRenderLayer() const;
 
     // LOTAnimatorNode interface
-    LOTBezierPath *localPath() const override;
-    LOTBezierPath *outputPath() const override;
+    QSharedPointer<LOTBezierPath> localPath() const override;
+    QSharedPointer<LOTBezierPath> outputPath() const override;
     void performLocalUpdate() override;
     void rebuildOutputs() override;
 };

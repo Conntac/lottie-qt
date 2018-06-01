@@ -39,17 +39,17 @@
 
 - (void)updateForFrame:(NSNumber *)frame withViewBounds:(CGRect)viewBounds {
   if ([self hasUpdateForFrame:frame]) {
-    LOTBezierPath *path = _pathInterpolator->pathForFrame(frame.floatValue, false);
+    QSharedPointer<LOTBezierPath> path = _pathInterpolator->pathForFrame(frame.floatValue, false);
     
     if (self.maskNode.maskMode == LOTMaskModeSubtract) {
       CGMutablePathRef pathRef = CGPathCreateMutable();
       CGPathAddRect(pathRef, NULL, viewBounds);
-      CGPathAddPath(pathRef, NULL, path.CGPath);
+      CGPathAddPath(pathRef, NULL, path->CGPath());
       self.path = pathRef;
       self.fillRule = @"even-odd";
       CGPathRelease(pathRef);
     } else {
-      self.path = path.CGPath;
+      self.path = path->CGPath();
     }
     
     self.opacity = _opacityInterpolator->floatValueForFrame(frame.floatValue);

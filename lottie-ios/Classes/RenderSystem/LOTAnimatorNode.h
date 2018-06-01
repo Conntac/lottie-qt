@@ -44,11 +44,11 @@ public:
 
     /// This nodes path in local object space
 //@property (nonatomic, strong)
-    void setLocalPath(LOTBezierPath *localPath);
-    virtual LOTBezierPath * _Nonnull localPath() const;
+    void setLocalPath(QSharedPointer<LOTBezierPath> localPath);
+    virtual QSharedPointer<LOTBezierPath> localPath() const;
     /// The sum of all paths in the tree including this node
 //@property (nonatomic, strong)
-    virtual LOTBezierPath * _Nonnull outputPath() const;
+    virtual QSharedPointer<LOTBezierPath> outputPath() const;
 
     /// Returns true if this node needs to update its contents for the given frame. To be overwritten by subclasses.
     virtual bool needsUpdateForFrame(qreal frame);
@@ -77,7 +77,7 @@ public:
                                   LOTKeypath * _Nonnull keypath);
 
 private:
-    LOTBezierPath *_localPath = nil;
-    LOTBezierPath *_outputPath = nil;
+    QSharedPointer<LOTBezierPath> _localPath;
+    QSharedPointer<LOTBezierPath> _outputPath;
     bool _pathShouldCacheLengths = false;
 };

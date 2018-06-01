@@ -26,17 +26,17 @@ LOTAnimatorNode::~LOTAnimatorNode()
 {
 }
 
-void LOTAnimatorNode::setLocalPath(LOTBezierPath *localPath)
+void LOTAnimatorNode::setLocalPath(QSharedPointer<LOTBezierPath> localPath)
 {
     _localPath = localPath;
 }
 
-LOTBezierPath *LOTAnimatorNode::localPath() const
+QSharedPointer<LOTBezierPath> LOTAnimatorNode::localPath() const
 {
     return _localPath;
 }
 
-LOTBezierPath *LOTAnimatorNode::outputPath() const
+QSharedPointer<LOTBezierPath> LOTAnimatorNode::outputPath() const
 {
     return _outputPath;
 }
@@ -100,15 +100,15 @@ bool LOTAnimatorNode::pathShouldCacheLengths() const
 /// Performs any local content update and updates self.localPath
 void LOTAnimatorNode::performLocalUpdate()
 {
-    _localPath = [[LOTBezierPath alloc] init];
+    _localPath = _localPath.create();
 }
 
 /// Rebuilds outputs by adding localPath to inputNodes output path.
 void LOTAnimatorNode::rebuildOutputs()
 {
     if (inputNode) {
-      _outputPath = [inputNode->outputPath() copy];
-      [_outputPath LOT_appendPath:localPath()];
+      _outputPath = inputNode->outputPath()->copy();
+      _outputPath->LOT_appendPath(localPath());
     } else {
       _outputPath = localPath();
     }

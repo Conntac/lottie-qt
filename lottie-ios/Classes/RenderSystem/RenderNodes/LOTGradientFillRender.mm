@@ -128,10 +128,10 @@ void LOTGradientFillRender::performLocalUpdate()
 
 void LOTGradientFillRender::rebuildOutputs()
 {
-    QRectF frame = [inputNode->outputPath() bounds];
+    QRectF frame = inputNode->outputPath()->bounds();
     CGPoint modifiedAnchor = CGPointMake(-frame.x() / frame.width(),
                                          -frame.y() / frame.height());
-    _maskShape.path = inputNode->outputPath().CGPath;
+    _maskShape.path = inputNode->outputPath()->CGPath();
     _gradientOpacityLayer.bounds = frame.toCGRect();
     _gradientOpacityLayer.anchorPoint = modifiedAnchor;
 

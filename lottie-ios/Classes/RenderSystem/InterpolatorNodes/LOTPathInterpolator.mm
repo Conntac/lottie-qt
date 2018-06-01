@@ -14,7 +14,7 @@ LOTPathInterpolator::LOTPathInterpolator(NSArray<LOTKeyframe *> *keyframes)
 {
 }
 
-LOTBezierPath *LOTPathInterpolator::pathForFrame(qreal frame, bool cacheLengths)
+QSharedPointer<LOTBezierPath> LOTPathInterpolator::pathForFrame(qreal frame, bool cacheLengths)
 {
     CGFloat progress = progressForFrame(frame);
     if (hasDelegateOverride()) {
@@ -22,11 +22,11 @@ LOTBezierPath *LOTPathInterpolator::pathForFrame(qreal frame, bool cacheLengths)
                                              startKeyframe:leadingKeyframe.keyframeTime.floatValue
                                                endKeyframe:trailingKeyframe.keyframeTime.floatValue
                                       interpolatedProgress:progress];
-      return [LOTBezierPath pathWithCGPath:callBackPath];
+      return QSharedPointer<LOTBezierPath>::create(callBackPath);
     }
 
-    LOTBezierPath *returnPath = [[LOTBezierPath alloc] init];
-    returnPath.cacheLengths = cacheLengths;
+    QSharedPointer<LOTBezierPath> returnPath = returnPath.create();
+    returnPath->cacheLengths = cacheLengths;
     QSharedPointer<LOTBezierData> leadingData = leadingKeyframe.pathData;
     QSharedPointer<LOTBezierData> trailingData = trailingKeyframe.pathData;
     int vertexCount = leadingData ? leadingData->count() : trailingData->count();
@@ -58,16 +58,16 @@ LOTBezierPath *LOTPathInterpolator::pathForFrame(qreal frame, bool cacheLengths)
       if (i == 0) {
         startPoint = p1;
         startInTangent = cp2;
-        [returnPath LOT_moveToPoint:p1];
+        returnPath->LOT_moveToPoint(p1);
       } else {
-        [returnPath LOT_addCurveToPoint:p1 controlPoint1:cp1 controlPoint2:cp2];
+        returnPath->LOT_addCurveToPoint(p1, cp1, cp2);
       }
       cp1 = cp3;
     }
 
     if (closePath) {
-      [returnPath LOT_addCurveToPoint:startPoint controlPoint1:cp3 controlPoint2:startInTangent];
-      [returnPath LOT_closePath];
+      returnPath->LOT_addCurveToPoint(startPoint, cp3, startInTangent);
+      returnPath->LOT_closePath();
     }
 
     return returnPath;

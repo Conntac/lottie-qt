@@ -18,8 +18,8 @@ public:
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
-    LOTBezierPath *localPath() const override;
-    LOTBezierPath *outputPath() const override;
+    QSharedPointer<LOTBezierPath> localPath() const override;
+    QSharedPointer<LOTBezierPath> outputPath() const override;
     bool needsUpdateForFrame(qreal frame) override;
     bool updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode * _Nonnull inputNode)> modifier, bool forceUpdate) override;
     void performLocalUpdate() override;

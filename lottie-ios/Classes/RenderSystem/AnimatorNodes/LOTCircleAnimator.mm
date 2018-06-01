@@ -57,16 +57,16 @@ void LOTCircleAnimator::performLocalUpdate()
     CGFloat cpW = halfWidth * kLOTEllipseControlPointPercentage;
     CGFloat cpH = halfHeight * kLOTEllipseControlPointPercentage;
 
-    LOTBezierPath *path = [[LOTBezierPath alloc] init];
-    path.cacheLengths = pathShouldCacheLengths();
-    [path LOT_moveToPoint:circleQ1];
-    [path LOT_addCurveToPoint:circleQ2 controlPoint1:QPointF(circleQ1.x() + cpW, circleQ1.y()) controlPoint2:QPointF(circleQ2.x(), circleQ2.y() - cpH)];
+    QSharedPointer<LOTBezierPath> path = path.create();
+    path->cacheLengths = pathShouldCacheLengths();
+    path->LOT_moveToPoint(circleQ1);
+    path->LOT_addCurveToPoint(circleQ2, QPointF(circleQ1.x() + cpW, circleQ1.y()), QPointF(circleQ2.x(), circleQ2.y() - cpH));
 
-    [path LOT_addCurveToPoint:circleQ3 controlPoint1:QPointF(circleQ2.x(), circleQ2.y() + cpH) controlPoint2:QPointF(circleQ3.x() + cpW, circleQ3.y())];
+    path->LOT_addCurveToPoint(circleQ3, QPointF(circleQ2.x(), circleQ2.y() + cpH), QPointF(circleQ3.x() + cpW, circleQ3.y()));
 
-    [path LOT_addCurveToPoint:circleQ4 controlPoint1:QPointF(circleQ3.x() - cpW, circleQ3.y()) controlPoint2:QPointF(circleQ4.x(), circleQ4.y() + cpH)];
+    path->LOT_addCurveToPoint(circleQ4, QPointF(circleQ3.x() - cpW, circleQ3.y()), QPointF(circleQ4.x(), circleQ4.y() + cpH));
 
-    [path LOT_addCurveToPoint:circleQ1 controlPoint1:QPointF(circleQ4.x(), circleQ4.y() - cpH) controlPoint2:QPointF(circleQ1.x() - cpW, circleQ1.y())];
+    path->LOT_addCurveToPoint(circleQ1, QPointF(circleQ4.x(), circleQ4.y() - cpH), QPointF(circleQ1.x() - cpW, circleQ1.y()));
 
     setLocalPath(path);
 }

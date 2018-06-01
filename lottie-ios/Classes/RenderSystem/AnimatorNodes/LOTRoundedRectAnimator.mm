@@ -13,9 +13,9 @@
 
 #include <QSharedPointer>
 
-static void addCorner(const QPointF &cornerPoint, CGFloat radius, LOTBezierPath *path, bool clockwise)
+static void addCorner(const QPointF &cornerPoint, CGFloat radius, QSharedPointer<LOTBezierPath> path, bool clockwise)
 {
-  QPointF currentPoint = path.currentPoint;
+  QPointF currentPoint = path->currentPoint();
   
   CGFloat ellipseControlPointPercentage = 0.55228;
   
@@ -24,26 +24,26 @@ static void addCorner(const QPointF &cornerPoint, CGFloat radius, LOTBezierPath 
     if (cornerPoint.x() < currentPoint.x()) {
       // Moving west
       QPointF corner = QPointF(cornerPoint.x() + radius, currentPoint.y());
-      [path LOT_addLineToPoint:corner];
+      path->LOT_addLineToPoint(corner);
       if (radius) {
         QPointF curvePoint = clockwise ? QPointF(cornerPoint.x(), cornerPoint.y() - radius) : QPointF(cornerPoint.x(), cornerPoint.y() + radius);
         QPointF cp1 = QPointF(corner.x() - (radius * ellipseControlPointPercentage), corner.y());
         QPointF cp2 = (clockwise ?
                        QPointF(curvePoint.x(), curvePoint.y() + (radius * ellipseControlPointPercentage)) :
                        QPointF(curvePoint.x(), curvePoint.y() - (radius * ellipseControlPointPercentage)));
-        [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
+        path->LOT_addCurveToPoint(curvePoint, cp1, cp2);
       }
     } else {
       // Moving east
       QPointF corner = QPointF(cornerPoint.x() - radius, currentPoint.y());
-      [path LOT_addLineToPoint:corner];
+      path->LOT_addLineToPoint(corner);
       if (radius) {
         QPointF curvePoint = clockwise ? QPointF(cornerPoint.x(), cornerPoint.y() + radius) : QPointF(cornerPoint.x(), cornerPoint.y() - radius);
         QPointF cp1 = QPointF(corner.x() + (radius * ellipseControlPointPercentage), corner.y());
         QPointF cp2 = (clockwise ?
                        QPointF(curvePoint.x(), curvePoint.y() - (radius * ellipseControlPointPercentage)) :
                        QPointF(curvePoint.x(), curvePoint.y() + (radius * ellipseControlPointPercentage)));
-        [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
+        path->LOT_addCurveToPoint(curvePoint, cp1, cp2);
       }
     }
   } else {
@@ -51,27 +51,27 @@ static void addCorner(const QPointF &cornerPoint, CGFloat radius, LOTBezierPath 
     if (cornerPoint.y() < currentPoint.y()) {
       // Moving North
       QPointF corner = QPointF(currentPoint.x(), cornerPoint.y() + radius);
-      [path LOT_addLineToPoint:corner];
+      path->LOT_addLineToPoint(corner);
       if (radius) {
         QPointF curvePoint = clockwise ? QPointF(cornerPoint.x() + radius, cornerPoint.y()) : QPointF(cornerPoint.x() - radius, cornerPoint.y());
         QPointF cp1 = QPointF(corner.x(), corner.y()  - (radius * ellipseControlPointPercentage));
         QPointF cp2 = (clockwise ?
                        QPointF(curvePoint.x() - (radius * ellipseControlPointPercentage), curvePoint.y()) :
                        QPointF(curvePoint.x() + (radius * ellipseControlPointPercentage), curvePoint.y()));
-        [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
+        path->LOT_addCurveToPoint(curvePoint, cp1, cp2);
       }
 
     } else {
       // moving south
       QPointF corner = QPointF(currentPoint.x(), cornerPoint.y() - radius);
-      [path LOT_addLineToPoint:corner];
+      path->LOT_addLineToPoint(corner);
       if (radius) {
         QPointF curvePoint = clockwise ? QPointF(cornerPoint.x() - radius, cornerPoint.y()) : QPointF(cornerPoint.x() + radius, cornerPoint.y());
         QPointF cp1 = QPointF(corner.x(), corner.y()  + (radius * ellipseControlPointPercentage));
         QPointF cp2 = (clockwise ?
                        QPointF(curvePoint.x() + (radius * ellipseControlPointPercentage), curvePoint.y()) :
                        QPointF(curvePoint.x() - (radius * ellipseControlPointPercentage), curvePoint.y()));
-        [path LOT_addCurveToPoint:curvePoint controlPoint1:cp1 controlPoint2:cp2];
+        path->LOT_addCurveToPoint(curvePoint, cp1, cp2);
       }
     }
   }
@@ -121,12 +121,12 @@ void LOTRoundedRectAnimator::performLocalUpdate()
     CGFloat radius = MIN(MIN(halfWidth, halfHeight), cornerRadius);
     BOOL clockWise = !_reversed;
 
-    LOTBezierPath *path1 = [[LOTBezierPath alloc] init];
-    path1.cacheLengths = pathShouldCacheLengths();
+    QSharedPointer<LOTBezierPath> path1 = path1.create();
+    path1->cacheLengths = pathShouldCacheLengths();
     QPointF startPoint = (clockWise ?
                           QPointF(topRight.x(), topRight.y() + radius) :
                           QPointF(topRight.x() - radius, topRight.y()));
-    [path1 LOT_moveToPoint:startPoint];
+    path1->LOT_moveToPoint(startPoint);
     if (clockWise) {
       addCorner(bottomRight, radius, path1, clockWise);
       addCorner(bottomLeft, radius, path1, clockWise);
@@ -138,7 +138,7 @@ void LOTRoundedRectAnimator::performLocalUpdate()
       addCorner(bottomRight, radius, path1, clockWise);
       addCorner(topRight, radius, path1, clockWise);
     }
-    [path1 LOT_closePath];
+    path1->LOT_closePath();
 
     setLocalPath(path1);
 }

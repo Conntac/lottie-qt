@@ -62,8 +62,8 @@ void LOTPolystarAnimator::performLocalUpdate()
     CGFloat points = _pointsInterpolator->floatValueForFrame(currentFrame);
     CGFloat rotation = _rotationInterpolator->floatValueForFrame(currentFrame);
     QPointF position = _positionInterpolator->pointValueForFrame(currentFrame);
-    LOTBezierPath *path = [[LOTBezierPath alloc] init];
-    path.cacheLengths = pathShouldCacheLengths();
+    QSharedPointer<LOTBezierPath> path = path.create();
+    path->cacheLengths = pathShouldCacheLengths();
     CGFloat currentAngle = LOT_DegreesToRadians(rotation - 90);
     CGFloat anglePerPoint = (CGFloat)((2 * M_PI) / points);
     CGFloat halfAnglePerPoint = anglePerPoint / 2.0f;
@@ -81,12 +81,12 @@ void LOTPolystarAnimator::performLocalUpdate()
       partialPointRadius = innerRadius + partialPointAmount * (outerRadius - innerRadius);
       x = (CGFloat) (partialPointRadius * cosf(currentAngle));
       y = (CGFloat) (partialPointRadius * sinf(currentAngle));
-      [path LOT_moveToPoint:QPointF(x, y)];
+      path->LOT_moveToPoint(QPointF(x, y));
       currentAngle += anglePerPoint * partialPointAmount / 2.f;
     } else {
       x = (float) (outerRadius * cosf(currentAngle));
       y = (float) (outerRadius * sinf(currentAngle));
-      [path LOT_moveToPoint:QPointF(x, y)];
+      path->LOT_moveToPoint(QPointF(x, y));
       currentAngle += halfAnglePerPoint;
     }
 
@@ -108,7 +108,7 @@ void LOTPolystarAnimator::performLocalUpdate()
       y = (CGFloat) (radius * sinf(currentAngle));
 
       if (innerRoundness == 0 && outerRoundness == 0) {
-        [path LOT_addLineToPoint:QPointF(x, y)];
+        path->LOT_addLineToPoint(QPointF(x, y));
       } else {
         CGFloat cp1Theta = (CGFloat) (atan2f(previousY, previousX) - M_PI / 2.f);
         CGFloat cp1Dx = (CGFloat) cosf(cp1Theta);
@@ -136,15 +136,15 @@ void LOTPolystarAnimator::performLocalUpdate()
             cp2y *= partialPointAmount;
           }
         }
-        [path LOT_addCurveToPoint:QPointF(x, y)
-                    controlPoint1:QPointF(previousX - cp1x, previousY - cp1y)
-                    controlPoint2:QPointF(x + cp2x, y + cp2y)];
+        path->LOT_addCurveToPoint(QPointF(x, y),
+                                  QPointF(previousX - cp1x, previousY - cp1y),
+                                  QPointF(x + cp2x, y + cp2y));
       }
       currentAngle += dTheta;
       longSegment = !longSegment;
     }
-    [path LOT_closePath];
-    [path LOT_applyTransform:CGAffineTransformMakeTranslation(position.x(), position.y())];
+    path->LOT_closePath();
+    path->LOT_applyTransform(CGAffineTransformMakeTranslation(position.x(), position.y()));
 
     setLocalPath(path);
 }

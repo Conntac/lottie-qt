@@ -34,13 +34,13 @@ QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTTrimPathNode::valueInter
     return map;
 }
 
-LOTBezierPath *LOTTrimPathNode::localPath() const
+QSharedPointer<LOTBezierPath> LOTTrimPathNode::localPath() const
 {
     return inputNode->localPath();
 }
 
 /// Forwards its input node's output path forwards downstream
-LOTBezierPath *LOTTrimPathNode::outputPath() const
+QSharedPointer<LOTBezierPath> LOTTrimPathNode::outputPath() const
 {
     return inputNode->outputPath();
 }
@@ -67,7 +67,7 @@ bool LOTTrimPathNode::updateWithFrame(qreal frame, std::function<void(LOTAnimato
       if (dynamic_cast<LOTPathAnimator *>(inputNode) ||
           dynamic_cast<LOTCircleAnimator *>(inputNode) ||
           dynamic_cast<LOTRoundedRectAnimator *>(inputNode)) {
-        [inputNode->localPath() trimPathFromT:_startT toT:_endT offset:_offsetT];
+        inputNode->localPath()->trimPathFromT(_startT, _endT, _offsetT);
       }
       if (modifier) {
         modifier(inputNode);

@@ -18,7 +18,7 @@ class LOTPathInterpolator : public LOTValueInterpolator
 public:
     LOTPathInterpolator(NSArray <LOTKeyframe *> *keyframes);
 
-    LOTBezierPath *pathForFrame(qreal frame, bool cacheLengths);
+    QSharedPointer<LOTBezierPath> pathForFrame(qreal frame, bool cacheLengths);
 
 //@property (nonatomic, weak, nullable)
     id<LOTPathValueDelegate> delegate = nil;

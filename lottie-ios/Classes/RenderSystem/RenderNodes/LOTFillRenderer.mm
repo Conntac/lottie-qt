@@ -59,5 +59,5 @@ void LOTFillRenderer::performLocalUpdate()
 
 void LOTFillRenderer::rebuildOutputs()
 {
-    outputLayer.path = inputNode->outputPath().CGPath;
+    outputLayer.path = inputNode->outputPath()->CGPath();
 }
