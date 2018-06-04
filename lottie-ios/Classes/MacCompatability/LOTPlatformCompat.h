@@ -21,7 +21,6 @@
 #import "UIColor.h"
 #import "CALayer+Compat.h"
 #import "NSValue+Compat.h"
-#import "UIBezierPath.h"
 
 NS_INLINE NSString *NSStringFromCGRect(CGRect rect) {
     return NSStringFromRect(rect);

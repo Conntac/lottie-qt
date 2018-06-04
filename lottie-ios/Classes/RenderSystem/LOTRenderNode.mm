@@ -8,7 +8,7 @@
 
 #import "LOTRenderNode.h"
 
-LOTRenderNode::LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *keyname)
+LOTRenderNode::LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, const QString &keyname)
 : LOTAnimatorNode(inputNode, keyname)
 {
 //    outputLayer = [CAShapeLayer new];

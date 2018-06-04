@@ -57,7 +57,7 @@ LOTLayerContainer::LOTLayerContainer(LOTLayer *layer, LOTLayerGroup *layerGroup)
     if (ENABLE_DEBUG_SHAPES) {
       wrapperLayer->addSublayer(DEBUG_Center);
     }
-    actions = QVariantMap{{"hidden", QVariant()}, {"opacity", QVariant()}, {"transform", QVariant()}};
+    actions = {{"hidden", QVariant()}, {"opacity", QVariant()}, {"transform", QVariant()}};
     wrapperLayer->actions = actions;
     timeStretchFactor = 1.0;
     commonInitializeWith(layer, layerGroup);
@@ -92,7 +92,7 @@ void LOTLayerContainer::displayWithFrame(qreal frame)
 void LOTLayerContainer::displayWithFrame(qreal frame, bool forceUpdate)
 {
     qreal newFrame = frame / timeStretchFactor;
-    if (ENABLE_DEBUG_LOGGING) NSLog(@"View %@ Displaying Frame %d, with local time %d", this, frame, newFrame);
+    if (ENABLE_DEBUG_LOGGING) NSLog(@"View %ld Displaying Frame %f, with local time %f", this, frame, newFrame);
     BOOL hidden = NO;
     if (_inFrame && _outFrame) {
       hidden = (frame < _inFrame.floatValue ||
@@ -112,49 +112,51 @@ void LOTLayerContainer::displayWithFrame(qreal frame, bool forceUpdate)
       _contentsGroup->updateWithFrame(newFrame, nullptr, forceUpdate);
     }
 
-    _maskLayer->setCurrentFrame(newFrame);
+    if (_maskLayer) {
+        _maskLayer->setCurrentFrame(newFrame);
+    }
 }
 
 void LOTLayerContainer::searchNodesForKeypath(LOTKeypath *keypath)
 {
-    if (_contentsGroup == nil && [keypath pushKey:layerName]) {
+    if (_contentsGroup == nil && keypath->pushKey(layerName)) {
       // Matches self.
-      if ([keypath pushKey:@"Transform"]) {
+      if (keypath->pushKey("Transform")) {
         // Is a transform node, check interpolators
-        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators[QString::fromNSString(keypath.currentKey)];
+        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators[keypath->currentKey()];
         if (interpolator) {
           // We have a match!
-          [keypath pushKey:keypath.currentKey];
-//          [keypath addSearchResultForCurrentPath:_wrapperLayer];
-          [keypath popKey];
+          keypath->pushKey(keypath->currentKey());
+          keypath->addSearchResultForCurrentPath(wrapperLayer);
+          keypath->popKey();
         }
-        if (keypath.endOfKeypath) {
-//          [keypath addSearchResultForCurrentPath:_wrapperLayer];
+        if (keypath->endOfKeypath()) {
+          keypath->addSearchResultForCurrentPath(wrapperLayer);
         }
-        [keypath popKey];
+        keypath->popKey();
       }
-      if (keypath.endOfKeypath) {
-//        [keypath addSearchResultForCurrentPath:_wrapperLayer];
+      if (keypath->endOfKeypath()) {
+        keypath->addSearchResultForCurrentPath(wrapperLayer);
       }
-      [keypath popKey];
+      keypath->popKey();
     }
     _contentsGroup->searchNodesForKeypath(keypath);
 }
 
 void LOTLayerContainer::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
 {
-    if ([keypath pushKey:layerName]) {
+    if (keypath->pushKey(layerName)) {
       // Matches self.
-      if ([keypath pushKey:@"Transform"]) {
+      if (keypath->pushKey("Transform")) {
         // Is a transform node, check interpolators
-        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators[QString::fromNSString(keypath.currentKey)];
+        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators[keypath->currentKey()];
         if (interpolator) {
           // We have a match!
           interpolator->setValueDelegate(delegate);
         }
-        [keypath popKey];
+        keypath->popKey();
       }
-      [keypath popKey];
+      keypath->popKey();
     }
     _contentsGroup->setValueDelegate(delegate, keypath);
 }

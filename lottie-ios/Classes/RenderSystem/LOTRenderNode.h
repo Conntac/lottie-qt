@@ -13,7 +13,7 @@
 class LOTRenderNode : public LOTAnimatorNode
 {
 public:
-    explicit LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *_Nullable keyname);
+    explicit LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, const QString &keyname);
 
 //@property (nonatomic, readonly, strong)
 //    CAShapeLayer * _Nonnull outputLayer;

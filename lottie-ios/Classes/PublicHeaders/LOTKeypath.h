@@ -6,9 +6,15 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#include "lotbase.h"
 
-extern NSString * _Nonnull const kLOTKeypathEnd;
+#include <QString>
+#include <QStringList>
+#include <QMap>
+#include <QVariant>
+#include <QSharedPointer>
+
+extern const QString kLOTKeypathEnd;
 
 /*!
  @brief LOTKeypath is an object that describes a keypath search for nodes in the animation JSON. LOTKeypath matches views inside of LOTAnimationView to their After Effects counterparts.
@@ -29,8 +35,9 @@ extern NSString * _Nonnull const kLOTKeypathEnd;
 
  */
 
-@interface LOTKeypath : NSObject
-
+class LOTKeypath
+{
+public:
 /*!
  @brief Creates a LOTKeypath from a dot separated string, can use wildcards @"*" and fuzzy depth wild cards @"**".
 
@@ -44,8 +51,7 @@ extern NSString * _Nonnull const kLOTKeypathEnd;
 
  @return A new LOTKeypath
  */
-
-+ (nonnull LOTKeypath *)keypathWithString:(nonnull NSString *)keypath;
+    LOTKeypath(const QString &keypath);
 
 /*!
  @brief Creates a LOTKeypath from a list of keypath string objects, can use wildcards @"*" and fuzzy depth wild cards @"**".
@@ -61,23 +67,39 @@ extern NSString * _Nonnull const kLOTKeypathEnd;
  @return A new LOTKeypath
  */
 
-+ (nonnull LOTKeypath *)keypathWithKeys:(nonnull NSString *)firstKey, ...
-  NS_REQUIRES_NIL_TERMINATION;
+    LOTKeypath(const QStringList &keypaths);
+    ~LOTKeypath();
 
-@property (nonatomic, readonly, nonnull) NSString *absoluteKeypath;
-@property (nonatomic, readonly, nonnull) NSString *currentKey;
-@property (nonatomic, readonly, nonnull) NSString *currentKeyPath;
+//@property (nonatomic, readonly, nonnull)
+    QString absoluteKeypath() const;
+//@property (nonatomic, readonly, nonnull)
+    QString currentKey() const;
+//@property (nonatomic, readonly, nonnull)
+    QString currentKeyPath() const;
 
-@property (nonatomic, readonly, nonnull) NSDictionary *searchResults;
+//@property (nonatomic, readonly, nonnull)
+    QMap<QString, QSharedPointer<LOTBase>> searchResults() const;
 
-@property (nonatomic, readonly) BOOL hasFuzzyWildcard;
-@property (nonatomic, readonly) BOOL hasWildcard;
-@property (nonatomic, readonly) BOOL endOfKeypath;
+//@property (nonatomic, readonly)
+    bool hasFuzzyWildcard() const;
+//@property (nonatomic, readonly)
+    bool hasWildcard() const;
+//@property (nonatomic, readonly)
+    bool endOfKeypath() const;
 
-- (BOOL)pushKey:(nonnull NSString *)key;
-- (void)popKey;
-- (void)popToRootKey;
+    bool pushKey(const QString &key);
+    void popKey();
+    void popToRootKey();
 
-- (void)addSearchResultForCurrentPath:(id _Nonnull)result;
+    void addSearchResultForCurrentPath(const QSharedPointer<LOTBase> &result);
 
-@end
+private:
+    void initWithKeys(const QStringList &keys);
+
+    QString _absoluteKeypath;
+    int _currentDepth;
+    QList<int> _fuzzyDepthStack;
+    QStringList _currentStack;
+    QStringList _keys;
+    QMap<QString, QSharedPointer<LOTBase>> _searchResults;
+};

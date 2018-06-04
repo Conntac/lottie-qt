@@ -33,7 +33,7 @@ public:
     explicit LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer);
 
 //    @property (nonatomic, readonly, strong, nullable)
-    NSString *layerName = nil;
+    QString layerName;
 //    @property (nonatomic, nullable)
     qreal currentFrame = 0.0;
 //    @property (nonatomic, readonly, nonnull)

@@ -16,7 +16,7 @@ Q_LOGGING_CATEGORY(logAnimatorNode, "lottie.animator_node")
 
 NSInteger indentation_level = 0;
 
-LOTAnimatorNode::LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *keyname)
+LOTAnimatorNode::LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, const QString &keyname)
 : inputNode(inputNode)
 , keyname(keyname)
 {
@@ -58,10 +58,10 @@ bool LOTAnimatorNode::updateWithFrame(qreal frame, std::function<void(LOTAnimato
     if (currentFrame == frame && !forceUpdate) {
       return NO;
     }
-    if (ENABLE_DEBUG_LOGGING) logString([NSString stringWithFormat:@"%lu %@ Checking for update", (unsigned long)this, keyname]);
+    if (ENABLE_DEBUG_LOGGING) qCDebug(logAnimatorNode) << (quint64)this << keyname << "Checking for update";
     BOOL localUpdate = needsUpdateForFrame(frame) || forceUpdate;
     if (localUpdate && ENABLE_DEBUG_LOGGING) {
-      logString([NSString stringWithFormat:@"%lu %@ Performing update", (unsigned long)this, keyname]);
+      logString([NSString stringWithFormat:@"%lu %@ Performing update", (unsigned long)this, keyname.toNSString()]);
     }
     bool inputUpdated = inputNode ? inputNode->updateWithFrame(frame, modifier, forceUpdate) : false;
     currentFrame = frame;
@@ -122,31 +122,31 @@ void LOTAnimatorNode::logString(NSString *string)
 void LOTAnimatorNode::searchNodesForKeypath(LOTKeypath *keypath)
 {
     inputNode->searchNodesForKeypath(keypath);
-    if ([keypath pushKey:keyname]) {
+    if (keypath->pushKey(keyname)) {
       // Matches self. Check interpolators
-      if (keypath.endOfKeypath) {
+      if (keypath->endOfKeypath()) {
         // Add self
 //        [keypath addSearchResultForCurrentPath:this];
-      } else if (valueInterpolators()[QString::fromNSString(keypath.currentKey)] != nil) {
-        [keypath pushKey:keypath.currentKey];
+      } else if (valueInterpolators()[keypath->currentKey()]) {
+        keypath->pushKey(keypath->currentKey());
         // We have a match!
 //        [keypath addSearchResultForCurrentPath:this];
-        [keypath popKey];
+        keypath->popKey();
       }
-      [keypath popKey];
+      keypath->popKey();
     }
 }
 
 void LOTAnimatorNode::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
 {
-    if ([keypath pushKey:keyname]) {
+    if (keypath->pushKey(keyname)) {
       // Matches self. Check interpolators
-      QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators()[QString::fromNSString(keypath.currentKey)];
+      QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators()[keypath->currentKey()];
       if (interpolator) {
         // We have a match!
         interpolator->setValueDelegate(delegate);
       }
-      [keypath popKey];
+      keypath->popKey();
     }
     inputNode->setValueDelegate(delegate, keypath);
 }

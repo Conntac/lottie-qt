@@ -25,20 +25,20 @@ LOTRepeaterRenderer::LOTRepeaterRenderer(const QSharedPointer<LOTAnimatorNode> &
     _startOpacityInterpolator = _startOpacityInterpolator.create(repeater.startOpacity.keyframes);
     _endOpacityInterpolator = _endOpacityInterpolator.create(repeater.endOpacity.keyframes);
 
-    _instanceLayer = [CALayer layer];
+    _instanceLayer = _instanceLayer.create();
     recursivelyAddChildLayers(inputNode);
 
-    _replicatorLayer = [CAReplicatorLayer layer];
-    _replicatorLayer.actions = @{@"instanceCount" : [NSNull null],
-                                 @"instanceTransform" : [NSNull null],
-                                 @"instanceAlphaOffset" : [NSNull null]};
-    [_replicatorLayer addSublayer:_instanceLayer];
-    [outputLayer addSublayer:_replicatorLayer];
+    _replicatorLayer = _replicatorLayer.create();
+    _replicatorLayer->actions = {{"instanceCount", QVariantMap()},
+                                 {"instanceTransform", QVariantMap()},
+                                 {"instanceAlphaOffset", QVariantMap()}};
+    _replicatorLayer->addSublayer(_instanceLayer);
+    outputLayer->addSublayer(_replicatorLayer);
 
-    centerPoint_DEBUG = [CALayer layer];
-    centerPoint_DEBUG.bounds = CGRectMake(0, 0, 20, 20);
+    centerPoint_DEBUG = centerPoint_DEBUG.create();
+    centerPoint_DEBUG->bounds = QRectF(0, 0, 20, 20);
     if (ENABLE_DEBUG_SHAPES) {
-      [outputLayer addSublayer:centerPoint_DEBUG];
+      outputLayer->addSublayer(centerPoint_DEBUG);
     }
 }
 
@@ -68,25 +68,25 @@ bool LOTRepeaterRenderer::needsUpdateForFrame(qreal frame)
 
 void LOTRepeaterRenderer::performLocalUpdate()
 {
-    centerPoint_DEBUG.backgroundColor =  [UIColor greenColor].CGColor;
-    centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
-    centerPoint_DEBUG.borderWidth = 2.f;
+    centerPoint_DEBUG->backgroundColor = QColor(Qt::green);
+    centerPoint_DEBUG->borderColor = QColor(Qt::lightGray);
+    centerPoint_DEBUG->borderWidth = 2.f;
 
     CGFloat copies = ceilf(_copiesInterpolator->floatValueForFrame(currentFrame));
-    _replicatorLayer.instanceCount = (NSInteger)copies;
-    _replicatorLayer.instanceTransform = _transformInterpolator->transformForFrame(currentFrame);
+    _replicatorLayer->instanceCount = (NSInteger)copies;
+    _replicatorLayer->instanceTransform = _transformInterpolator->transformForFrame(currentFrame);
     CGFloat startOpacity = _startOpacityInterpolator->floatValueForFrame(currentFrame);
     CGFloat endOpacity = _endOpacityInterpolator->floatValueForFrame(currentFrame);
     CGFloat opacityStep = (endOpacity - startOpacity) / copies;
-    _instanceLayer.opacity = startOpacity;
-    _replicatorLayer.instanceAlphaOffset = opacityStep;
+    _instanceLayer->opacity = startOpacity;
+    _replicatorLayer->instanceAlphaOffset = opacityStep;
 }
 
 void LOTRepeaterRenderer::recursivelyAddChildLayers(const QSharedPointer<LOTAnimatorNode> &node)
 {
     QSharedPointer<LOTRenderNode> renderNode = node.dynamicCast<LOTRenderNode>();
     if (renderNode) {
-      [_instanceLayer addSublayer:renderNode->outputLayer];
+      _instanceLayer->addSublayer(renderNode->outputLayer);
     }
     if (!node.dynamicCast<LOTRepeaterRenderer>() &&
         node->inputNode) {

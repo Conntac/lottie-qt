@@ -22,7 +22,7 @@
 - (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
   
   if (jsonDictionary[@"nm"] ) {
-    _keyname = [jsonDictionary[@"nm"] copy];
+    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
   }
   
   NSDictionary *color = jsonDictionary[@"c"];

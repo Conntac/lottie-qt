@@ -8,133 +8,126 @@
 
 #import "LOTKeypath.h"
 
-NSString *const kLOTKeypathEnd = @"LOTENDKEYPATH";
+const QString kLOTKeypathEnd = "LOTENDKEYPATH";
 
-@implementation LOTKeypath {
-  NSInteger _currentDepth;
-  NSMutableArray<NSNumber *> *_fuzzyDepthStack;
-  NSMutableArray *_currentStack;
-  NSArray *_keys;
-  NSMutableDictionary *_searchResults;
+LOTKeypath::LOTKeypath(const QString &keypath)
+{
+    initWithKeys(keypath.split('.'));
 }
 
-+ (nonnull LOTKeypath *)keypathWithString:(nonnull NSString *)keypath {
-  return [[self alloc] initWithKeys:[keypath componentsSeparatedByString:@"."]];
+LOTKeypath::LOTKeypath(const QStringList &keypath)
+{
+    initWithKeys(keypath);
 }
 
-+ (nonnull LOTKeypath *)keypathWithKeys:(nonnull NSString *)firstKey, ... {
-  NSMutableArray *keys = [NSMutableArray array];
-  va_list args;
-  va_start(args, firstKey);
-  for (NSString *arg = firstKey; arg != nil; arg = va_arg(args, NSString*))
-  {
-    [keys addObject:arg];
-  }
-  va_end(args);
-  return [[self alloc] initWithKeys:keys];
+LOTKeypath::~LOTKeypath()
+{
 }
 
-- (instancetype)initWithKeys:(NSArray *)keys {
-  self = [super init];
-  if (self) {
-    _keys = [NSArray arrayWithArray:keys];
-    NSMutableString *absolutePath = [NSMutableString string];
-    for (int i = 0; i < _keys.count; i++) {
-      if (i > 0) {
-        [absolutePath appendString:@"."];
+QString LOTKeypath::absoluteKeypath() const
+{
+    return _absoluteKeypath;
+}
+
+QString LOTKeypath::currentKey() const
+{
+    if (_currentDepth == _keys.size()) {
+      return kLOTKeypathEnd;
+    }
+    return _keys[_currentDepth];
+}
+
+QString LOTKeypath::currentKeyPath() const
+{
+    return _currentStack.join('.');
+}
+
+QMap<QString, QSharedPointer<LOTBase> > LOTKeypath::searchResults() const
+{
+    return _searchResults;
+}
+
+bool LOTKeypath::hasFuzzyWildcard() const
+{
+    if (_currentDepth == 0 ||
+        _currentDepth > _keys.size()) {
+      return false;
+    }
+    return _keys[_currentDepth - 1] == "**";
+}
+
+bool LOTKeypath::hasWildcard() const
+{
+    if (_currentDepth == _keys.size()) {
+      return false;
+    }
+    return (_keys[_currentDepth] == "**" ||
+            _keys[_currentDepth] == "*");
+}
+
+bool LOTKeypath::endOfKeypath() const
+{
+    return (_currentDepth == _keys.size());
+}
+
+bool LOTKeypath::pushKey(const QString &key)
+{
+    if (_currentDepth == _keys.size() &&
+        hasFuzzyWildcard() == false) {
+      return false;
+    }
+    QString current = currentKey();
+    if (hasWildcard() ||
+      current == key) {
+      _currentStack.append(key);
+      _currentDepth ++;
+      if (hasFuzzyWildcard()) {
+        _fuzzyDepthStack.append(_currentDepth);
       }
-      [absolutePath appendString:_keys[i]];
+      return true;
+    } else if (hasFuzzyWildcard()) {
+      _currentStack.append(key);
+      return true;
     }
-    _currentStack = [NSMutableArray array];
-    _absoluteKeypath = absolutePath;
-    _currentDepth = 0;
-    _fuzzyDepthStack = [NSMutableArray array];
-    _searchResults = [NSMutableDictionary dictionary];
-  }
-  return self;
+    return false;
 }
 
-- (BOOL)pushKey:(nonnull NSString *)key {
-  if (_currentDepth == _keys.count &&
-      self.hasFuzzyWildcard == NO) {
-    return NO;
-  }
-  NSString *current = self.currentKey;
-  if (self.hasWildcard ||
-      [current isEqualToString:key]) {
-    [_currentStack addObject:[key copy]];
-    _currentDepth ++;
-    if (self.hasFuzzyWildcard) {
-      [_fuzzyDepthStack addObject:@(_currentDepth)];
-    }
-    return YES;
-  } else if (self.hasFuzzyWildcard) {
-    [_currentStack addObject:[key copy]];
-    return YES;
-  }
-  return NO;
-}
-
-- (void)popKey {
-  if (_currentDepth == 0) {
-    return;
-  }
-  NSInteger stackCount = _currentStack.count;
-  [_currentStack removeLastObject];
-
-  if (self.hasFuzzyWildcard ) {
-    if (stackCount == _fuzzyDepthStack.lastObject.integerValue) {
-      [_fuzzyDepthStack removeLastObject];
-    } else {
+void LOTKeypath::popKey()
+{
+    if (_currentDepth == 0) {
       return;
     }
-  }
-  _currentDepth --;
+    int stackCount = _currentStack.size();
+    _currentStack.removeLast();
+
+    if (hasFuzzyWildcard()) {
+      if (stackCount == _fuzzyDepthStack.last()) {
+          _fuzzyDepthStack.removeLast();
+      } else {
+        return;
+      }
+    }
+    _currentDepth --;
 }
 
-- (void)popToRootKey {
-  _currentDepth = 0;
-  [_currentStack removeAllObjects];
-  [_fuzzyDepthStack removeAllObjects];
+void LOTKeypath::popToRootKey()
+{
+    _currentDepth = 0;
+    _currentStack.clear();
+    _fuzzyDepthStack.clear();
 }
 
-- (NSString *)currentKey {
-  if (_currentDepth == _keys.count) {
-    return kLOTKeypathEnd;
-  }
-  return _keys[_currentDepth];
+void LOTKeypath::addSearchResultForCurrentPath(const QSharedPointer<LOTBase> &result)
+{
+    _searchResults.insert(currentKeyPath(), result);
 }
 
-- (NSString *)currentKeyPath {
-  return [_currentStack componentsJoinedByString:@"."];
+void LOTKeypath::initWithKeys(const QStringList &keys)
+{
+    _keys = keys;
+    _currentStack.clear();
+    _absoluteKeypath = keys.join('.');
+    _currentDepth = 0;
+    _fuzzyDepthStack.clear();
+    _searchResults.clear();
 }
-
-- (BOOL)hasWildcard {
-  if (_currentDepth == _keys.count) {
-    return NO;
-  }
-  return ([_keys[_currentDepth] isEqualToString:@"**"] ||
-          [_keys[_currentDepth] isEqualToString:@"*"]);
-}
-
-- (BOOL)hasFuzzyWildcard {
-  if (_currentDepth == 0 ||
-      _currentDepth > _keys.count) {
-    return NO;
-  }
-  return [_keys[_currentDepth - 1] isEqualToString:@"**"];
-}
-
-- (BOOL)endOfKeypath {
-  return (_currentDepth == _keys.count);
-}
-
-- (void)addSearchResultForCurrentPath:(id _Nonnull)result {
-  [_searchResults setObject:result forKey:self.currentKeyPath];
-}
-
-- (NSDictionary *)searchResults {
-  return _searchResults;
-}
-
-@end

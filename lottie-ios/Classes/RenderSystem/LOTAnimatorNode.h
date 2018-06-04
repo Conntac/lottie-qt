@@ -20,11 +20,11 @@ class LOTValueInterpolator;
 
 extern NSInteger indentation_level;
 
-class LOTAnimatorNode
+class LOTAnimatorNode : public LOTBase
 {
 public:
     /// Initializes the node with and optional input node and keyname.
-    explicit LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, NSString *_Nullable keyname);
+    explicit LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, const QString &keyname);
     virtual ~LOTAnimatorNode();
 
     /// A dictionary of the value interpolators this node controls
@@ -33,7 +33,7 @@ public:
 
     /// The keyname of the node. Used for dynamically setting keyframe data.
 //@property (nonatomic, readonly, strong)
-    NSString * _Nullable keyname = nil;
+    QString keyname;
 
     /// The current time in frames
 //@property (nonatomic, readonly, strong)

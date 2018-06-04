@@ -13,7 +13,7 @@
 
 - (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
 
-@property (nonatomic, readonly) NSString *keyname;
+@property (nonatomic, readonly) QString keyname;
 @property (nonatomic, readonly) LOTKeyframeGroup *position;
 @property (nonatomic, readonly) LOTKeyframeGroup *size;
 @property (nonatomic, readonly) LOTKeyframeGroup *cornerRadius;

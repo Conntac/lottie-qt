@@ -14,7 +14,7 @@ class LOTTransformInterpolator;
 class LOTRenderGroup : public LOTRenderNode
 {
 public:
-    explicit LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray * _Nonnull contents, NSString *_Nullable keyname);
+    explicit LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray * _Nonnull contents, const QString &keyname);
 
 //@property (nonatomic, strong, readonly)
 //    CALayer * _Nonnull containerLayer;

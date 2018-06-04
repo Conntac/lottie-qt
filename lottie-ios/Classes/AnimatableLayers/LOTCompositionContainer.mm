@@ -17,6 +17,9 @@
 #import "LOTNumberInterpolator.h"
 
 #include <QSharedPointer>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(logCompositionContainer, "lottie.composition_container")
 
 LOTCompositionContainer::LOTCompositionContainer(LOTLayer *layer, LOTLayerGroup *layerGroup, LOTLayerGroup *childLayerGroup, LOTAssetGroup *assetGroup)
 : LOTLayerContainer(layer, layerGroup)
@@ -43,14 +46,19 @@ LOTCompositionContainer::LOTCompositionContainer(LOTLayer *layer, LOTLayerGroup 
     initializeWithChildGroup(childLayerGroup, assetGroup);
 }
 
-NSArray *LOTCompositionContainer::keysForKeyPath(LOTKeypath *keypath)
+QStringList LOTCompositionContainer::keysForKeyPath(LOTKeypath *keypath)
 {
-    if (_keypathCache == nil) {
-      _keypathCache = [NSMutableDictionary dictionary];
-    }
+//    if (_keypathCache == nil) {
+//      _keypathCache = [NSMutableDictionary dictionary];
+//    }
     searchNodesForKeypath(keypath);
-    [_keypathCache addEntriesFromDictionary:keypath.searchResults];
-    return keypath.searchResults.allKeys;
+    QMapIterator<QString, QSharedPointer<LOTBase>> iter(keypath->searchResults());
+    while (iter.hasNext()) {
+        iter.next();
+
+        _keypathCache.insert(iter.key(), iter.value());
+    }
+    return keypath->searchResults().keys();
 }
 
 CGPoint LOTCompositionContainer::convertPointToKeypathLayer(CGPoint point, LOTKeypath *keypath, CALayer *parent)
@@ -162,8 +170,8 @@ void LOTCompositionContainer::initializeWithChildGroup(LOTLayerGroup *childGroup
         wrapperLayer->addSublayer(child);
       }
       children.append(child);
-      if (child->layerName) {
-        childMap.insert(QString::fromNSString(child->layerName), child);
+      if (!child->layerName.isNull()) {
+        childMap.insert(child->layerName, child);
       }
     }
     this->childMap = childMap;
@@ -172,13 +180,13 @@ void LOTCompositionContainer::initializeWithChildGroup(LOTLayerGroup *childGroup
 
 CALayer *LOTCompositionContainer::_layerForKeypath(LOTKeypath *keypath)
 {
-    id node = _keypathCache[keypath.absoluteKeypath];
+    auto node = _keypathCache[keypath->absoluteKeypath()];
     if (node == nil) {
       keysForKeyPath(keypath);
-      node = _keypathCache[keypath.absoluteKeypath];
+      node = _keypathCache[keypath->absoluteKeypath()];
     }
     if (node == nil) {
-      NSLog(@"LOTComposition could not find layer for keypath:%@", keypath.absoluteKeypath);
+      qCDebug(logCompositionContainer) << "LOTComposition could not find layer for keypath:" << keypath->absoluteKeypath();
       return nil;
     }
   //  if ([node isKindOfClass:[CALayer class]]) {
@@ -202,12 +210,12 @@ void LOTCompositionContainer::searchNodesForKeypath(LOTKeypath *keypath)
       LOTLayerContainer::searchNodesForKeypath(keypath);
     }
     if (layerName == nil ||
-        [keypath pushKey:layerName]) {
+        keypath->pushKey(layerName)) {
       for (auto child : childLayers) {
         child->searchNodesForKeypath(keypath);
       }
       if (layerName != nil) {
-        [keypath popKey];
+        keypath->popKey();
       }
     }
 }
@@ -218,12 +226,12 @@ void LOTCompositionContainer::setValueDelegate(id<LOTValueDelegate> delegate, LO
       LOTLayerContainer::setValueDelegate(delegate, keypath);
     }
     if (layerName == nil ||
-        [keypath pushKey:layerName]) {
+        keypath->pushKey(layerName)) {
       for (auto child : childLayers) {
         child->setValueDelegate(delegate, keypath);
       }
       if (layerName != nil) {
-        [keypath popKey];
+        keypath->popKey();
       }
     }
 }

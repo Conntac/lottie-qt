@@ -33,7 +33,7 @@
       withAssetGroup:(LOTAssetGroup *)assetGroup
        withFramerate:(NSNumber *)framerate {
 
-  _layerName = [jsonDictionary[@"nm"] copy];
+  _layerName = QString::fromNSString([jsonDictionary[@"nm"] copy]);
   _layerID = [jsonDictionary[@"ind"] copy];
   
   NSNumber *layerType = jsonDictionary[@"ty"];
@@ -175,7 +175,7 @@
 
 - (NSString *)description {
     NSMutableString *text = [[super description] mutableCopy];
-    [text appendFormat:@" %@ id: %d pid: %d frames: %d-%d", _layerName, (int)_layerID.integerValue, (int)_parentID.integerValue,
+    [text appendFormat:@" %@ id: %d pid: %d frames: %d-%d", _layerName.toNSString(), (int)_layerID.integerValue, (int)_parentID.integerValue,
      (int)_inFrame.integerValue, (int)_outFrame.integerValue];
     return text;
 }

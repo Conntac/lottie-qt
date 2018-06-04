@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
 
-@property (nonatomic, readonly) NSString *keyname;
+@property (nonatomic, readonly) QString keyname;
 @property (nonatomic, readonly, nullable) LOTKeyframeGroup *copies;
 @property (nonatomic, readonly, nullable) LOTKeyframeGroup *offset;
 @property (nonatomic, readonly, nullable) LOTKeyframeGroup *anchorPoint;

@@ -10,6 +10,8 @@
 #import "LOTPlatformCompat.h"
 #import "LOTKeyframe.h"
 
+#include <QString>
+
 @class LOTShapeGroup;
 @class LOTMask;
 @class LOTAsset;
@@ -39,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
               withAssetGroup:(LOTAssetGroup * _Nullable)assetGroup
                withFramerate:(NSNumber *)framerate;
 
-@property (nonatomic, readonly) NSString *layerName;
+@property (nonatomic, readonly) QString layerName;
 @property (nonatomic, readonly, nullable) NSString *referenceID;
 @property (nonatomic, readonly) NSNumber *layerID;
 @property (nonatomic, readonly) LOTLayerType layerType;

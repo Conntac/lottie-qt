@@ -31,7 +31,7 @@ private:
     QSharedPointer<LOTNumberInterpolator> _startOpacityInterpolator;
     QSharedPointer<LOTNumberInterpolator> _endOpacityInterpolator;
 
-    CALayer *_instanceLayer;
-    CAReplicatorLayer *_replicatorLayer;
-    CALayer *centerPoint_DEBUG;
+    QSharedPointer<QQuickLottieLayer> _instanceLayer;
+    QSharedPointer<QQuickLottieReplicatorLayer> _replicatorLayer;
+    QSharedPointer<QQuickLottieLayer> centerPoint_DEBUG;
 };

@@ -20,7 +20,7 @@ typedef enum : NSUInteger {
 
 - (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
 
-@property (nonatomic, readonly) NSString *keyname;
+@property (nonatomic, readonly) QString keyname;
 @property (nonatomic, readonly) NSNumber *numberOfColors;
 @property (nonatomic, readonly) LOTKeyframeGroup *startPoint;
 @property (nonatomic, readonly) LOTKeyframeGroup *endPoint;

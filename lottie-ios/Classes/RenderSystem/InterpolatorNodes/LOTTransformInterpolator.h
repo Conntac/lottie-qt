@@ -42,7 +42,7 @@ public:
     QSharedPointer<LOTNumberInterpolator> rotationInterpolator;
     QSharedPointer<LOTNumberInterpolator> positionXInterpolator;
     QSharedPointer<LOTNumberInterpolator> positionYInterpolator;
-    NSString *parentKeyName;
+    QString parentKeyName;
 
     // Functions
     QTransform transformForFrame(qreal frame);

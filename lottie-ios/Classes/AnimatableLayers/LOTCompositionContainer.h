@@ -19,7 +19,7 @@ public:
                                      LOTLayerGroup * _Nullable childLayerGroup,
                                      LOTAssetGroup * _Nullable assetGroup);
 
-    NSArray *_Nullable keysForKeyPath(LOTKeypath *_Nonnull keypath);
+    QStringList keysForKeyPath(LOTKeypath *_Nonnull keypath);
 
     CGPoint convertPointToKeypathLayer(CGPoint point,
                          LOTKeypath *_Nonnull keypath,
@@ -62,6 +62,6 @@ private:
 
     qreal _frameOffset = 0.0;
     QSharedPointer<QQuickLottieLayer> DEBUG_Center;
-    NSMutableDictionary *_keypathCache;
+    QMap<QString, QSharedPointer<LOTBase>> _keypathCache;
     QSharedPointer<LOTNumberInterpolator> _timeInterpolator;
 };

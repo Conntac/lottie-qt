@@ -68,11 +68,11 @@ public:
 //    @property (nonatomic)
     CGLineJoin lineJoinStyle;
 //    @property (nonatomic)
-    CGFloat miterLimit;
+    qreal miterLimit;
 //    @property (nonatomic)
-    CGFloat flatness;
+    qreal flatness;
 //    @property (nonatomic)
-    BOOL usesEvenOddFillRule;
+    bool usesEvenOddFillRule;
 //    @property (readonly, getter=isEmpty)
     bool isEmpty() const;
 //    @property (nonatomic, readonly)

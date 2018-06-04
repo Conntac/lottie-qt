@@ -35,7 +35,7 @@ QSharedPointer<LOTTransformInterpolator> LOTTransformInterpolator::transformForL
                                          layer.anchor.keyframes,
                                          layer.scale.keyframes);
     }
-    interpolator->parentKeyName = [layer.layerName copy];
+    interpolator->parentKeyName = layer.layerName;
     return interpolator;
 }
 

@@ -26,7 +26,7 @@
 
 #include <QSharedPointer>
 
-LOTRenderGroup::LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray *contents, NSString *keyname)
+LOTRenderGroup::LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray *contents, const QString &keyname)
 : LOTRenderNode(inputNode, keyname)
 {
 //    containerLayer = [CALayer layer];
@@ -96,13 +96,17 @@ void LOTRenderGroup::setPathShouldCacheLengths(bool pathShouldCacheLengths)
 void LOTRenderGroup::performLocalUpdate()
 {
     if (_opacityInterpolator) {
-      containerLayer.opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
+      containerLayer->opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
     }
     if (_transformInterolator) {
-      CATransform3D xform = _transformInterolator->transformForFrame(currentFrame);
-      containerLayer.transform = xform;
+      QTransform xform = _transformInterolator->transformForFrame(currentFrame);
+      containerLayer->transform = xform;
 
-      CGAffineTransform appliedXform = CATransform3DGetAffineTransform(xform);
+      Q_ASSERT(xform.isAffine());
+
+      CGAffineTransform appliedXform = {}; // = CATransform3DGetAffineTransform(xform);
+//      QTransform appliedXform = xform;
+//      Q_ASSERT(false);
       _localPath = _rootNode->outputPath()->copy();
       _localPath->LOT_applyTransform(appliedXform);
     } else {
@@ -186,49 +190,49 @@ void LOTRenderGroup::buildContents(NSArray *contents)
 void LOTRenderGroup::searchNodesForKeypath(LOTKeypath *keypath)
 {
     inputNode->searchNodesForKeypath(keypath);
-    if ([keypath pushKey:keyname]) {
+    if (keypath->pushKey(keyname)) {
       // Matches self. Dig deeper.
       // Check interpolators
 
-      if ([keypath pushKey:@"Transform"]) {
+      if (keypath->pushKey("Transform")) {
         // Matches a Transform interpolator!
-        if (valueInterpolators()[QString::fromNSString(keypath.currentKey)] != nil) {
-          [keypath pushKey:keypath.currentKey];
-//          [keypath addSearchResultForCurrentPath:this];
-          [keypath popKey];
+        if (valueInterpolators()[keypath->currentKey()]) {
+          keypath->pushKey(keypath->currentKey());
+          keypath->addSearchResultForCurrentPath(sharedFromThis());
+          keypath->popKey();
         }
-        [keypath popKey];
+        keypath->popKey();
       }
 
-      if (keypath.endOfKeypath) {
+      if (keypath->endOfKeypath()) {
         // We have a match!
-//        [keypath addSearchResultForCurrentPath:this];
+        keypath->addSearchResultForCurrentPath(sharedFromThis());
       }
       // Check child nodes
       _rootNode->searchNodesForKeypath(keypath);
-      [keypath popKey];
+      keypath->popKey();
     }
 }
 
 void LOTRenderGroup::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
 {
-    if ([keypath pushKey:keyname]) {
+    if (keypath->pushKey(keyname)) {
       // Matches self. Dig deeper.
       // Check interpolators
-      if ([keypath pushKey:@"Transform"]) {
+      if (keypath->pushKey("Transform")) {
         // Matches a Transform interpolator!
-        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators()[QString::fromNSString(keypath.currentKey)];
+        QSharedPointer<LOTValueInterpolator> interpolator = valueInterpolators()[keypath->currentKey()];
         if (interpolator) {
           // We have a match!
           interpolator->setValueDelegate(delegate);
         }
-        [keypath popKey];
+        keypath->popKey();
       }
 
       // Check child nodes
       _rootNode->setValueDelegate(delegate, keypath);
 
-      [keypath popKey];
+      keypath->popKey();
     }
 
     // Check upstream
