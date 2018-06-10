@@ -525,7 +525,7 @@ void QQuickShapeGenericRenderer::updateNode()
             Q_ASSERT(prevNode);
             *nodePtr = new QQuickShapeGenericNode;
             prevNode->m_next = *nodePtr;
-            prevNode->appendChildNode(*nodePtr);
+            m_rootNode->appendChildNode(*nodePtr);
         }
 
         QQuickShapeGenericNode *node = *nodePtr;
@@ -579,7 +579,7 @@ void QQuickShapeGenericRenderer::updateNode()
     }
 
     if (*nodePtr && prevNode) {
-        prevNode->removeChildNode(*nodePtr);
+        m_rootNode->removeChildNode(*nodePtr);
         delete *nodePtr;
         *nodePtr = nullptr;
     }
