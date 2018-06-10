@@ -230,7 +230,7 @@ void LOTLayerContainer::commonInitializeWith(LOTLayer *layer, LOTLayerGroup *lay
       buildContents(layer.shapes);
     }
     if (layer.layerType == LOTLayerTypeSolid) {
-      wrapperLayer->backgroundColor = qcolorFromCGColor(layer.solidColor.CGColor);
+      wrapperLayer->backgroundColor = layer.solidColor;
     }
     if (layer.masks.count) {
       _maskLayer = _maskLayer.create(layer.masks);

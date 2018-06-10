@@ -11,6 +11,7 @@
 #import "LOTKeyframe.h"
 
 #include <QString>
+#include <QColor>
 
 @class LOTShapeGroup;
 @class LOTMask;
@@ -57,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, nullable) NSNumber *layerWidth;
 @property (nonatomic, readonly, nullable) NSNumber *layerHeight;
-@property (nonatomic, readonly, nullable) UIColor *solidColor;
+@property (nonatomic, readonly) QColor solidColor;
 @property (nonatomic, readonly, nullable) LOTAsset *imageAsset;
 
 @property (nonatomic, readonly) LOTKeyframeGroup *opacity;

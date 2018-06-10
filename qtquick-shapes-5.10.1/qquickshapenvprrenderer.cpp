@@ -55,7 +55,17 @@ void QQuickShapeNvprRenderer::beginSync(int totalCount)
     }
 }
 
-void QQuickShapeNvprRenderer::setPath(int index, const QQuickPath *path)
+void QQuickShapeNvprRenderer::setHidden(int index, bool hidden)
+{
+    Q_ASSERT(false);
+}
+
+void QQuickShapeNvprRenderer::setOpacity(int index, qreal opacity)
+{
+    Q_ASSERT(false);
+}
+
+void QQuickShapeNvprRenderer::setPath(int index, const QQuickShapePath *path)
 {
     ShapePathGuiData &d(m_sp[index]);
     convertPath(path, &d);

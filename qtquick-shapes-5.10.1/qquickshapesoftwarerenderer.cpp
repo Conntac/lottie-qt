@@ -50,7 +50,31 @@ void QQuickShapeSoftwareRenderer::beginSync(int totalCount)
     }
 }
 
-void QQuickShapeSoftwareRenderer::setPath(int index, const QQuickPath *path)
+void QQuickShapeSoftwareRenderer::setTransform(int index, const QTransform &transform)
+{
+    ShapePathGuiData &d(m_sp[index]);
+    d.transform = transform;
+    d.dirty |= DirtyPath;
+    m_accDirty |= DirtyPath;
+}
+
+void QQuickShapeSoftwareRenderer::setHidden(int index, bool hidden)
+{
+    ShapePathGuiData &d(m_sp[index]);
+    d.hidden = hidden;
+    d.dirty |= DirtyPath;
+    m_accDirty |= DirtyPath;
+}
+
+void QQuickShapeSoftwareRenderer::setOpacity(int index, qreal opacity)
+{
+    ShapePathGuiData &d(m_sp[index]);
+    d.opacity = opacity;
+    d.dirty |= DirtyPath;
+    m_accDirty |= DirtyPath;
+}
+
+void QQuickShapeSoftwareRenderer::setPath(int index, const QQuickShapePath *path)
 {
     ShapePathGuiData &d(m_sp[index]);
     d.path = path ? path->path() : QPainterPath();
@@ -199,6 +223,10 @@ void QQuickShapeSoftwareRenderer::updateNode()
         ShapePathGuiData &src(m_sp[i]);
         QQuickShapeSoftwareRenderNode::ShapePathRenderData &dst(m_node->m_sp[i]);
 
+        dst.transform = src.transform;
+        dst.hidden = src.hidden;
+        dst.opacity = src.opacity;
+
         if (listChanged || (src.dirty & DirtyPath)) {
             dst.path = src.path;
             dst.path.setFillRule(src.fillRule);
@@ -258,9 +286,19 @@ void QQuickShapeSoftwareRenderNode::render(const RenderState *state)
     p->setOpacity(inheritedOpacity());
 
     for (const ShapePathRenderData &d : qAsConst(m_sp)) {
+        if (d.hidden) {
+            continue;
+        }
+
+//        QTransform oldTransform = p->transform();
+//        p->setTransform(d.transform, true);
+
+//        p->setOpacity(inheritedOpacity() * d.opacity);
         p->setPen(d.strokeWidth >= 0.0f && d.pen.color() != Qt::transparent ? d.pen : Qt::NoPen);
         p->setBrush(d.brush.color() != Qt::transparent ? d.brush : Qt::NoBrush);
         p->drawPath(d.path);
+
+//        p->setTransform(oldTransform);
     }
 }
 

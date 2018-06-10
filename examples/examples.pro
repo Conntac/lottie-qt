@@ -1,5 +1,4 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    lottie-qt \
-    examples
+    lottie-qml-viewer

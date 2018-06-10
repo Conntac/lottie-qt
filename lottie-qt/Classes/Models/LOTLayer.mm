@@ -70,7 +70,7 @@
     _layerWidth = jsonDictionary[@"sw"];
     _layerHeight = jsonDictionary[@"sh"];
     NSString *solidColor = jsonDictionary[@"sc"];
-    _solidColor = [UIColor LOT_colorWithHexString:solidColor];
+    _solidColor = QColor(QString::fromNSString(solidColor));
   }
   
   _layerBounds = CGRectMake(0, 0, _layerWidth.floatValue, _layerHeight.floatValue);

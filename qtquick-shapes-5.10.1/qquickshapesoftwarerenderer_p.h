@@ -72,7 +72,10 @@ public:
     };
 
     void beginSync(int totalCount) override;
-    void setPath(int index, const QQuickPath *path) override;
+    void setTransform(int index, const QTransform &transform) override;
+    void setHidden(int index, bool hidden) override;
+    void setOpacity(int index, qreal opacity) override;
+    void setPath(int index, const QQuickShapePath *path) override;
     void setStrokeColor(int index, const QColor &color) override;
     void setStrokeWidth(int index, qreal w) override;
     void setFillColor(int index, const QColor &color) override;
@@ -93,6 +96,9 @@ private:
     int m_accDirty = 0;
     struct ShapePathGuiData {
         int dirty = 0;
+        bool hidden;
+        qreal opacity;
+        QTransform transform;
         QPainterPath path;
         QPen pen;
         float strokeWidth;
@@ -119,6 +125,9 @@ private:
     QQuickShape *m_item;
 
     struct ShapePathRenderData {
+        qreal opacity;
+        QTransform transform;
+        bool hidden;
         QPainterPath path;
         QPen pen;
         float strokeWidth;

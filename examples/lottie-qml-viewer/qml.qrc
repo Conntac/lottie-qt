@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>animations/9squares-AlBoardman.json</file>
+        <file>animations/GeometryTransformTest.json</file>
+        <file>animations/LottieLogo1.json</file>
+        <file>animations/newAnimation.json</file>
+    </qresource>
+</RCC>

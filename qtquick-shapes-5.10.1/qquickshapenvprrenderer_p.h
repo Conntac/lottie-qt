@@ -80,7 +80,9 @@ public:
     };
 
     void beginSync(int totalCount) override;
-    void setPath(int index, const QQuickPath *path) override;
+    void setHidden(int index, bool hidden) override;
+    void setOpacity(int index, qreal opacity) override;
+    void setPath(int index, const QQuickShapePath *path) override;
     void setStrokeColor(int index, const QColor &color) override;
     void setStrokeWidth(int index, qreal w) override;
     void setFillColor(int index, const QColor &color) override;

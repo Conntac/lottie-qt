@@ -21,16 +21,27 @@ SHAPES_PATH = ../qtquick-shapes-5.10.1
 INCLUDEPATH += $$SHAPES_PATH
 
 HEADERS += \
-    $$SHAPES_PATH/qquickshape_p_p.h \
     $$SHAPES_PATH/qquickshape_p.h \
-    $$SHAPES_PATH/qquickshapegenericrenderer_p.h
+    $$SHAPES_PATH/qquickshape_p_p.h \
+    $$SHAPES_PATH/qquickshapegenericrenderer_p.h \
+    $$SHAPES_PATH/qquickshapesoftwarerenderer_p.h
 
 SOURCES += \
+#    $$SHAPES_PATH/plugin.cpp \
     $$SHAPES_PATH/qquickshape.cpp \
-    $$SHAPES_PATH/qquickshapegenericrenderer.cpp
+    $$SHAPES_PATH/qquickshapegenericrenderer.cpp \
+    $$SHAPES_PATH/qquickshapesoftwarerenderer.cpp
 
-RESOURCES += \
-    $$SHAPES_PATH/qtquickshapesplugin.qrc
+HEADERS += \
+    $$SHAPES_PATH/qquicknvprfunctions_p.h \
+    $$SHAPES_PATH/qquicknvprfunctions_p_p.h \
+    $$SHAPES_PATH/qquickshapenvprrenderer_p.h
+
+SOURCES += \
+    $$SHAPES_PATH/qquicknvprfunctions.cpp \
+    $$SHAPES_PATH/qquickshapenvprrenderer.cpp
+
+RESOURCES += $$SHAPES_PATH/qtquickshapesplugin.qrc
 
 # Real Lottie
 INCLUDEPATH += \
