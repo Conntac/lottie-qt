@@ -45,17 +45,18 @@ LOTStrokeRenderer::LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inpu
     _dashOffsetInterpolator = _dashOffsetInterpolator.create(stroke.dashOffset.keyframes);
   }
 
-  outputLayer->fillColor = nil;
-  outputLayer->lineCap = QString::fromNSString(stroke.capType == LOTLineCapTypeRound ? kCALineCapRound : kCALineCapButt);
+  // TODO: This might be a nil color?
+  outputLayer->setFillColor(QColor(Qt::transparent));
+  outputLayer->setCapStyle(stroke.capType == LOTLineCapTypeRound ? QQuickShapePath::RoundCap : QQuickShapePath::FlatCap);
   switch (stroke.joinType) {
     case LOTLineJoinTypeBevel:
-      outputLayer->lineJoin = QString::fromNSString(kCALineJoinBevel);
+      outputLayer->setJoinStyle(QQuickShapePath::BevelJoin);
       break;
     case LOTLineJoinTypeMiter:
-      outputLayer->lineJoin =QString::fromNSString(kCALineJoinMiter);
+      outputLayer->setJoinStyle(QQuickShapePath::MiterJoin);
       break;
     case LOTLineJoinTypeRound:
-      outputLayer->lineJoin = QString::fromNSString(kCALineJoinRound);
+      outputLayer->setJoinStyle(QQuickShapePath::RoundJoin);
       break;
     default:
       break;
@@ -94,15 +95,16 @@ bool LOTStrokeRenderer::needsUpdateForFrame(qreal frame)
 void LOTStrokeRenderer::performLocalUpdate()
 {
     outputLayer->lineDashPhase = _dashOffsetInterpolator ? _dashOffsetInterpolator->floatValueForFrame(currentFrame) : 0.0f;
-    outputLayer->strokeColor = _colorInterpolator->colorForFrame(currentFrame);
-    outputLayer->lineWidth = _widthInterpolator->floatValueForFrame(currentFrame);
-    outputLayer->opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
+    outputLayer->setStrokeColor(_colorInterpolator->colorForFrame(currentFrame));
+    outputLayer->setStrokeWidth(_widthInterpolator->floatValueForFrame(currentFrame));
+    outputLayer->setOpacity(_opacityInterpolator->floatValueForFrame(currentFrame));
 }
 
 void LOTStrokeRenderer::rebuildOutputs()
 {
-//    outputLayer->path = inputNode->outputPath()->CGPath();
-//    Q_ASSERT(false);
+    if (inputNode->outputPath()) {
+        outputLayer->setPainterPath(inputNode->outputPath()->CGPath());
+    }
 }
 
 void LOTStrokeRenderer::_updateLineDashPatternsForFrame(qreal frame)
@@ -116,7 +118,7 @@ void LOTStrokeRenderer::_updateLineDashPatternsForFrame(qreal frame)
       lineDashPatterns.append(patternValue);
     }
     if (dashTotal > 0) {
-      outputLayer->lineDashPattern = lineDashPatterns;
+      outputLayer->setDashPattern(lineDashPatterns);
     }
   }
 }

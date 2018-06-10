@@ -96,15 +96,16 @@ void LOTRenderGroup::setPathShouldCacheLengths(bool pathShouldCacheLengths)
 void LOTRenderGroup::performLocalUpdate()
 {
     if (_opacityInterpolator) {
-      containerLayer->opacity = _opacityInterpolator->floatValueForFrame(currentFrame);
+      containerLayer->setOpacity(_opacityInterpolator->floatValueForFrame(currentFrame));
     }
     if (_transformInterolator) {
       QTransform xform = _transformInterolator->transformForFrame(currentFrame);
-      containerLayer->transform = xform;
+      containerLayer->setTransform(xform);
 
       Q_ASSERT(xform.isAffine());
 
-      CGAffineTransform appliedXform = {}; // = CATransform3DGetAffineTransform(xform);
+      QTransform appliedXform = xform;
+//      CGAffineTransform appliedXform = ; // = CATransform3DGetAffineTransform(xform);
 //      QTransform appliedXform = xform;
 //      Q_ASSERT(false);
       _localPath = _rootNode->outputPath()->copy();

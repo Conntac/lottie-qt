@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+#include <QString>
+
 @class LOTLayerGroup;
 @class LOTLayer;
 @class LOTAssetGroup;
@@ -23,7 +25,7 @@
                               inBundle:(nonnull NSBundle *)bundle NS_SWIFT_NAME(init(name:bundle:));
 
 /// Loads an animation from a specific file path. WARNING Do not use a web URL for file path.
-+ (nullable instancetype)animationWithFilePath:(nonnull NSString *)filePath NS_SWIFT_NAME(init(filePath:));
++ (nullable instancetype)animationWithFilePath:(const QString&)filePath;
 
 /// Creates an animation from the deserialized JSON Dictionary
 + (nonnull instancetype)animationFromJSON:(nonnull NSDictionary *)animationJSON NS_SWIFT_NAME(init(json:));

@@ -10,7 +10,9 @@
 
 #include <QPointF>
 #include <QRectF>
+#include <QPainterPath>
 #include <QSharedPointer>
+#include <QTransform>
 #include <QEnableSharedFromThis>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -49,7 +51,7 @@ public:
 
     void trimPathFromT(qreal fromT, qreal toT, qreal offset);
 
-    void LOT_applyTransform(CGAffineTransform transform);
+    void LOT_applyTransform(const QTransform &transform);
 
 //    @property (nonatomic, assign)
     BOOL cacheLengths;
@@ -58,7 +60,7 @@ public:
     qreal length() const;
 
 //    @property (nonatomic, readonly)
-    CGPathRef CGPath() const;
+    QPainterPath CGPath() const;
 //    @property (nonatomic, readonly)
     QPointF currentPoint() const;
 //    @property (nonatomic)
@@ -101,7 +103,7 @@ private:
     qreal *_lineDashPattern;
     int _lineDashCount;
     qreal _lineDashPhase;
-    CGMutablePathRef _path;
+    QPainterPath _path;
 
     Q_DISABLE_COPY(LOTBezierPath)
 };

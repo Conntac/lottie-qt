@@ -78,7 +78,7 @@ void LOTRepeaterRenderer::performLocalUpdate()
     CGFloat startOpacity = _startOpacityInterpolator->floatValueForFrame(currentFrame);
     CGFloat endOpacity = _endOpacityInterpolator->floatValueForFrame(currentFrame);
     CGFloat opacityStep = (endOpacity - startOpacity) / copies;
-    _instanceLayer->opacity = startOpacity;
+    _instanceLayer->setOpacity(startOpacity);
     _replicatorLayer->instanceAlphaOffset = opacityStep;
 }
 

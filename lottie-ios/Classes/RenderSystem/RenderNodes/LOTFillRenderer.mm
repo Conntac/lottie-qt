@@ -25,7 +25,7 @@ LOTFillRenderer::LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNod
     }
     _evenOddFillRule = fill.evenOddFillRule;
 
-    outputLayer->fillRule = _evenOddFillRule ? "even-odd" : "non-zero";
+    outputLayer->setFillRule(_evenOddFillRule ? QQuickShapePath::OddEvenFill : QQuickShapePath::WindingFill);
 }
 
 NSDictionary *LOTFillRenderer::actionsForRenderLayer() const
@@ -53,11 +53,11 @@ void LOTFillRenderer::performLocalUpdate()
     centerPoint_DEBUG->backgroundColor =  colorInterpolator_->colorForFrame(currentFrame);
     centerPoint_DEBUG->borderColor = QColor(Qt::lightGray);
     centerPoint_DEBUG->borderWidth = 2.f;
-    outputLayer->fillColor = colorInterpolator_->colorForFrame(currentFrame);
-    outputLayer->opacity = opacityInterpolator_->floatValueForFrame(currentFrame);
+    outputLayer->setFillColor(colorInterpolator_->colorForFrame(currentFrame));
+    outputLayer->setOpacity(opacityInterpolator_->floatValueForFrame(currentFrame));
 }
 
 void LOTFillRenderer::rebuildOutputs()
 {
-//    outputLayer->path = inputNode->outputPath()->CGPath();
+    outputLayer->setPainterPath(inputNode->outputPath()->CGPath());
 }

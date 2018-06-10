@@ -30,7 +30,7 @@ class LOTLayerContainer : public QQuickLottieLayer
 public:
     explicit LOTLayerContainer(LOTLayer * _Nullable layer,
                                LOTLayerGroup * _Nullable layerGroup);
-    explicit LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer);
+//    explicit LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer);
 
 //    @property (nonatomic, readonly, strong, nullable)
     QString layerName;

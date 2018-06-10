@@ -19,7 +19,7 @@ public:
         _opacityInterpolator = _opacityInterpolator.create(maskNode.opacity.keyframes);
         _expansionInterpolator = _expansionInterpolator.create(maskNode.expansion.keyframes);
         this->maskNode = maskNode;
-        fillColor = QColor(Qt::blue);
+        setFillColor(QColor(Qt::blue));
     }
 
 //    @property (nonatomic, readonly)
@@ -32,17 +32,18 @@ public:
 
         Q_ASSERT(false);
         if (maskNode.maskMode == LOTMaskModeSubtract) {
-          CGMutablePathRef pathRef = CGPathCreateMutable();
-          CGPathAddRect(pathRef, NULL, viewBounds.toCGRect());
-          CGPathAddPath(pathRef, NULL, path->CGPath());
+//          CGMutablePathRef pathRef = CGPathCreateMutable();
+//          CGPathAddRect(pathRef, NULL, viewBounds.toCGRect());
+//          CGPathAddPath(pathRef, NULL, path->CGPath());
 //          path = pathRef;
-          fillRule = "even-odd";
-          CGPathRelease(pathRef);
+          setFillRule(QQuickShapePath::OddEvenFill);
+//          CGPathRelease(pathRef);
         } else {
 //          path = path->CGPath();
         }
 
-        opacity = _opacityInterpolator->floatValueForFrame(frame);
+        qreal opacity = _opacityInterpolator->floatValueForFrame(frame);
+        setOpacity(opacity);
       }
     }
 

@@ -9,6 +9,8 @@
 #import "LOTBezierPath.h"
 #import "CGGeometry+LOTAdditions.h"
 
+#include <QTransform>
+
 typedef void(^LOTBezierPathEnumerationHandler)(const CGPathElement *element);
 
 
@@ -48,7 +50,6 @@ LOTBezierPath::LOTBezierPath()
     _length = 0;
     headSubpath_ = NULL;
     tailSubpath_ = NULL;
-    _path = CGPathCreateMutable();
     lineWidth = 1;
     lineCapStyle = kCGLineCapButt;
     lineJoinStyle = kCGLineJoinMiter;
@@ -70,7 +71,6 @@ LOTBezierPath::LOTBezierPath(CGPathRef path)
 LOTBezierPath::~LOTBezierPath()
 {
     removeAllSubpaths();
-    if (_path) CGPathRelease(_path);
 }
 
 QSharedPointer<LOTBezierPath> LOTBezierPath::copy()
@@ -94,7 +94,7 @@ void LOTBezierPath::LOT_moveToPoint(const QPointF &point)
 {
     subpathStartPoint_ = point;
     addSubpathWithType(kCGPathElementMoveToPoint, 0, point, QPointF(), QPointF());
-    CGPathMoveToPoint(_path, NULL, point.x(), point.y());
+    _path.moveTo(point);
 }
 
 void LOTBezierPath::LOT_addLineToPoint(const QPointF &point)
@@ -105,7 +105,7 @@ void LOTBezierPath::LOT_addLineToPoint(const QPointF &point)
       _length = _length + length;
     }
     addSubpathWithType(kCGPathElementAddLineToPoint, length, point, QPointF(), QPointF());
-    CGPathAddLineToPoint(_path, NULL, point.x(), point.y());
+    _path.lineTo(point);
 }
 
 void LOTBezierPath::LOT_addCurveToPoint(const QPointF &point, const QPointF &cp1, const QPointF &cp2)
@@ -116,7 +116,7 @@ void LOTBezierPath::LOT_addCurveToPoint(const QPointF &point, const QPointF &cp1
       _length = _length + length;
     }
     addSubpathWithType(kCGPathElementAddCurveToPoint, length, point, cp1, cp2);
-    CGPathAddCurveToPoint(_path, NULL, cp1.x(), cp1.y(), cp2.x(), cp2.y(), point.x(), point.y());
+    _path.cubicTo(cp1, cp2, point);
 }
 
 void LOTBezierPath::LOT_closePath()
@@ -127,7 +127,7 @@ void LOTBezierPath::LOT_closePath()
       _length = _length + length;
     }
     addSubpathWithType(kCGPathElementCloseSubpath, length, subpathStartPoint_, QPointF(), QPointF());
-    CGPathCloseSubpath(_path);
+    _path.closeSubpath();
 }
 
 void LOTBezierPath::LOT_removeAllPoints()
@@ -138,7 +138,7 @@ void LOTBezierPath::LOT_removeAllPoints()
 
 void LOTBezierPath::LOT_appendPath(QSharedPointer<LOTBezierPath> bezierPath)
 {
-    CGPathAddPath(_path, NULL, bezierPath->CGPath());
+    _path.addPath(bezierPath->CGPath());
 
     LOT_Subpath *nextSubpath = bezierPath->headSubpath();
     while (nextSubpath) {
@@ -349,12 +349,14 @@ void LOTBezierPath::trimPathFromT(qreal fromT, qreal toT, qreal offset)
     }
 }
 
-void LOTBezierPath::LOT_applyTransform(CGAffineTransform transform)
+void LOTBezierPath::LOT_applyTransform(const QTransform &transform)
 {
-    CGMutablePathRef mutablePath = CGPathCreateMutable();
-    CGPathAddPath(mutablePath, &transform, _path);
-    CGPathRelease(_path);
-    _path = mutablePath;
+//    CGMutablePathRef mutablePath = CGPathCreateMutable();
+//    CGPathAddPath(mutablePath, &transform, _path);
+//    CGPathRelease(_path);
+//    _path = mutablePath;
+    Q_ASSERT(transform.isAffine());
+    _path = transform.map(_path);
 }
 
 qreal LOTBezierPath::length() const
@@ -362,7 +364,7 @@ qreal LOTBezierPath::length() const
     return _length;
 }
 
-CGPathRef LOTBezierPath::CGPath() const
+QPainterPath LOTBezierPath::CGPath() const
 {
     return _path;
 }
@@ -375,25 +377,26 @@ QPointF LOTBezierPath::currentPoint() const
 
 bool LOTBezierPath::isEmpty() const
 {
-    return CGPathIsEmpty(_path);
+    return _path.isEmpty();
 }
 
 QRectF LOTBezierPath::bounds() const
 {
-    return QRectF::fromCGRect(CGPathGetBoundingBox(_path));
+    return _path.boundingRect();
 }
 
 void LOTBezierPath::_clearPathData()
 {
     _length = 0;
     subpathStartPoint_ = QPointF();
-    CGPathRelease(_path);
-    _path = CGPathCreateMutable();
+    _path = QPainterPath();
 }
 
 bool LOTBezierPath::containsPoint(const QPointF &point) const
 {
-    return CGPathContainsPoint(_path, NULL, point.toCGPoint(), usesEvenOddFillRule);
+    Q_ASSERT(false);
+//    CGPathContainsPoint(_path, NULL, point.toCGPoint(), usesEvenOddFillRule);
+    return _path.contains(point);
 }
 
 void LOTBezierPath::setWithCGPath(CGPathRef path)

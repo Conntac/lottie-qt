@@ -100,7 +100,8 @@ void LOTPolygonAnimator::performLocalUpdate()
       currentAngle += anglePerPoint;
     }
     path->LOT_closePath();
-    path->LOT_applyTransform(CGAffineTransformMakeTranslation(position.x(), position.y()));
+//    path->LOT_applyTransform(CGAffineTransformMakeTranslation(position.x(), position.y()));
+    path->LOT_applyTransform(QTransform().translate(position.x(), position.y()));
 
     setLocalPath(path);
 }

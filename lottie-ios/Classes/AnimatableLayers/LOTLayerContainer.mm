@@ -63,14 +63,14 @@ LOTLayerContainer::LOTLayerContainer(LOTLayer *layer, LOTLayerGroup *layerGroup)
     commonInitializeWith(layer, layerGroup);
 }
 
-LOTLayerContainer::LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer)
-: QQuickLottieLayer(layer)
-{
-    QSharedPointer<LOTLayerContainer> other = layer.dynamicCast<LOTLayerContainer>();
-    if (other) {
-        currentFrame = other->currentFrame;
-    }
-}
+//LOTLayerContainer::LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer)
+//: QQuickLottieLayer(layer)
+//{
+//    QSharedPointer<LOTLayerContainer> other = layer.dynamicCast<LOTLayerContainer>();
+//    if (other) {
+//        currentFrame = other->currentFrame;
+//    }
+//}
 
 void LOTLayerContainer::setViewportBounds(const QRectF &viewportBounds)
 {
@@ -98,15 +98,17 @@ void LOTLayerContainer::displayWithFrame(qreal frame, bool forceUpdate)
       hidden = (frame < _inFrame.floatValue ||
                 frame > _outFrame.floatValue);
     }
-    this->hidden = hidden;
+    setHidden(hidden);
     if (hidden) {
       return;
     }
     if (_opacityInterpolator && _opacityInterpolator->hasUpdateForFrame(newFrame)) {
-      opacity = _opacityInterpolator->floatValueForFrame(newFrame);
+      qreal opacity = _opacityInterpolator->floatValueForFrame(newFrame);
+      setOpacity(opacity);
     }
     if (_transformInterpolator && _transformInterpolator->hasUpdateForFrame(newFrame)) {
-      wrapperLayer->transform = _transformInterpolator->transformForFrame(newFrame);
+      QTransform transform = _transformInterpolator->transformForFrame(newFrame);
+      wrapperLayer->setTransform(transform);
     }
     if (_contentsGroup) {
       _contentsGroup->updateWithFrame(newFrame, nullptr, forceUpdate);

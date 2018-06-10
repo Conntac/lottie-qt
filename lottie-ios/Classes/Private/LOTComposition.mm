@@ -12,6 +12,8 @@
 #import "LOTLayerGroup.h"
 #import "LOTAnimationCache.h"
 
+#include <QFile>
+
 @implementation LOTComposition
 
 # pragma mark - Convenience Initializers
@@ -51,23 +53,28 @@
   return nil;
 }
 
-+ (nullable instancetype)animationWithFilePath:(nonnull NSString *)filePath {
-  NSString *animationName = filePath;
++ (nullable instancetype)animationWithFilePath:(const QString &)filePath {
+//  NSString *animationName = filePath;
   
-  LOTComposition *comp = [[LOTAnimationCache sharedCache] animationForKey:animationName];
-  if (comp) {
-    return comp;
+//  LOTComposition *comp = [[LOTAnimationCache sharedCache] animationForKey:animationName];
+//  if (comp) {
+//    return comp;
+//  }
+
+  QFile file(filePath);
+  if (!file.open(QIODevice::ReadOnly)) {
+    return nil;
   }
   
   NSError *error;
-  NSData *jsonData = [[NSData alloc] initWithContentsOfFile:filePath];
+  NSData *jsonData = file.readAll().toNSData();
   NSDictionary  *JSONObject = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData
                                                                          options:0 error:&error] : nil;
   if (JSONObject && !error) {
     LOTComposition *laScene = [[self alloc] initWithJSON:JSONObject withAssetBundle:[NSBundle mainBundle]];
-    laScene.rootDirectory = [filePath stringByDeletingLastPathComponent];
-    [[LOTAnimationCache sharedCache] addAnimation:laScene forKey:animationName];
-    laScene.cacheKey = animationName;
+//    laScene.rootDirectory = [filePath stringByDeletingLastPathComponent];
+//    [[LOTAnimationCache sharedCache] addAnimation:laScene forKey:animationName];
+//    laScene.cacheKey = animationName;
     return laScene;
   }
   
