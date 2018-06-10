@@ -88,7 +88,10 @@ public:
     virtual void endSync(bool async) = 0;
     virtual void setAsyncCallback(void (*)(void *), void *) { }
     virtual Flags flags() const { return 0; }
-    virtual void setPath(int index, const QQuickPath *path) = 0;
+    virtual void setTransform(int index, const QTransform &transform) = 0;
+    virtual void setHidden(int index, bool hidden) = 0;
+    virtual void setOpacity(int index, qreal opacity) = 0;
+    virtual void setPath(int index, const QQuickShapePath *path) = 0;
     virtual void setStrokeColor(int index, const QColor &color) = 0;
     virtual void setStrokeWidth(int index, qreal w) = 0;
     virtual void setFillColor(int index, const QColor &color) = 0;
@@ -109,6 +112,10 @@ struct QQuickShapeStrokeFillParams
 {
     QQuickShapeStrokeFillParams();
 
+    QTransform transform;
+    bool hidden;
+    QPainterPath path;
+    qreal opacity;
     QColor strokeColor;
     qreal strokeWidth;
     QColor fillColor;
@@ -136,8 +143,11 @@ public:
         DirtyStyle = 0x20,
         DirtyDash = 0x40,
         DirtyFillGradient = 0x80,
+        DirtyOpacity = 0x100,
+        DirtyHidden = 0x200,
+        DirtyTransform = 0x400,
 
-        DirtyAll = 0xFF
+        DirtyAll = 0xFFF
     };
 
     QQuickShapePathPrivate();

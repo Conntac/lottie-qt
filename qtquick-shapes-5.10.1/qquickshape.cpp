@@ -66,7 +66,9 @@ Q_LOGGING_CATEGORY(QQSHAPE_LOG_TIME_DIRTY_SYNC, "qt.shape.time.sync")
 */
 
 QQuickShapeStrokeFillParams::QQuickShapeStrokeFillParams()
-    : strokeColor(Qt::white),
+    : hidden(false),
+      opacity(1.0),
+      strokeColor(Qt::white),
       strokeWidth(1),
       fillColor(Qt::white),
       fillRule(QQuickShapePath::OddEvenFill),
@@ -161,6 +163,77 @@ QQuickShapePath::QQuickShapePath(QObject *parent)
 
 QQuickShapePath::~QQuickShapePath()
 {
+}
+
+void QQuickShapePath::setTransform(const QTransform &transform)
+{
+    Q_D(QQuickShapePath);
+    if (d->sfp.transform != transform) {
+        d->dirty |= QQuickShapePathPrivate::DirtyTransform;
+        d->sfp.transform = transform;
+
+        emit transformChanged();
+        emit shapePathChanged();
+    }
+}
+
+QTransform QQuickShapePath::transform() const
+{
+    Q_D(const QQuickShapePath);
+    return d->sfp.transform;
+}
+
+bool QQuickShapePath::hidden() const
+{
+    Q_D(const QQuickShapePath);
+    return d->sfp.hidden;
+}
+
+void QQuickShapePath::setHidden(bool hidden)
+{
+    Q_D(QQuickShapePath);
+    if (d->sfp.hidden != hidden) {
+        d->dirty |= QQuickShapePathPrivate::DirtyHidden;
+        d->sfp.hidden = hidden;
+
+        emit hiddenChanged();
+        emit shapePathChanged();
+    }
+}
+
+void QQuickShapePath::setPainterPath(const QPainterPath &painterPath)
+{
+    Q_D(QQuickShapePath);
+    if (d->sfp.path != painterPath) {
+        d->dirty |= QQuickShapePathPrivate::DirtyPath;
+        d->sfp.path = painterPath;
+
+        emit pathChanged();
+        emit shapePathChanged();
+    }
+}
+
+QPainterPath QQuickShapePath::painterPath() const
+{
+    Q_D(const QQuickShapePath);
+    return d->sfp.path;
+}
+
+qreal QQuickShapePath::opacity() const
+{
+    Q_D(const QQuickShapePath);
+    return d->sfp.opacity;
+}
+
+void QQuickShapePath::setOpacity(qreal opacity)
+{
+    Q_D(QQuickShapePath);
+    if (d->sfp.opacity != opacity) {
+        d->sfp.opacity = opacity;
+        d->dirty |= QQuickShapePathPrivate::DirtyOpacity;
+        emit opacityChanged();
+        emit shapePathChanged();
+    }
 }
 
 /*!
@@ -919,7 +992,7 @@ void QQuickShapePrivate::createRenderer()
     case QSGRendererInterface::OpenGL:
         if (enableVendorExts && QQuickShapeNvprRenderNode::isSupported()) {
             rendererType = QQuickShape::NvprRenderer;
-            renderer = new QQuickShapeNvprRenderer;
+//            renderer = new QQuickShapeNvprRenderer;
         } else {
             rendererType = QQuickShape::GeometryRenderer;
             renderer = new QQuickShapeGenericRenderer(q);
@@ -1004,6 +1077,12 @@ void QQuickShapePrivate::sync()
         int &dirty(QQuickShapePathPrivate::get(p)->dirty);
         syncTimingTotalDirty |= dirty;
 
+        if (dirty & QQuickShapePathPrivate::DirtyTransform)
+            renderer->setTransform(i, p->transform());
+        if (dirty & QQuickShapePathPrivate::DirtyHidden)
+            renderer->setHidden(i, p->hidden());
+        if (dirty & QQuickShapePathPrivate::DirtyOpacity)
+            renderer->setOpacity(i, p->opacity());
         if (dirty & QQuickShapePathPrivate::DirtyPath)
             renderer->setPath(i, p);
         if (dirty & QQuickShapePathPrivate::DirtyStrokeColor)

@@ -201,6 +201,8 @@ class QQuickShapePath : public QQuickPath
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool hidden READ hidden WRITE setHidden NOTIFY hiddenChanged)
+    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
     Q_PROPERTY(QColor strokeColor READ strokeColor WRITE setStrokeColor NOTIFY strokeColorChanged)
     Q_PROPERTY(qreal strokeWidth READ strokeWidth WRITE setStrokeWidth NOTIFY strokeWidthChanged)
     Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
@@ -243,6 +245,18 @@ public:
     QQuickShapePath(QObject *parent = nullptr);
     ~QQuickShapePath();
 
+    void setTransform(const QTransform &transform);
+    QTransform transform() const;
+
+    bool hidden() const;
+    void setHidden(bool hidden);
+
+    void setPainterPath(const QPainterPath &painterPath);
+    QPainterPath painterPath() const;
+
+    qreal opacity() const;
+    void setOpacity(qreal opacity);
+
     QColor strokeColor() const;
     void setStrokeColor(const QColor &color);
 
@@ -278,6 +292,10 @@ public:
     void resetFillGradient();
 
 Q_SIGNALS:
+    void transformChanged();
+    void hiddenChanged();
+    void pathChanged();
+    void opacityChanged();
     void shapePathChanged();
     void strokeColorChanged();
     void strokeWidthChanged();

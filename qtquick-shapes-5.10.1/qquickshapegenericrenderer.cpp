@@ -167,10 +167,32 @@ void QQuickShapeGenericRenderer::beginSync(int totalCount)
         d.syncDirty = 0;
 }
 
-void QQuickShapeGenericRenderer::setPath(int index, const QQuickPath *path)
+void QQuickShapeGenericRenderer::setTransform(int index, const QTransform &transform)
 {
     ShapePathData &d(m_sp[index]);
-    d.path = path ? path->path() : QPainterPath();
+    d.transform = transform;
+    d.syncDirty |= DirtyTransform;
+}
+
+void QQuickShapeGenericRenderer::setHidden(int index, bool hidden)
+{
+    ShapePathData &d(m_sp[index]);
+    d.hidden = hidden;
+    d.syncDirty |= DirtyColor;
+}
+
+void QQuickShapeGenericRenderer::setOpacity(int index, qreal opacity)
+{
+    ShapePathData &d(m_sp[index]);
+    d.opacity = opacity;
+    d.syncDirty |= DirtyFillGeom | DirtyStrokeGeom;
+}
+
+void QQuickShapeGenericRenderer::setPath(int index, const QQuickShapePath *path)
+{
+    ShapePathData &d(m_sp[index]);
+//    d.path = path ? path->path() : QPainterPath();
+    d.path = path->painterPath();
     d.syncDirty |= DirtyFillGeom | DirtyStrokeGeom;
 }
 
@@ -509,7 +531,7 @@ void QQuickShapeGenericRenderer::updateNode()
         QQuickShapeGenericNode *node = *nodePtr;
 
         if (m_accDirty & DirtyList)
-            d.effectiveDirty |= DirtyFillGeom | DirtyStrokeGeom | DirtyColor | DirtyFillGradient;
+            d.effectiveDirty |= DirtyFillGeom | DirtyStrokeGeom | DirtyColor | DirtyFillGradient | DirtyTransform;
 
         if (!d.effectiveDirty) {
             prevNode = node;
@@ -517,25 +539,33 @@ void QQuickShapeGenericRenderer::updateNode()
             continue;
         }
 
-        if (d.fillColor.a == 0) {
+        if (!node->m_transformNode) {
+            node->m_transformNode = new QSGTransformNode;
+            node->appendChildNode(node->m_transformNode);
+        }
+
+        node->setOpacity(d.opacity);
+        node->m_transformNode->setMatrix(d.transform);
+
+        if (d.fillColor.a == 0 || d.hidden) {
             delete node->m_fillNode;
             node->m_fillNode = nullptr;
         } else if (!node->m_fillNode) {
             node->m_fillNode = new QQuickShapeGenericStrokeFillNode(m_item->window());
             if (node->m_strokeNode)
-                node->removeChildNode(node->m_strokeNode);
-            node->appendChildNode(node->m_fillNode);
+                node->m_transformNode->removeChildNode(node->m_strokeNode);
+            node->m_transformNode->appendChildNode(node->m_fillNode);
             if (node->m_strokeNode)
-                node->appendChildNode(node->m_strokeNode);
+                node->m_transformNode->appendChildNode(node->m_strokeNode);
             d.effectiveDirty |= DirtyFillGeom;
         }
 
-        if (d.strokeWidth < 0.0f || d.strokeColor.a == 0) {
+        if (d.strokeWidth < 0.0f || d.strokeColor.a == 0 || d.hidden) {
             delete node->m_strokeNode;
             node->m_strokeNode = nullptr;
         } else if (!node->m_strokeNode) {
             node->m_strokeNode = new QQuickShapeGenericStrokeFillNode(m_item->window());
-            node->appendChildNode(node->m_strokeNode);
+            node->m_transformNode->appendChildNode(node->m_strokeNode);
             d.effectiveDirty |= DirtyStrokeGeom;
         }
 

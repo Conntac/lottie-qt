@@ -73,7 +73,8 @@ public:
         DirtyStrokeGeom = 0x02,
         DirtyColor = 0x04,
         DirtyFillGradient = 0x08,
-        DirtyList = 0x10 // only for accDirty
+        DirtyTransform = 0x10,
+        DirtyList = 0x20 // only for accDirty
     };
 
     QQuickShapeGenericRenderer(QQuickItem *item)
@@ -87,7 +88,10 @@ public:
     ~QQuickShapeGenericRenderer();
 
     void beginSync(int totalCount) override;
-    void setPath(int index, const QQuickPath *path) override;
+    void setTransform(int index, const QTransform &transform) override;
+    void setHidden(int index, bool hidden) override;
+    void setOpacity(int index, qreal opacity) override;
+    void setPath(int index, const QQuickShapePath *path) override;
     void setStrokeColor(int index, const QColor &color) override;
     void setStrokeWidth(int index, qreal w) override;
     void setFillColor(int index, const QColor &color) override;
@@ -125,6 +129,8 @@ private:
     void maybeUpdateAsyncItem();
 
     struct ShapePathData {
+        QTransform transform;
+        bool hidden = false;
         float strokeWidth;
         QPen pen;
         Color4ub strokeColor;
@@ -137,6 +143,7 @@ private:
         IndexContainerType fillIndices;
         QSGGeometry::Type indexType;
         VertexContainerType strokeVertices;
+        float opacity = 1.0;
         int syncDirty;
         int effectiveDirty = 0;
         QQuickShapeFillRunnable *pendingFill = nullptr;
@@ -224,9 +231,10 @@ private:
     friend class QQuickShapeGenericRenderer;
 };
 
-class QQuickShapeGenericNode : public QSGNode
+class QQuickShapeGenericNode : public QSGOpacityNode
 {
 public:
+    QSGTransformNode *m_transformNode = nullptr;
     QQuickShapeGenericStrokeFillNode *m_fillNode = nullptr;
     QQuickShapeGenericStrokeFillNode *m_strokeNode = nullptr;
     QQuickShapeGenericNode *m_next = nullptr;
