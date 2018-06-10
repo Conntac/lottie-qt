@@ -1,13 +1,7 @@
 #ifndef LOTTIEANIMATION_H
 #define LOTTIEANIMATION_H
 
-#include <QObject>
 #include <QQuickItem>
-
-#include <qquickshape_p.h>
-
-class LottieNode;
-class QQuickLottieLayer;
 
 class LottieAnimation : public QQuickItem
 {

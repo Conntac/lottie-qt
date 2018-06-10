@@ -1,11 +1,8 @@
 #include "lottieanimation.h"
 
 #include <QLoggingCategory>
-#include <QGuiApplication>
-#include <QQuickWindow>
-#include <QtGui/qpa/qplatformnativeinterface.h>
-#include <QTimer>
 
+#include "qquickshape_p.h"
 #include "qquickshapegenericrenderer_p.h"
 
 #import "LOTAnimationView.h"
