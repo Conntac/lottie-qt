@@ -74,10 +74,10 @@ void QQuickShapeSoftwareRenderer::setOpacity(int index, qreal opacity)
     m_accDirty |= DirtyPath;
 }
 
-void QQuickShapeSoftwareRenderer::setPath(int index, const QQuickShapePath *path)
+void QQuickShapeSoftwareRenderer::setPath(int index, const QPainterPath &path)
 {
     ShapePathGuiData &d(m_sp[index]);
-    d.path = path ? path->path() : QPainterPath();
+    d.path = path;
     d.dirty |= DirtyPath;
     m_accDirty |= DirtyPath;
 }

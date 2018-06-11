@@ -113,14 +113,14 @@ void LottieAnimation::Private::sync()
         renderer.setTransform(i, absoluteTransform);
         renderer.setHidden(i, layer->hidden());
         renderer.setOpacity(i, layer->opacity());
-        renderer.setPath(i, layer);
+        renderer.setPath(i, layer->path());
         renderer.setStrokeColor(i, layer->strokeColor());
         renderer.setStrokeWidth(i, layer->strokeWidth());
         renderer.setFillColor(i, layer->fillColor());
-        renderer.setFillRule(i, layer->fillRule());
-        renderer.setJoinStyle(i, layer->joinStyle(), layer->miterLimit());
-        renderer.setCapStyle(i, layer->capStyle());
-        renderer.setStrokeStyle(i, layer->strokeStyle(), layer->dashOffset(), layer->dashPattern());
+        renderer.setFillRule(i, (QQuickShapePath::FillRule)layer->fillRule());
+        renderer.setJoinStyle(i, (QQuickShapePath::JoinStyle)layer->joinStyle(), layer->miterLimit());
+        renderer.setCapStyle(i, (QQuickShapePath::CapStyle)layer->capStyle());
+        renderer.setStrokeStyle(i, (QQuickShapePath::StrokeStyle)layer->strokeStyle(), layer->dashOffset(), layer->dashPattern());
         renderer.setFillGradient(i, layer->fillGradient());
     }
 

@@ -25,7 +25,7 @@ LOTFillRenderer::LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNod
     }
     _evenOddFillRule = fill.evenOddFillRule;
 
-    outputLayer->setFillRule(_evenOddFillRule ? QQuickShapePath::OddEvenFill : QQuickShapePath::WindingFill);
+    outputLayer->setFillRule(_evenOddFillRule ? Qt::OddEvenFill : Qt::WindingFill);
 }
 
 NSDictionary *LOTFillRenderer::actionsForRenderLayer() const
@@ -59,5 +59,5 @@ void LOTFillRenderer::performLocalUpdate()
 
 void LOTFillRenderer::rebuildOutputs()
 {
-    outputLayer->setPainterPath(inputNode->outputPath()->CGPath());
+    outputLayer->setPath(inputNode->outputPath()->CGPath());
 }

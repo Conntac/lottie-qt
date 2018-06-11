@@ -36,7 +36,7 @@ public:
 //          CGPathAddRect(pathRef, NULL, viewBounds.toCGRect());
 //          CGPathAddPath(pathRef, NULL, path->CGPath());
 //          path = pathRef;
-          setFillRule(QQuickShapePath::OddEvenFill);
+          setFillRule(Qt::OddEvenFill);
 //          CGPathRelease(pathRef);
         } else {
 //          path = path->CGPath();

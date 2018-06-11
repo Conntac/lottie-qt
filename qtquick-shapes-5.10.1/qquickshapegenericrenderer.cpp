@@ -188,11 +188,11 @@ void QQuickShapeGenericRenderer::setOpacity(int index, qreal opacity)
     d.syncDirty |= DirtyFillGeom | DirtyStrokeGeom;
 }
 
-void QQuickShapeGenericRenderer::setPath(int index, const QQuickShapePath *path)
+void QQuickShapeGenericRenderer::setPath(int index, const QPainterPath &path)
 {
     ShapePathData &d(m_sp[index]);
 //    d.path = path ? path->path() : QPainterPath();
-    d.path = path->painterPath();
+    d.path = path;
     d.syncDirty |= DirtyFillGeom | DirtyStrokeGeom;
 }
 

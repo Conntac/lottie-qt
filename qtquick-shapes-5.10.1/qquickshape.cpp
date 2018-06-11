@@ -1084,7 +1084,7 @@ void QQuickShapePrivate::sync()
         if (dirty & QQuickShapePathPrivate::DirtyOpacity)
             renderer->setOpacity(i, p->opacity());
         if (dirty & QQuickShapePathPrivate::DirtyPath)
-            renderer->setPath(i, p);
+            renderer->setPath(i, p->path());
         if (dirty & QQuickShapePathPrivate::DirtyStrokeColor)
             renderer->setStrokeColor(i, p->strokeColor());
         if (dirty & QQuickShapePathPrivate::DirtyStrokeWidth)

@@ -10,13 +10,56 @@
 
 #include <qquickshape_p.h>
 
-class QQuickLottieLayer : public QQuickShapePath
-        , public LOTBase // CALayer
+class QQuickLottieLayer : public LOTBase // CALayer
 {
 public:
     QQuickLottieLayer();
-//    explicit QQuickLottieLayer(const QSharedPointer<QQuickLottieLayer> &layer);
     ~QQuickLottieLayer();
+
+    void setFillColor(const QColor &fillColor);
+    QColor fillColor() const;
+
+    void setFillRule(Qt::FillRule fillRule);
+    Qt::FillRule fillRule() const;
+
+    void setOpacity(qreal opacity);
+    qreal opacity() const;
+
+    void setCapStyle(Qt::PenCapStyle capStyle);
+    Qt::PenCapStyle capStyle() const;
+
+    void setHidden(bool hidden);
+    bool hidden() const;
+
+    void setTransform(const QTransform &transform);
+    QTransform transform() const;
+
+    void setPath(const QPainterPath &path);
+    QPainterPath path() const;
+
+    void setStrokeColor(const QColor &strokeColor);
+    QColor strokeColor() const;
+
+    void setStrokeWidth(qreal strokeWidth);
+    qreal strokeWidth() const;
+
+    void setJoinStyle(Qt::PenJoinStyle joinStyle);
+    Qt::PenJoinStyle joinStyle() const;
+
+    void setStrokeStyle(Qt::PenStyle strokeStyle);
+    Qt::PenStyle strokeStyle() const;
+
+    void setMiterLimit(int miterLimit);
+    int miterLimit() const;
+
+    void setDashPattern(const QVector<qreal> &dashPattern);
+    QVector<qreal> dashPattern() const;
+
+    void setDashOffset(qreal dashOffset);
+    qreal dashOffset() const;
+
+    void setFillGradient(QQuickShapeGradient *fillGradient);
+    QQuickShapeGradient *fillGradient() const;
 
     QRectF bounds;
 
@@ -66,16 +109,35 @@ public:
 
 private:
     Q_DISABLE_COPY(QQuickLottieLayer)
+
+    QColor m_fillColor;
+    Qt::FillRule m_fillRule = Qt::OddEvenFill;
+    qreal m_opacity = 1.0;
+    Qt::PenCapStyle m_capStyle = Qt::FlatCap;
+    bool m_hidden = false;
+    QTransform m_transform;
+    QPainterPath m_path;
+    QColor m_strokeColor = Qt::transparent;
+    qreal m_strokeWidth = 0.0;
+    Qt::PenJoinStyle m_joinStyle = Qt::MiterJoin;
+    int m_miterLimit = 0;
+    Qt::PenStyle m_strokeStyle = Qt::SolidLine;
+    QVector<qreal> m_dashPattern;
+    qreal m_dashOffset = 0.0;
+    QQuickShapeGradient *m_fillGradient = nullptr;
 };
 
 class QQuickLottieShapeLayer : public QQuickLottieLayer // CAShapeLayer
 {
 public:
+    QQuickLottieShapeLayer();
 };
 
 class QQuickLottieReplicatorLayer : public QQuickLottieLayer // CAReplicatorLayer
 {
 public:
+    QQuickLottieReplicatorLayer();
+
     int instanceCount = 0;
     QTransform instanceTransform;
 

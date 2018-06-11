@@ -91,7 +91,7 @@ public:
     virtual void setTransform(int index, const QTransform &transform) = 0;
     virtual void setHidden(int index, bool hidden) = 0;
     virtual void setOpacity(int index, qreal opacity) = 0;
-    virtual void setPath(int index, const QQuickShapePath *path) = 0;
+    virtual void setPath(int index, const QPainterPath &path) = 0;
     virtual void setStrokeColor(int index, const QColor &color) = 0;
     virtual void setStrokeWidth(int index, qreal w) = 0;
     virtual void setFillColor(int index, const QColor &color) = 0;

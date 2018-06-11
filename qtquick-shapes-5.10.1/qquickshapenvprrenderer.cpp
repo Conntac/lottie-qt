@@ -65,10 +65,10 @@ void QQuickShapeNvprRenderer::setOpacity(int index, qreal opacity)
     Q_ASSERT(false);
 }
 
-void QQuickShapeNvprRenderer::setPath(int index, const QQuickShapePath *path)
+void QQuickShapeNvprRenderer::setPath(int index, const QPainterPath &path)
 {
     ShapePathGuiData &d(m_sp[index]);
-    convertPath(path, &d);
+//    convertPath(path, &d);
     d.dirty |= DirtyPath;
     m_accDirty |= DirtyPath;
 }

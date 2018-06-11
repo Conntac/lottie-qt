@@ -47,16 +47,16 @@ LOTStrokeRenderer::LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inpu
 
   // TODO: This might be a nil color?
   outputLayer->setFillColor(QColor(Qt::transparent));
-  outputLayer->setCapStyle(stroke.capType == LOTLineCapTypeRound ? QQuickShapePath::RoundCap : QQuickShapePath::FlatCap);
+  outputLayer->setCapStyle(stroke.capType == LOTLineCapTypeRound ? Qt::RoundCap : Qt::FlatCap);
   switch (stroke.joinType) {
     case LOTLineJoinTypeBevel:
-      outputLayer->setJoinStyle(QQuickShapePath::BevelJoin);
+      outputLayer->setJoinStyle(Qt::BevelJoin);
       break;
     case LOTLineJoinTypeMiter:
-      outputLayer->setJoinStyle(QQuickShapePath::MiterJoin);
+      outputLayer->setJoinStyle(Qt::MiterJoin);
       break;
     case LOTLineJoinTypeRound:
-      outputLayer->setJoinStyle(QQuickShapePath::RoundJoin);
+      outputLayer->setJoinStyle(Qt::RoundJoin);
       break;
     default:
       break;
@@ -103,7 +103,7 @@ void LOTStrokeRenderer::performLocalUpdate()
 void LOTStrokeRenderer::rebuildOutputs()
 {
     if (inputNode->outputPath()) {
-        outputLayer->setPainterPath(inputNode->outputPath()->CGPath());
+        outputLayer->setPath(inputNode->outputPath()->CGPath());
     }
 }
 
