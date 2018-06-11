@@ -184,7 +184,9 @@ SOURCES += \
     $$LOTTIE_PATH/RenderSystem/LOTAnimatorNode.mm \
     $$LOTTIE_PATH/RenderSystem/LOTRenderNode.mm
 
-LIBS += -lobjc -framework QuartzCore -framework Foundation -framework CoreGraphics -framework AppKit
+LIBS += -lobjc -framework QuartzCore -framework Foundation -framework CoreGraphics
+
+macx:LIBS += -framework AppKit
 
 QMAKE_CFLAGS += -fobjc-arc
 QMAKE_CXXFLAGS += -fobjc-arc
