@@ -12,9 +12,7 @@ Window {
 
     LottieAnimation {
         id: animation
-        anchors.centerIn: parent
-        width: 500
-        height: 500
+        anchors.fill: parent
 
         source: "animations/LottieLogo1.json"
 //        source: "animations/9squares-AlBoardman.json
@@ -28,7 +26,7 @@ Window {
             from: animation.startFrame
             to: animation.endFrame
 
-            duration: (animation.endFrame - animation.startFrame) * 1000 / 30
+            duration: animation.timeDuration
 
             loops: -1
             running: autoPlayButton.checked

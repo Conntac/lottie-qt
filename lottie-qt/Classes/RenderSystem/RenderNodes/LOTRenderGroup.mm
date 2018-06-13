@@ -150,7 +150,7 @@ void LOTRenderGroup::buildContents(const QList<LOTBase *> &contents)
         QSharedPointer<LOTCircleAnimator> circleAnimator = circleAnimator.create(previousNode, dynamic_cast<LOTShapeCircle *>(item));
         previousNode = circleAnimator;
       } else if (dynamic_cast<LOTShapeGroup *>(item)) {
-        LOTShapeGroup *shapeGroup = (LOTShapeGroup *)item;
+        LOTShapeGroup *shapeGroup = dynamic_cast<LOTShapeGroup *>(item);
         QSharedPointer<LOTRenderGroup> renderGroup = renderGroup.create(previousNode, shapeGroup->items, shapeGroup->keyname);
         containerLayer->insertSublayer(renderGroup->containerLayer, 0);
         previousNode = renderGroup;

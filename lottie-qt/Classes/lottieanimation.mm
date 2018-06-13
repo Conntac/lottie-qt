@@ -28,6 +28,7 @@ public:
     qreal startFrame = 0.0;
     qreal endFrame = 0.0;
     qreal frameRate = 0.0;
+    qreal timeDuration = 0.0;
 
     QUrl source;
 
@@ -67,12 +68,14 @@ void LottieAnimation::Private::loadAnimation()
         startFrame = composition->startFrame;
         endFrame = composition->endFrame;
         frameRate = composition->framerate;
+        timeDuration = composition->timeDuration;
 
 //        QRectF bound = QRectF::fromCGRect(composition.compBounds);
 
         emit q->startFrameChanged();
         emit q->endFrameChanged();
         emit q->frameRateChanged();
+        emit q->timeDurationChanged();
 
         container->display();
     }
@@ -179,6 +182,11 @@ qreal LottieAnimation::endFrame() const
 qreal LottieAnimation::frameRate() const
 {
     return d->frameRate;
+}
+
+qreal LottieAnimation::timeDuration() const
+{
+    return d->timeDuration * 1000;
 }
 
 void LottieAnimation::setSource(const QUrl &source)

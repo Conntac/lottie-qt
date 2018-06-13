@@ -10,6 +10,7 @@ class LottieAnimation : public QQuickItem
     Q_PROPERTY(qreal startFrame READ startFrame NOTIFY startFrameChanged)
     Q_PROPERTY(qreal endFrame READ endFrame NOTIFY endFrameChanged)
     Q_PROPERTY(qreal frameRate READ frameRate NOTIFY frameRateChanged)
+    Q_PROPERTY(qreal timeDuration READ timeDuration NOTIFY timeDurationChanged)
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 
 public:
@@ -22,6 +23,7 @@ public:
     qreal startFrame() const;
     qreal endFrame() const;
     qreal frameRate() const;
+    qreal timeDuration() const;
 
     void setSource(const QUrl &source);
     QUrl source() const;
@@ -39,6 +41,7 @@ signals:
     void startFrameChanged();
     void endFrameChanged();
     void frameRateChanged();
+    void timeDurationChanged();
 
     void sourceChanged();
 

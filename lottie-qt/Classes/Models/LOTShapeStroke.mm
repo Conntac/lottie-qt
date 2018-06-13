@@ -28,7 +28,7 @@ LOTShapeStroke::LOTShapeStroke(const QVariantMap &jsonDictionary)
       });
     }
 
-    capType = static_cast<LOTLineCapType>(jsonDictionary["lc"].toInt());
+    capType = static_cast<LOTLineCapType>(jsonDictionary["lc"].toInt() - 1);
     joinType = static_cast<LOTLineJoinType>(jsonDictionary["lj"].toInt() - 1);
 
     fillEnabled = jsonDictionary.value("fillEnabled").toBool();
