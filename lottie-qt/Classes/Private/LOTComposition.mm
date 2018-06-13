@@ -123,10 +123,8 @@ void LOTComposition::mapFromJSON(const QVariantMap &jsonDictionary)
       timeDuration = frameDuration / framerate;
     }
 
-    QVariantList assetArray = jsonDictionary["assets"].toList();
-    // TODO: always call if assets entry exists
-    if (assetArray.size()) {
-      assetGroup = new LOTAssetGroup(assetArray, framerate);
+    if (jsonDictionary.contains("assets")) {
+      assetGroup = new LOTAssetGroup(jsonDictionary.value("assets").toList(), framerate);
     }
 
     QVariantList layersJSON = jsonDictionary["layers"].toList();
@@ -134,7 +132,5 @@ void LOTComposition::mapFromJSON(const QVariantMap &jsonDictionary)
       layerGroup = new LOTLayerGroup(layersJSON, assetGroup, framerate);
     }
 
-    if (assetGroup) {
-        assetGroup->finalizeInitializationWithFramerate(framerate);
-    }
+    assetGroup->finalizeInitializationWithFramerate(framerate);
 }

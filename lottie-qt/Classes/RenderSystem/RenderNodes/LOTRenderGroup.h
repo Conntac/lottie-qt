@@ -38,7 +38,7 @@ private:
     QSharedPointer<LOTAnimatorNode> _rootNode;
     QSharedPointer<LOTBezierPath> _outputPath;
     QSharedPointer<LOTBezierPath> _localPath;
-    BOOL _rootNodeHasUpdate;
+    bool _rootNodeHasUpdate = false;
     QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
     QSharedPointer<LOTTransformInterpolator> _transformInterolator;
 };

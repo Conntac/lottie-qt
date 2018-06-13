@@ -37,7 +37,7 @@ LOTLayer::LOTLayer(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup,
 
     referenceID = jsonDictionary.value("refId").toString();
 
-    parentID = jsonDictionary.value("parent").toInt();
+    parentID = jsonDictionary.value("parent", -1).toInt();
 
     startFrame = jsonDictionary.value("st").toReal(); // Asumme 0.0 default
 //    if (jsonDictionary[@"st"]) {

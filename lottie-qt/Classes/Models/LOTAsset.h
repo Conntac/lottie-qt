@@ -36,7 +36,7 @@ public:
     QString imageDirectory;
 
 //@property (nonatomic, readonly, nullable)
-    LOTLayerGroup *layerGroup;
+    LOTLayerGroup *layerGroup = nullptr;
 
 //@property (nonatomic, readwrite)
     QString rootDirectory;

@@ -22,6 +22,6 @@ public:
     void performLocalUpdate() override;
 
 private:
-    LOTShapePath *_pathConent;
+    LOTShapePath *_pathConent = nullptr;
     QSharedPointer<LOTPathInterpolator> _interpolator;
 };

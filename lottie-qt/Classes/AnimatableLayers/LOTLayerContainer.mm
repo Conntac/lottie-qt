@@ -217,7 +217,7 @@ void LOTLayerContainer::commonInitializeWith(LOTLayer *layer, LOTLayerGroup *lay
     if (layer->parentID != -1) {
       int parentID = layer->parentID;
       QSharedPointer<LOTTransformInterpolator> childInterpolator = _transformInterpolator;
-      while (parentID /*!= nil*/) {
+      while (parentID != -1 /*!= nil*/) {
         LOTLayer *parentModel = layerGroup->layerModelForID(parentID);
         QSharedPointer<LOTTransformInterpolator> interpolator = LOTTransformInterpolator::transformForLayer(parentModel);
         childInterpolator->inputNode = interpolator;

@@ -83,7 +83,7 @@ bool LOTRenderGroup::updateWithFrame(qreal frame, std::function<void (LOTAnimato
     indentation_level = indentation_level + 1;
     _rootNodeHasUpdate = _rootNode && _rootNode->updateWithFrame(frame, modifier, forceUpdate);
     indentation_level = indentation_level - 1;
-    BOOL update = LOTRenderNode::updateWithFrame(frame, modifier, forceUpdate);
+    bool update = LOTRenderNode::updateWithFrame(frame, modifier, forceUpdate);
     return update;
 }
 
@@ -129,7 +129,6 @@ void LOTRenderGroup::rebuildOutputs()
 
 void LOTRenderGroup::buildContents(const QList<LOTBase *> &contents)
 {
-    // FIXME: use dynamic casts
     QSharedPointer<LOTAnimatorNode> previousNode;
     LOTShapeTransform *transform = nullptr;
     for (LOTBase *item : contents) {

@@ -138,11 +138,15 @@ void LOTBezierPath::LOT_removeAllPoints()
 
 void LOTBezierPath::LOT_appendPath(QSharedPointer<LOTBezierPath> bezierPath)
 {
+    if (!bezierPath) {
+        return;
+    }
+
     _path.addPath(bezierPath->CGPath());
 
     LOT_Subpath *nextSubpath = bezierPath->headSubpath();
     while (nextSubpath) {
-      CGFloat length = 0;
+      qreal length = 0;
       if (cacheLengths) {
         if (bezierPath->cacheLengths) {
           length = nextSubpath->length;

@@ -76,26 +76,26 @@ public:
 //@property (nonatomic, readonly)
     QColor solidColor;
 //@property (nonatomic, readonly, nullable)
-    LOTAsset *imageAsset;
+    LOTAsset *imageAsset = nullptr;
 
 //@property (nonatomic, readonly)
-    LOTKeyframeGroup *opacity;
+    LOTKeyframeGroup *opacity = nullptr;
 //@property (nonatomic, readonly, nullable)
-    LOTKeyframeGroup *timeRemapping;
+    LOTKeyframeGroup *timeRemapping = nullptr;
 //@property (nonatomic, readonly)
-    LOTKeyframeGroup *rotation;
+    LOTKeyframeGroup *rotation = nullptr;
 //@property (nonatomic, readonly, nullable)
-    LOTKeyframeGroup *position;
+    LOTKeyframeGroup *position = nullptr;
 
 //@property (nonatomic, readonly, nullable)
-    LOTKeyframeGroup *positionX;
+    LOTKeyframeGroup *positionX = nullptr;
 //@property (nonatomic, readonly, nullable)
-    LOTKeyframeGroup *positionY;
+    LOTKeyframeGroup *positionY = nullptr;
 
 //@property (nonatomic, readonly)
-    LOTKeyframeGroup *anchor;
+    LOTKeyframeGroup *anchor = nullptr;
 //@property (nonatomic, readonly)
-    LOTKeyframeGroup *scale;
+    LOTKeyframeGroup *scale = nullptr;
 
 //@property (nonatomic, readonly)
     LOTMatteType matteType;

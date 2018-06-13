@@ -56,7 +56,7 @@ bool LOTAnimatorNode::updateWithFrame(qreal frame)
 bool LOTAnimatorNode::updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode * _Nonnull inputNode)> modifier, bool forceUpdate)
 {
     if (currentFrame == frame && !forceUpdate) {
-      return NO;
+      return false;
     }
     if (ENABLE_DEBUG_LOGGING) qCDebug(logAnimatorNode) << (quint64)this << keyname << "Checking for update";
     BOOL localUpdate = needsUpdateForFrame(frame) || forceUpdate;

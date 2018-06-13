@@ -30,7 +30,7 @@ private:
     QSharedPointer<LOTNumberInterpolator> _endInterpolator;
     QSharedPointer<LOTNumberInterpolator> _offsetInterpolator;
 
-    CGFloat _startT;
-    CGFloat _endT;
-    CGFloat _offsetT;
+    qreal _startT = 0.0;
+    qreal _endT = 0.0;
+    qreal _offsetT = 0.0;
 };
