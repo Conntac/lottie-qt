@@ -10,6 +10,8 @@
 #import "LOTPlatformCompat.h"
 #import "LOTKeyframe.h"
 
+#include "lotbase.h"
+
 #include <QString>
 #include <QColor>
 #include <QRectF>
@@ -65,7 +67,7 @@ public:
     QRectF layerBounds;
 
 //@property (nonatomic, readonly, nullable)
-    QList<LOTShapeGroup *> shapes;
+    QList<LOTBase *> shapes;
 //@property (nonatomic, readonly, nullable)
     QList<LOTMask *> masks;
 

@@ -83,7 +83,7 @@ QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTStrokeRenderer::valueInt
 bool LOTStrokeRenderer::needsUpdateForFrame(qreal frame)
 {
     _updateLineDashPatternsForFrame(frame);
-    BOOL dashOffset = NO;
+    bool dashOffset = false;
     if (_dashOffsetInterpolator) {
       dashOffset = _dashOffsetInterpolator->hasUpdateForFrame(frame);
     }

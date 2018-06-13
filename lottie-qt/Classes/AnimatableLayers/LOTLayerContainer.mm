@@ -228,7 +228,7 @@ void LOTLayerContainer::commonInitializeWith(LOTLayer *layer, LOTLayerGroup *lay
     _opacityInterpolator = _opacityInterpolator.create(layer->opacity->keyframes);
     if (layer->layerType == LOTLayerTypeShape &&
         !layer->shapes.isEmpty()) {
-      buildContents(qlist_cast<LOTBase *>(layer->shapes));
+      buildContents(layer->shapes);
     }
     if (layer->layerType == LOTLayerTypeSolid) {
       wrapperLayer->backgroundColor = layer->solidColor;

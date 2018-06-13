@@ -67,17 +67,15 @@ LOTLayer::LOTLayer(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup,
 
     QVariantMap ks = jsonDictionary.value("ks").toMap();
 
-    QVariantMap opacity = ks.value("o").toMap();
-    if (!opacity.isEmpty()) {
-      this->opacity = new LOTKeyframeGroup(opacity);
-      this->opacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+    if (ks.contains("o")) {
+      opacity = new LOTKeyframeGroup(ks.value("o"));
+      opacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
         return LOT_RemapValue(inValue, 0, 100, 0, 1);
       });
     }
 
-    QVariantMap timeRemap = jsonDictionary.value("tm").toMap();
-    if (!timeRemap.isEmpty()) {
-      timeRemapping = new LOTKeyframeGroup(timeRemap);
+    if (jsonDictionary.contains("tm")) {
+      timeRemapping = new LOTKeyframeGroup(jsonDictionary.value("tm"));
       timeRemapping->remapKeyframesWithBlock([=](qreal inValue) -> qreal {
         return inValue * framerate;
       });
@@ -103,15 +101,13 @@ LOTLayer::LOTLayer(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup,
       this->position = new LOTKeyframeGroup(position);
     }
 
-    QVariantMap anchor = ks.value("a").toMap();
-    if (!anchor.isEmpty()) {
-        this->anchor = new LOTKeyframeGroup(anchor);
+    if (ks.contains("a")) {
+        anchor = new LOTKeyframeGroup(ks.value("a"));
     }
 
-    QVariantMap scale = ks.value("s").toMap();
-    if (!scale.isEmpty()) {
-      this->scale = new LOTKeyframeGroup(scale);
-      this->scale->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+    if (ks.contains("s")) {
+      scale = new LOTKeyframeGroup(ks.value("s"));
+      scale->remapKeyframesWithBlock([](qreal inValue) -> qreal {
         return LOT_RemapValue(inValue, -100, 100, -1, 1);
       });
     }
@@ -124,7 +120,7 @@ LOTLayer::LOTLayer(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup,
     }
 
     for(const QVariant &variant : jsonDictionary.value("shapes").toList()) {
-        LOTShapeGroup *shapeItem = new LOTShapeGroup(variant.toMap());
+        LOTShapeItem *shapeItem = LOTShapeGroup::shapeItemWithJSON(variant.toMap());
         // FIXME: Handle parsing errors (return null)
         if (shapeItem) {
             shapes.append(shapeItem);
