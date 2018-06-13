@@ -11,49 +11,19 @@
 #import "LOTLayerGroup.h"
 #import "LOTAssetGroup.h"
 
-@implementation LOTAsset
+LOTAsset::LOTAsset(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup, qreal framerate)
+{
+    assetBundle = nil;
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary
-              withAssetGroup:(LOTAssetGroup * _Nullable)assetGroup
-             withAssetBundle:(NSBundle *_Nonnull)bundle
-               withFramerate:(NSNumber *)framerate {
-  self = [super init];
-  if (self) {
-    _assetBundle = bundle;
-    [self _mapFromJSON:jsonDictionary
-        withAssetGroup:assetGroup
-     withFramerate:framerate];
-  }
-  return self;
+    referenceID = jsonDictionary.value("id").toString();
+
+    assetWidth = jsonDictionary.value("w", 0.0).toReal();
+    assetHeight = jsonDictionary.value("h", 0.0).toReal();
+    imageDirectory = jsonDictionary.value("u").toString();
+    imageName = jsonDictionary.value("p").toString();
+
+    QVariant layers = jsonDictionary.value("layers");
+    if (!layers.isNull()) {
+        layerGroup = new LOTLayerGroup(layers.toList(), assetGroup, framerate);
+    }
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary
-      withAssetGroup:(LOTAssetGroup * _Nullable)assetGroup
-       withFramerate:(NSNumber *)framerate {
-  _referenceID = [jsonDictionary[@"id"] copy];
-  
-  if (jsonDictionary[@"w"]) {
-    _assetWidth = [jsonDictionary[@"w"] copy];
-  }
-  
-  if (jsonDictionary[@"h"]) {
-    _assetHeight = [jsonDictionary[@"h"] copy];
-  }
-  
-  if (jsonDictionary[@"u"]) {
-    _imageDirectory = [jsonDictionary[@"u"] copy];
-  }
-  
-  if (jsonDictionary[@"p"]) {
-    _imageName = [jsonDictionary[@"p"] copy];
-  }
-
-  NSArray *layersJSON = jsonDictionary[@"layers"];
-  if (layersJSON) {
-    _layerGroup = [[LOTLayerGroup alloc] initWithLayerJSON:layersJSON
-                                            withAssetGroup:assetGroup
-                                             withFramerate:framerate];
-  }
-}
-
-@end

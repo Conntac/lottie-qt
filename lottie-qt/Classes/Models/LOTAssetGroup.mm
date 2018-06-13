@@ -9,62 +9,56 @@
 #import "LOTAssetGroup.h"
 #import "LOTAsset.h"
 
-@implementation LOTAssetGroup {
-  NSMutableDictionary<NSString *, LOTAsset *> *_assetMap;
-  NSDictionary<NSString *, NSDictionary *> *_assetJSONMap;
-}
-
-- (instancetype _Nonnull)initWithJSON:(NSArray * _Nonnull)jsonArray
-                      withAssetBundle:(NSBundle * _Nullable)bundle
-                        withFramerate:(NSNumber * _Nonnull)framerate {
-  self = [super init];
-  if (self) {
-    _assetBundle = bundle;
-    _assetMap = [NSMutableDictionary dictionary];
-    NSMutableDictionary *assetJSONMap = [NSMutableDictionary dictionary];
-    for (NSDictionary<NSString *, NSString *> *assetDictionary in jsonArray) {
-      NSString *referenceID = assetDictionary[@"id"];
-      if (referenceID) {
-        assetJSONMap[referenceID] = assetDictionary;
-      }
-    }
-    _assetJSONMap = assetJSONMap;
-  }
-  return self;
-}
-
-- (void)buildAssetNamed:(NSString *)refID
-          withFramerate:(NSNumber * _Nonnull)framerate {
-  
-  if ([self assetModelForID:refID]) {
-    return;
-  }
-  
-  NSDictionary *assetDictionary = _assetJSONMap[refID];
-  if (assetDictionary) {
-    LOTAsset *asset = [[LOTAsset alloc] initWithJSON:assetDictionary
-                                      withAssetGroup:self
-                                     withAssetBundle:_assetBundle
-                                       withFramerate:framerate];
-    _assetMap[refID] = asset;
-  }
-}
-
-- (void)finalizeInitializationWithFramerate:(NSNumber * _Nonnull)framerate {
-  for (NSString *refID in _assetJSONMap.allKeys) {
-    [self buildAssetNamed:refID withFramerate:framerate];
-  }
-  _assetJSONMap = nil;
-}
-
-- (LOTAsset *)assetModelForID:(NSString *)assetID {
-  return _assetMap[assetID];
-}
-
-- (void)setRootDirectory:(NSString *)rootDirectory {
+void LOTAssetGroup::setRootDirectory(const QString &rootDirectory)
+{
     _rootDirectory = rootDirectory;
-    [_assetMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, LOTAsset * _Nonnull obj, BOOL * _Nonnull stop) {
-        obj.rootDirectory = rootDirectory;
-    }];
+
+    for(LOTAsset *obj : _assetMap) {
+        obj->rootDirectory = rootDirectory;
+    }
 }
-@end
+
+QString LOTAssetGroup::rootDirectory() const
+{
+    return _rootDirectory;
+}
+
+LOTAssetGroup::LOTAssetGroup(const QVariantList &jsonArray, qreal framerate)
+{
+//    assetBundle = bundle;
+
+    for(const QVariant &variant : jsonArray) {
+        QVariantMap assetDictionary = variant.toMap();
+
+        if (assetDictionary.contains("id")) {
+            QString referenceID = assetDictionary.value("id").toString();
+            _assetJSONMap.insert(referenceID, assetDictionary);
+        }
+    }
+}
+
+void LOTAssetGroup::buildAssetNamed(const QString &refID, qreal framerate)
+{
+    if (assetModelForID(refID)) {
+      return;
+    }
+
+    QVariantMap assetDictionary = _assetJSONMap.value(refID);
+    if (!assetDictionary.isEmpty()) {
+      LOTAsset *asset = new LOTAsset(assetDictionary, this, framerate);
+      _assetMap.insert(refID, asset);
+    }
+}
+
+void LOTAssetGroup::finalizeInitializationWithFramerate(qreal framerate)
+{
+    for (const QString &refID : _assetJSONMap.keys()) {
+      buildAssetNamed(refID, framerate);
+    }
+    _assetJSONMap.clear();
+}
+
+LOTAsset *LOTAssetGroup::assetModelForID(const QString &assetID)
+{
+    return _assetMap.value(assetID);
+}

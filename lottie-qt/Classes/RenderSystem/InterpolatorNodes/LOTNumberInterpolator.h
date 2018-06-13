@@ -10,12 +10,10 @@
 #import "LOTValueInterpolator.h"
 #import "LOTValueDelegate.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
 class LOTNumberInterpolator : public LOTValueInterpolator
 {
 public:
-    LOTNumberInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    LOTNumberInterpolator(const QList<LOTKeyframe *> &keyframes);
 
     // Functions
     qreal floatValueForFrame(qreal frame);
@@ -27,5 +25,3 @@ public:
     bool hasDelegateOverride() const override;
     void setValueDelegate(id<LOTValueDelegate> delegate) override;
 };
-
-NS_ASSUME_NONNULL_END

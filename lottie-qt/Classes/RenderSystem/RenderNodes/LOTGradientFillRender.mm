@@ -16,15 +16,15 @@
 #include <QSharedPointer>
 
 LOTGradientFillRender::LOTGradientFillRender(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeGradientFill *fill)
-: LOTRenderNode(inputNode, fill.keyname)
+: LOTRenderNode(inputNode, fill->keyname)
 {
-  _gradientInterpolator = _gradientInterpolator.create(fill.gradient.keyframes);
-  _startPointInterpolator = _startPointInterpolator.create(fill.startPoint.keyframes);
-  _endPointInterpolator = _endPointInterpolator.create(fill.endPoint.keyframes);
-  _opacityInterpolator = _opacityInterpolator.create(fill.opacity.keyframes);
-  _numberOfPositions = fill.numberOfColors.integerValue;
+  _gradientInterpolator = _gradientInterpolator.create(fill->gradient->keyframes);
+  _startPointInterpolator = _startPointInterpolator.create(fill->startPoint->keyframes);
+  _endPointInterpolator = _endPointInterpolator.create(fill->endPoint->keyframes);
+  _opacityInterpolator = _opacityInterpolator.create(fill->opacity->keyframes);
+  _numberOfPositions = fill->numberOfColors;
 
-  _evenOddFillRule = fill.evenOddFillRule;
+  _evenOddFillRule = fill->evenOddFillRule;
   CALayer *wrapperLayer = [CALayer new];
   _maskShape = [CAShapeLayer new];
   _maskShape.fillRule = _evenOddFillRule ? @"even-odd" : @"non-zero";
@@ -32,7 +32,7 @@ LOTGradientFillRender::LOTGradientFillRender(const QSharedPointer<LOTAnimatorNod
   _maskShape.actions = @{@"path": [NSNull null]};
 
   _gradientOpacityLayer = [LOTRadialGradientLayer new];
-  _gradientOpacityLayer.isRadial = (fill.type == LOTGradientTypeRadial);
+  _gradientOpacityLayer.isRadial = (fill->type == LOTGradientTypeRadial);
   _gradientOpacityLayer.actions = @{@"startPoint" : [NSNull null],
                                     @"endPoint" : [NSNull null],
                                     @"opacity" : [NSNull null],
@@ -45,7 +45,7 @@ LOTGradientFillRender::LOTGradientFillRender(const QSharedPointer<LOTAnimatorNod
   [wrapperLayer addSublayer:_gradientOpacityLayer];
 
   _gradientLayer = [LOTRadialGradientLayer new];
-  _gradientLayer.isRadial = (fill.type == LOTGradientTypeRadial);
+  _gradientLayer.isRadial = (fill->type == LOTGradientTypeRadial);
   _gradientLayer.mask = wrapperLayer;
   _gradientLayer.actions = [_gradientOpacityLayer.actions copy];
 //  [outputLayer addSublayer:_gradientLayer];

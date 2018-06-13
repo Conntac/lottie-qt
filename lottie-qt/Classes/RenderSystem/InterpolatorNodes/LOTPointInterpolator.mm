@@ -9,7 +9,7 @@
 #import "LOTPointInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-LOTPointInterpolator::LOTPointInterpolator(NSArray<LOTKeyframe *> *keyframes)
+LOTPointInterpolator::LOTPointInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
 {
 }
@@ -19,25 +19,25 @@ QPointF LOTPointInterpolator::pointValueForFrame(qreal frame)
     CGFloat progress = progressForFrame(frame);
     QPointF returnPoint;
     if (progress == 0) {
-      returnPoint = leadingKeyframe.pointValue;
+      returnPoint = leadingKeyframe->pointValue;
     } else if (progress == 1) {
-      returnPoint = trailingKeyframe.pointValue;
-    } else if (!leadingKeyframe.spatialOutTangent.isNull() ||
-               !trailingKeyframe.spatialInTangent.isNull()) {
+      returnPoint = trailingKeyframe->pointValue;
+    } else if (!leadingKeyframe->spatialOutTangent.isNull() ||
+               !trailingKeyframe->spatialInTangent.isNull()) {
       // Spatial Bezier path
-      QPointF outTan = LOT_PointAddedToPoint(leadingKeyframe.pointValue, leadingKeyframe.spatialOutTangent);
-      QPointF inTan = LOT_PointAddedToPoint(trailingKeyframe.pointValue, trailingKeyframe.spatialInTangent);
-      returnPoint = LOT_PointInCubicCurve(leadingKeyframe.pointValue, outTan, inTan, trailingKeyframe.pointValue, progress);
+      QPointF outTan = LOT_PointAddedToPoint(leadingKeyframe->pointValue, leadingKeyframe->spatialOutTangent);
+      QPointF inTan = LOT_PointAddedToPoint(trailingKeyframe->pointValue, trailingKeyframe->spatialInTangent);
+      returnPoint = LOT_PointInCubicCurve(leadingKeyframe->pointValue, outTan, inTan, trailingKeyframe->pointValue, progress);
     } else {
-      returnPoint = LOT_PointInLine(leadingKeyframe.pointValue, trailingKeyframe.pointValue, progress);
+      returnPoint = LOT_PointInLine(leadingKeyframe->pointValue, trailingKeyframe->pointValue, progress);
     }
     if (hasDelegateOverride()) {
       returnPoint = QPointF::fromCGPoint([delegate pointForFrame:frame
-                            startKeyframe:leadingKeyframe.keyframeTime.floatValue
-                              endKeyframe:trailingKeyframe.keyframeTime.floatValue
+                            startKeyframe:leadingKeyframe->keyframeTime
+                              endKeyframe:trailingKeyframe->keyframeTime
                      interpolatedProgress:progress
-                               startPoint:leadingKeyframe.pointValue.toCGPoint()
-                                 endPoint:trailingKeyframe.pointValue.toCGPoint()
+                               startPoint:leadingKeyframe->pointValue.toCGPoint()
+                                 endPoint:trailingKeyframe->pointValue.toCGPoint()
                              currentPoint:returnPoint.toCGPoint()]);
     }
     return returnPoint;

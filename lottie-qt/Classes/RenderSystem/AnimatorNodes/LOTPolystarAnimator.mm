@@ -17,15 +17,15 @@
 const CGFloat kPOLYSTAR_MAGIC_NUMBER = .47829f;
 
 LOTPolystarAnimator::LOTPolystarAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStar *shapeStar)
-: LOTAnimatorNode(inputNode, shapeStar.keyname)
+: LOTAnimatorNode(inputNode, shapeStar->keyname)
 {
-    _outerRadiusInterpolator = _outerRadiusInterpolator.create(shapeStar.outerRadius.keyframes);
-    _innerRadiusInterpolator = _innerRadiusInterpolator.create(shapeStar.innerRadius.keyframes);
-    _outerRoundnessInterpolator = _outerRoundnessInterpolator.create(shapeStar.outerRoundness.keyframes);
-    _innerRoundnessInterpolator = _innerRoundnessInterpolator.create(shapeStar.innerRoundness.keyframes);
-    _pointsInterpolator = _pointsInterpolator.create(shapeStar.numberOfPoints.keyframes);
-    _rotationInterpolator = _rotationInterpolator.create(shapeStar.rotation.keyframes);
-    _positionInterpolator = _positionInterpolator.create(shapeStar.position.keyframes);
+    _outerRadiusInterpolator = _outerRadiusInterpolator.create(shapeStar->outerRadius->keyframes);
+    _innerRadiusInterpolator = _innerRadiusInterpolator.create(shapeStar->innerRadius->keyframes);
+    _outerRoundnessInterpolator = _outerRoundnessInterpolator.create(shapeStar->outerRoundness->keyframes);
+    _innerRoundnessInterpolator = _innerRoundnessInterpolator.create(shapeStar->innerRoundness->keyframes);
+    _pointsInterpolator = _pointsInterpolator.create(shapeStar->numberOfPoints->keyframes);
+    _rotationInterpolator = _rotationInterpolator.create(shapeStar->rotation->keyframes);
+    _positionInterpolator = _positionInterpolator.create(shapeStar->position->keyframes);
 }
 
 

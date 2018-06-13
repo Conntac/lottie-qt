@@ -16,12 +16,12 @@
 #include <QSharedPointer>
 
 LOTTrimPathNode::LOTTrimPathNode(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeTrimPath *trimPath)
-: LOTAnimatorNode(inputNode, trimPath.keyname)
+: LOTAnimatorNode(inputNode, trimPath->keyname)
 {
     inputNode->setPathShouldCacheLengths(true);
-    _startInterpolator = _startInterpolator.create(trimPath.start.keyframes);
-    _endInterpolator = _endInterpolator.create(trimPath.end.keyframes);
-    _offsetInterpolator = _offsetInterpolator.create(trimPath.offset.keyframes);
+    _startInterpolator = _startInterpolator.create(trimPath->start->keyframes);
+    _endInterpolator = _endInterpolator.create(trimPath->end->keyframes);
+    _offsetInterpolator = _offsetInterpolator.create(trimPath->offset->keyframes);
 }
 
 

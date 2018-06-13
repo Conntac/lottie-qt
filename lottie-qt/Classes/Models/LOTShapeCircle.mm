@@ -8,33 +8,18 @@
 
 #import "LOTShapeCircle.h"
 
-@implementation LOTShapeCircle
+LOTShapeCircle::LOTShapeCircle(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    QVariantMap position = jsonDictionary["p"].toMap();
+    if (!position.isEmpty()) {
+      this->position = new LOTKeyframeGroup(position);
+    }
+
+    QVariantMap size = jsonDictionary["s"].toMap();
+    if (!size.isEmpty()) {
+      this->size = new LOTKeyframeGroup(size);
+    }
+    reversed = (jsonDictionary.value("d").toInt() == 3);
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSDictionary *position = jsonDictionary[@"p"];
-  if (position) {
-    _position = [[LOTKeyframeGroup alloc] initWithData:position];
-  }
-  
-  NSDictionary *size= jsonDictionary[@"s"];
-  if (size) {
-    _size = [[LOTKeyframeGroup alloc] initWithData:size];
-  }
-  NSNumber *reversed = jsonDictionary[@"d"];
-  _reversed = (reversed.integerValue == 3);
-}
-
-@end

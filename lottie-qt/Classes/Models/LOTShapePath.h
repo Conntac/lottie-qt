@@ -9,13 +9,19 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-@interface LOTShapePath : NSObject
+#include "lotbase.h"
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+class LOTShapePath : public LOTShapeItem
+{
+public:
+    LOTShapePath(const QVariantMap &jsonDictionary);
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) BOOL closed;
-@property (nonatomic, readonly) NSNumber *index;
-@property (nonatomic, readonly) LOTKeyframeGroup *shapePath;
-
-@end
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    bool closed;
+//@property (nonatomic, readonly)
+    int index = -1;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *shapePath = nullptr;
+};

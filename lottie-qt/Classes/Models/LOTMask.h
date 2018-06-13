@@ -9,21 +9,28 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-typedef enum : NSUInteger {
+enum LOTMaskMode {
   LOTMaskModeAdd,
   LOTMaskModeSubtract,
   LOTMaskModeIntersect,
   LOTMaskModeUnknown
-} LOTMaskMode;
+};
 
-@interface LOTMask : NSObject
+class LOTMask
+{
+public:
+    LOTMask(const QVariantMap &jsonDictionary);
 
-- (instancetype _Nonnull)initWithJSON:(NSDictionary * _Nonnull)jsonDictionary;
-
-@property (nonatomic, readonly) BOOL closed;
-@property (nonatomic, readonly) BOOL inverted;
-@property (nonatomic, readonly) LOTMaskMode maskMode;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *maskPath;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *opacity;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *expansion;
-@end
+//@property (nonatomic, readonly)
+    BOOL closed;
+//@property (nonatomic, readonly)
+    BOOL inverted;
+//@property (nonatomic, readonly)
+    LOTMaskMode maskMode;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *maskPath = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *opacity = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *expansion = nullptr;
+};

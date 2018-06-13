@@ -9,14 +9,21 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-@interface LOTShapeRectangle : NSObject
+#include "lotbase.h"
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+class LOTShapeRectangle : public LOTShapeItem
+{
+public:
+    LOTShapeRectangle(const QVariantMap &jsonDictionary);
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) LOTKeyframeGroup *position;
-@property (nonatomic, readonly) LOTKeyframeGroup *size;
-@property (nonatomic, readonly) LOTKeyframeGroup *cornerRadius;
-@property (nonatomic, readonly) BOOL reversed;
-
-@end
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *position = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *size = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *cornerRadius = nullptr;
+//@property (nonatomic, readonly)
+    bool reversed;
+};

@@ -14,16 +14,16 @@
 #include <QSharedPointer>
 
 LOTFillRenderer::LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeFill *fill)
-: LOTRenderNode(inputNode, fill.keyname)
+: LOTRenderNode(inputNode, fill->keyname)
 {
-    colorInterpolator_ = colorInterpolator_.create(fill.color.keyframes);
-    opacityInterpolator_ = opacityInterpolator_.create(fill.opacity.keyframes);
+    colorInterpolator_ = colorInterpolator_.create(fill->color->keyframes);
+    opacityInterpolator_ = opacityInterpolator_.create(fill->opacity->keyframes);
     centerPoint_DEBUG = centerPoint_DEBUG.create();
     centerPoint_DEBUG->bounds = QRectF(0, 0, 20, 20);
     if (ENABLE_DEBUG_SHAPES) {
         outputLayer->addSublayer(centerPoint_DEBUG);
     }
-    _evenOddFillRule = fill.evenOddFillRule;
+    _evenOddFillRule = fill->evenOddFillRule;
 
     outputLayer->setFillRule(_evenOddFillRule ? Qt::OddEvenFill : Qt::WindingFill);
 }

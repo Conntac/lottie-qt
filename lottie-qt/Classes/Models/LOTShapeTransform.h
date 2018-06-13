@@ -11,15 +11,24 @@
 #import <QuartzCore/QuartzCore.h>
 #import "LOTKeyframe.h"
 
-@interface LOTShapeTransform : NSObject
+#include "lotbase.h"
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+class LOTShapeTransform : public LOTShapeItem
+{
+public:
+    LOTShapeTransform(const QVariantMap &jsonDictionary);
 
-@property (nonatomic, readonly) NSString *keyname;
-@property (nonatomic, readonly) LOTKeyframeGroup *position;
-@property (nonatomic, readonly) LOTKeyframeGroup *anchor;
-@property (nonatomic, readonly) LOTKeyframeGroup *scale;
-@property (nonatomic, readonly) LOTKeyframeGroup *rotation;
-@property (nonatomic, readonly) LOTKeyframeGroup *opacity;
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *position = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *anchor = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *scale = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *rotation = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *opacity = nullptr;
 
-@end
+};

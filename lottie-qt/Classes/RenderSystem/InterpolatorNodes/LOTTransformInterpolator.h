@@ -20,16 +20,16 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTTransformInterpolator
 {
 public:
-    LOTTransformInterpolator(NSArray <LOTKeyframe *> *position,
-                             NSArray <LOTKeyframe *> *rotation,
-                             NSArray <LOTKeyframe *> *anchor,
-                             NSArray <LOTKeyframe *> *scale);
+    LOTTransformInterpolator(const QList<LOTKeyframe *> &position,
+                             const QList<LOTKeyframe *> &rotation,
+                             const QList<LOTKeyframe *> &anchor,
+                             const QList<LOTKeyframe *> &scale);
 
-    LOTTransformInterpolator(NSArray <LOTKeyframe *> *positionX,
-                             NSArray <LOTKeyframe *> *positionY,
-                             NSArray <LOTKeyframe *> *rotation,
-                             NSArray <LOTKeyframe *> *anchor,
-                             NSArray <LOTKeyframe *> *scale);
+    LOTTransformInterpolator(const QList<LOTKeyframe *> &positionX,
+                             const QList<LOTKeyframe *> &positionY,
+                             const QList<LOTKeyframe *> &rotation,
+                             const QList<LOTKeyframe *> &anchor,
+                             const QList<LOTKeyframe *> &scale);
 
     static QSharedPointer<LOTTransformInterpolator> transformForLayer(LOTLayer *layer);
 
@@ -49,12 +49,12 @@ public:
     bool hasUpdateForFrame(qreal frame);
 
 private:
-    void initialize(NSArray <LOTKeyframe *> *positionX,
-                    NSArray <LOTKeyframe *> * positionY,
-                    NSArray <LOTKeyframe *> * position,
-                    NSArray <LOTKeyframe *> * rotation,
-                    NSArray <LOTKeyframe *> * anchor,
-                    NSArray <LOTKeyframe *> * scale);
+    void initialize(const QList<LOTKeyframe *> &positionX,
+                    const QList<LOTKeyframe *> &positionY,
+                    const QList<LOTKeyframe *> &position,
+                    const QList<LOTKeyframe *> &rotation,
+                    const QList<LOTKeyframe *> &anchor,
+                    const QList<LOTKeyframe *> &scale);
 };
 
 NS_ASSUME_NONNULL_END

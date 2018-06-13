@@ -9,13 +9,19 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-@interface LOTShapeTrimPath : NSObject
+#include "lotbase.h"
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+class LOTShapeTrimPath : public LOTShapeItem
+{
+public:
+    LOTShapeTrimPath(const QVariantMap &jsonDictionary);
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) LOTKeyframeGroup *start;
-@property (nonatomic, readonly) LOTKeyframeGroup *end;
-@property (nonatomic, readonly) LOTKeyframeGroup *offset;
-
-@end
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *start = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *end = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *offset = nullptr;
+};

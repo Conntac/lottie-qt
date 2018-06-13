@@ -8,23 +8,30 @@
 
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
+#include "lotbase.h"
 
-NS_ASSUME_NONNULL_BEGIN
+class LOTShapeRepeater : public LOTShapeItem
+{
+public:
+    LOTShapeRepeater(const QVariantMap &jsonDictionary);
 
-@interface LOTShapeRepeater : NSObject
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *copies = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *offset = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *anchorPoint = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *scale = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *position = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *rotation = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *startOpacity = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *endOpacity = nullptr;
+};
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
-
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *copies;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *offset;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *anchorPoint;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *scale;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *position;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *rotation;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *startOpacity;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *endOpacity;
-
-@end
-
-NS_ASSUME_NONNULL_END

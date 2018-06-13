@@ -18,13 +18,13 @@
 const CGFloat kPOLYGON_MAGIC_NUMBER = .25f;
 
 LOTPolygonAnimator::LOTPolygonAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStar *shapeStar)
-: LOTAnimatorNode(inputNode, shapeStar.keyname)
+: LOTAnimatorNode(inputNode, shapeStar->keyname)
 {
-    _outerRadiusInterpolator = _outerRadiusInterpolator.create(shapeStar.outerRadius.keyframes);
-    _outerRoundnessInterpolator = _outerRoundnessInterpolator.create(shapeStar.outerRoundness.keyframes);
-    _pointsInterpolator = _pointsInterpolator.create(shapeStar.numberOfPoints.keyframes);
-    _rotationInterpolator = _rotationInterpolator.create(shapeStar.rotation.keyframes);
-    _positionInterpolator = _positionInterpolator.create(shapeStar.position.keyframes);
+    _outerRadiusInterpolator = _outerRadiusInterpolator.create(shapeStar->outerRadius->keyframes);
+    _outerRoundnessInterpolator = _outerRoundnessInterpolator.create(shapeStar->outerRoundness->keyframes);
+    _pointsInterpolator = _pointsInterpolator.create(shapeStar->numberOfPoints->keyframes);
+    _rotationInterpolator = _rotationInterpolator.create(shapeStar->rotation->keyframes);
+    _positionInterpolator = _positionInterpolator.create(shapeStar->position->keyframes);
 }
 
 

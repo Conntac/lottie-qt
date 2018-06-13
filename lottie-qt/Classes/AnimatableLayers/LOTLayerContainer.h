@@ -61,14 +61,14 @@ public:
 private:
     void commonInitializeWith(LOTLayer *layer,
                               LOTLayerGroup *layerGroup);
-    void buildContents(NSArray *contents);
+    void buildContents(const QList<LOTBase *> &contents);
 
     QRectF _viewportBounds;
 
     QSharedPointer<LOTTransformInterpolator> _transformInterpolator;
     QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
-    NSNumber *_inFrame;
-    NSNumber *_outFrame;
+    qreal _inFrame;
+    qreal _outFrame;
     QSharedPointer<QQuickLottieLayer> DEBUG_Center;
     QSharedPointer<LOTRenderGroup> _contentsGroup;
     QSharedPointer<LOTMaskContainer> _maskLayer;

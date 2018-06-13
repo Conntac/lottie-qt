@@ -9,44 +9,27 @@
 #import "LOTShapeFill.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTShapeFill
+LOTShapeFill::LOTShapeFill(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    if (jsonDictionary.contains("c")) {
+      color = new LOTKeyframeGroup(jsonDictionary.value("c"));
+    }
+
+    if (jsonDictionary.contains("o")) {
+      opacity = new LOTKeyframeGroup(jsonDictionary.value("o"));
+      opacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, 0, 100, 0, 1);
+      });
+    }
+
+    int evenOdd = jsonDictionary.value("r").toInt();
+    if (evenOdd == 2) {
+      evenOddFillRule = true;
+    } else {
+      evenOddFillRule = false;
+    }
+
+    fillEnabled = jsonDictionary.value("fillEnabled").toBool();
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSDictionary *color = jsonDictionary[@"c"];
-  if (color) {
-    _color = [[LOTKeyframeGroup alloc] initWithData:color];
-  }
-  
-  NSDictionary *opacity = jsonDictionary[@"o"];
-  if (opacity) {
-    _opacity = [[LOTKeyframeGroup alloc] initWithData:opacity];
-    [_opacity remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, 0, 100, 0, 1);
-    }];
-  }
-  
-  NSNumber *evenOdd = jsonDictionary[@"r"];
-  if (evenOdd.integerValue == 2) {
-    _evenOddFillRule = YES;
-  } else {
-    _evenOddFillRule = NO;
-  }
-  
-  NSNumber *fillEnabled = jsonDictionary[@"fillEnabled"];
-  _fillEnabled = fillEnabled.boolValue;
-}
-
-@end

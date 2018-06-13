@@ -13,14 +13,10 @@
 #import "LOTAnimationCache.h"
 
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-@implementation LOTComposition
-
-# pragma mark - Convenience Initializers
-
-+ (nullable instancetype)animationNamed:(nonnull NSString *)animationName {
-  return [self animationNamed:animationName inBundle:[NSBundle mainBundle]];
-}
+/*
 
 + (nullable instancetype)animationNamed:(nonnull NSString *)animationName inBundle:(nonnull NSBundle *)bundle {
   NSArray *components = [animationName componentsSeparatedByString:@"."];
@@ -52,7 +48,9 @@
   NSLog(@"%s: Animation Not Found", __PRETTY_FUNCTION__);
   return nil;
 }
+*/
 
+/*
 + (nullable instancetype)animationWithFilePath:(const QString &)filePath {
 //  NSString *animationName = filePath;
   
@@ -81,67 +79,62 @@
   NSLog(@"%s: Animation Not Found", __PRETTY_FUNCTION__);
   return nil;
 }
+*/
 
-+ (nonnull instancetype)animationFromJSON:(nonnull NSDictionary *)animationJSON {
-  return [self animationFromJSON:animationJSON inBundle:[NSBundle mainBundle]];
-}
+LOTComposition::LOTComposition(const QString &filePath)
+{
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly)) {
+        QJsonParseError error;
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
 
-+ (nonnull instancetype)animationFromJSON:(nullable NSDictionary *)animationJSON inBundle:(nullable NSBundle *)bundle {
-  return [[self alloc] initWithJSON:animationJSON withAssetBundle:bundle];
-}
-
-#pragma mark - Initializer
-
-- (instancetype _Nonnull)initWithJSON:(NSDictionary * _Nullable)jsonDictionary
-                      withAssetBundle:(NSBundle * _Nullable)bundle {
-  self = [super init];
-  if (self) {
-    if (jsonDictionary) {
-      [self _mapFromJSON:jsonDictionary withAssetBundle:bundle];
+        if (error.error == QJsonParseError::NoError) {
+            QJsonObject obj = doc.object();
+            mapFromJSON(obj.toVariantMap());
+        }
     }
-  }
-  return self;
 }
 
-#pragma mark - Internal Methods
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary
-     withAssetBundle:(NSBundle *)bundle {
-  NSNumber *width = jsonDictionary[@"w"];
-  NSNumber *height = jsonDictionary[@"h"];
-  if (width && height) {
-    CGRect bounds = CGRectMake(0, 0, width.floatValue, height.floatValue);
-    _compBounds = bounds;
-  }
-  
-  _startFrame = [jsonDictionary[@"ip"] copy];
-  _endFrame = [jsonDictionary[@"op"] copy];
-  _framerate = [jsonDictionary[@"fr"] copy];
-  
-  if (_startFrame && _endFrame && _framerate) {
-    NSInteger frameDuration = (_endFrame.integerValue - _startFrame.integerValue) - 1;
-    NSTimeInterval timeDuration = frameDuration / _framerate.floatValue;
-    _timeDuration = timeDuration;
-  }
-  
-  NSArray *assetArray = jsonDictionary[@"assets"];
-  if (assetArray.count) {
-    _assetGroup = [[LOTAssetGroup alloc] initWithJSON:assetArray withAssetBundle:bundle withFramerate:_framerate];
-  }
-  
-  NSArray *layersJSON = jsonDictionary[@"layers"];
-  if (layersJSON) {
-    _layerGroup = [[LOTLayerGroup alloc] initWithLayerJSON:layersJSON
-                                            withAssetGroup:_assetGroup
-                                             withFramerate:_framerate];
-  }
-  
-  [_assetGroup finalizeInitializationWithFramerate:_framerate];
-}
-  
-- (void)setRootDirectory:(NSString *)rootDirectory {
+void LOTComposition::setRootDirectory(const QString &rootDirectory)
+{
     _rootDirectory = rootDirectory;
-    self.assetGroup.rootDirectory = rootDirectory;
+    assetGroup->setRootDirectory(rootDirectory);
 }
-  
-@end
+
+QString LOTComposition::rootDirectory() const
+{
+    return _rootDirectory;
+}
+
+void LOTComposition::mapFromJSON(const QVariantMap &jsonDictionary)
+{
+    qreal width = jsonDictionary["w"].toReal();
+    qreal height = jsonDictionary["h"].toReal();
+    if (width && height) {
+      compBounds = QRectF(0, 0, width, height);
+    }
+
+    startFrame = jsonDictionary.value("ip", -1).toInt();
+    endFrame = jsonDictionary.value("op", -1).toInt();
+    framerate = jsonDictionary.value("fr", -1).toInt();
+
+    if (startFrame != -1 && endFrame != -1 && framerate != -1) {
+      int frameDuration = (endFrame - startFrame) - 1;
+      timeDuration = frameDuration / framerate;
+    }
+
+    QVariantList assetArray = jsonDictionary["assets"].toList();
+    // TODO: always call if assets entry exists
+    if (assetArray.size()) {
+      assetGroup = new LOTAssetGroup(assetArray, framerate);
+    }
+
+    QVariantList layersJSON = jsonDictionary["layers"].toList();
+    if (layersJSON.size()) {
+      layerGroup = new LOTLayerGroup(layersJSON, assetGroup, framerate);
+    }
+
+    if (assetGroup) {
+        assetGroup->finalizeInitializationWithFramerate(framerate);
+    }
+}

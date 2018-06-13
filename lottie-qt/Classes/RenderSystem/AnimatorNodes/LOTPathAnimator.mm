@@ -11,10 +11,10 @@
 #include <QSharedPointer>
 
 LOTPathAnimator::LOTPathAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapePath *shapePath)
-: LOTAnimatorNode(inputNode, shapePath.keyname)
+: LOTAnimatorNode(inputNode, shapePath->keyname)
 {
     _pathConent = shapePath;
-    _interpolator = _interpolator.create(_pathConent.shapePath.keyframes);
+    _interpolator = _interpolator.create(_pathConent->shapePath->keyframes);
 }
 
 QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTPathAnimator::valueInterpolators() const

@@ -9,20 +9,35 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
-@class LOTAsset;
-@class LOTLayerGroup;
-@interface LOTAssetGroup : NSObject
-@property (nonatomic, readwrite) NSString * _Nullable rootDirectory;
-@property (nonatomic, readonly, nullable) NSBundle *assetBundle;
+#include <QList>
+#include <QMap>
 
-- (instancetype _Nonnull)initWithJSON:(NSArray * _Nonnull)jsonArray
-                      withAssetBundle:(NSBundle *_Nullable)bundle
-                        withFramerate:(NSNumber * _Nonnull)framerate;
+class LOTAsset;
+class LOTLayerGroup;
 
-- (void)buildAssetNamed:(NSString * _Nonnull)refID withFramerate:(NSNumber * _Nonnull)framerate;
+class LOTAssetGroup
+{
+public:
 
-- (void)finalizeInitializationWithFramerate:(NSNumber * _Nonnull)framerate;
+//@property (nonatomic, readwrite)
+    void setRootDirectory(const QString &rootDirectory);
+    QString rootDirectory() const;
 
-- (LOTAsset * _Nullable)assetModelForID:(NSString * _Nonnull)assetID;
+//@property (nonatomic, readonly, nullable)
+    NSBundle *assetBundle = nil;
 
-@end
+    LOTAssetGroup(const QVariantList &jsonArray,
+                  qreal framerate);
+
+    void buildAssetNamed(const QString &refID, qreal framerate);
+
+    void finalizeInitializationWithFramerate(qreal framerate);
+
+    LOTAsset *_Nullable assetModelForID(const QString &assetID);
+
+private:
+    QString _rootDirectory;
+
+    QMap<QString, LOTAsset *> _assetMap;
+    QMap<QString, QVariantMap> _assetJSONMap;
+};

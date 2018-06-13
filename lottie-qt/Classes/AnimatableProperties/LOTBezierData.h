@@ -10,13 +10,12 @@
 #import <CoreGraphics/CoreGraphics.h>
 
 #include <QPointF>
-
-NS_ASSUME_NONNULL_BEGIN
+#include <QVariantMap>
 
 class LOTBezierData
 {
 public:
-    explicit LOTBezierData(NSDictionary *bezierData);
+    explicit LOTBezierData(const QVariantMap &bezierData);
     ~LOTBezierData();
 
 //    @property (nonatomic, readonly)
@@ -29,7 +28,7 @@ public:
     QPointF outTangentAtIndex(int index) const;
 
 private:
-    void initializeData(NSDictionary *bezierData);
+    void initializeData(const QVariantMap &bezierData);
 
     QPointF *_vertices = nullptr;
     QPointF *_inTangents = nullptr;
@@ -38,4 +37,3 @@ private:
     bool _closed = false;
 };
 
-NS_ASSUME_NONNULL_END

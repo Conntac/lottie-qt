@@ -31,7 +31,26 @@ QColor qcolorFromCGColor(CGColorRef cgcolor)
     return pc;
 }
 
-LOTColorInterpolator::LOTColorInterpolator(NSArray<LOTKeyframe *> *keyframes)
+static QColor LOT_colorByLerpingFromColor(QColor fromColor, QColor toColor, qreal amount) {
+  Q_ASSERT_X((!toColor.isValid() && !fromColor.isValid()), "LOT_colorByLerpingFromColor", "Passing Nil Color");
+  amount = CLAMP(amount, 0.f, 1.f);
+
+  qreal fromComponents[4];
+  fromColor.getRgbF(&fromComponents[0], &fromComponents[1], &fromComponents[2], &fromComponents[3]);
+  qreal toComponents[4];
+  toColor.getRgbF(&toComponents[0], &toComponents[1], &toComponents[2], &toComponents[3]);
+
+  qreal r = fromComponents[0] + ((toComponents[0] - fromComponents[0]) * amount);
+  qreal g = fromComponents[1] + ((toComponents[1] - fromComponents[1]) * amount);
+  qreal b = fromComponents[2] + ((toComponents[2] - fromComponents[2]) * amount);
+  qreal a = fromComponents[3] + ((toComponents[3] - fromComponents[3]) * amount);
+
+  QColor c;
+  c.setRgbF(r, g, b, a);
+  return c;
+}
+
+LOTColorInterpolator::LOTColorInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
 {
 }
@@ -39,26 +58,26 @@ LOTColorInterpolator::LOTColorInterpolator(NSArray<LOTKeyframe *> *keyframes)
 QColor LOTColorInterpolator::colorForFrame(qreal frame)
 {
     CGFloat progress = progressForFrame(frame);
-    UIColor *returnColor;
+    QColor returnColor;
 
     if (progress == 0) {
-      returnColor = leadingKeyframe.colorValue;
+      returnColor = leadingKeyframe->colorValue;
     } else if (progress == 1) {
-      returnColor = trailingKeyframe.colorValue;
+      returnColor = trailingKeyframe->colorValue;
     } else {
-      returnColor = [UIColor LOT_colorByLerpingFromColor:leadingKeyframe.colorValue toColor:trailingKeyframe.colorValue amount:progress];
+      returnColor = LOT_colorByLerpingFromColor(leadingKeyframe->colorValue, trailingKeyframe->colorValue, progress);
     }
     if (hasDelegateOverride()) {
-      return qcolorFromCGColor([delegate colorForFrame:frame
-                       startKeyframe:leadingKeyframe.keyframeTime.floatValue
-                         endKeyframe:trailingKeyframe.keyframeTime.floatValue
+      return [delegate colorForFrame:frame
+                       startKeyframe:leadingKeyframe->keyframeTime
+                         endKeyframe:trailingKeyframe->keyframeTime
                 interpolatedProgress:progress
-                          startColor:leadingKeyframe.colorValue.CGColor
-                            endColor:trailingKeyframe.colorValue.CGColor
-                        currentColor:returnColor.CGColor]);
+                          startColor:leadingKeyframe->colorValue
+                            endColor:trailingKeyframe->colorValue
+                        currentColor:returnColor];
     }
 
-    return qcolorFromCGColor(returnColor.CGColor);
+    return returnColor;
 }
 
 void LOTColorInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)

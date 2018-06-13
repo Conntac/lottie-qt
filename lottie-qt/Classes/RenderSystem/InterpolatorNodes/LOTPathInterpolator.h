@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTPathInterpolator : public LOTValueInterpolator
 {
 public:
-    LOTPathInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    LOTPathInterpolator(const QList<LOTKeyframe *> &keyframes);
 
     QSharedPointer<LOTBezierPath> pathForFrame(qreal frame, bool cacheLengths);
 

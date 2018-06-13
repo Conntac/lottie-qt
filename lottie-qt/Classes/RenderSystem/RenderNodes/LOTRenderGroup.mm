@@ -26,7 +26,7 @@
 
 #include <QSharedPointer>
 
-LOTRenderGroup::LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray *contents, const QString &keyname)
+LOTRenderGroup::LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, const QList<LOTBase *> &contents, const QString &keyname)
 : LOTRenderNode(inputNode, keyname)
 {
 //    containerLayer = [CALayer layer];
@@ -81,7 +81,7 @@ bool LOTRenderGroup::needsUpdateForFrame(qreal frame)
 bool LOTRenderGroup::updateWithFrame(qreal frame, std::function<void (LOTAnimatorNode *)> modifier, bool forceUpdate)
 {
     indentation_level = indentation_level + 1;
-    _rootNodeHasUpdate = _rootNode->updateWithFrame(frame, modifier, forceUpdate);
+    _rootNodeHasUpdate = _rootNode && _rootNode->updateWithFrame(frame, modifier, forceUpdate);
     indentation_level = indentation_level - 1;
     BOOL update = LOTRenderNode::updateWithFrame(frame, modifier, forceUpdate);
     return update;
@@ -90,7 +90,9 @@ bool LOTRenderGroup::updateWithFrame(qreal frame, std::function<void (LOTAnimato
 void LOTRenderGroup::setPathShouldCacheLengths(bool pathShouldCacheLengths)
 {
     LOTRenderNode::setPathShouldCacheLengths(pathShouldCacheLengths);
-    _rootNode->setPathShouldCacheLengths(pathShouldCacheLengths);
+    if (_rootNode) {
+        _rootNode->setPathShouldCacheLengths(pathShouldCacheLengths);
+    }
 }
 
 void LOTRenderGroup::performLocalUpdate()
@@ -125,64 +127,65 @@ void LOTRenderGroup::rebuildOutputs()
     }
 }
 
-void LOTRenderGroup::buildContents(NSArray *contents)
+void LOTRenderGroup::buildContents(const QList<LOTBase *> &contents)
 {
+    // FIXME: use dynamic casts
     QSharedPointer<LOTAnimatorNode> previousNode;
-    LOTShapeTransform *transform;
-    for (id item in contents) {
-      if ([item isKindOfClass:[LOTShapeFill class]]) {
-        QSharedPointer<LOTFillRenderer> fillRenderer = fillRenderer.create(previousNode, (LOTShapeFill *)item);
+    LOTShapeTransform *transform = nullptr;
+    for (LOTBase *item : contents) {
+      if (dynamic_cast<LOTShapeFill *>(item)) {
+        QSharedPointer<LOTFillRenderer> fillRenderer = fillRenderer.create(previousNode, dynamic_cast<LOTShapeFill *>(item));
         containerLayer->insertSublayer(fillRenderer->outputLayer, 0);
         previousNode = fillRenderer;
-      } else if ([item isKindOfClass:[LOTShapeStroke class]]) {
-        QSharedPointer<LOTStrokeRenderer> strokRenderer = strokRenderer.create(previousNode, (LOTShapeStroke *)item);
+      } else if (dynamic_cast<LOTShapeStroke *>(item)) {
+        QSharedPointer<LOTStrokeRenderer> strokRenderer = strokRenderer.create(previousNode, dynamic_cast<LOTShapeStroke *>(item));
         containerLayer->insertSublayer(strokRenderer->outputLayer, 0);
         previousNode = strokRenderer;
-      } else if ([item isKindOfClass:[LOTShapePath class]]) {
-        QSharedPointer<LOTPathAnimator> pathAnimator = pathAnimator.create(previousNode, (LOTShapePath *)item);
+      } else if (dynamic_cast<LOTShapePath *>(item)) {
+        QSharedPointer<LOTPathAnimator> pathAnimator = pathAnimator.create(previousNode, dynamic_cast<LOTShapePath *>(item));
         previousNode = pathAnimator;
-      } else if ([item isKindOfClass:[LOTShapeRectangle class]]) {
-        QSharedPointer<LOTRoundedRectAnimator> rectAnimator = rectAnimator.create(previousNode, (LOTShapeRectangle *)item);
+      } else if (dynamic_cast<LOTShapeRectangle *>(item)) {
+        QSharedPointer<LOTRoundedRectAnimator> rectAnimator = rectAnimator.create(previousNode, dynamic_cast<LOTShapeRectangle *>(item));
         previousNode = rectAnimator;
-      } else if ([item isKindOfClass:[LOTShapeCircle class]]) {
-        QSharedPointer<LOTCircleAnimator> circleAnimator = circleAnimator.create(previousNode, (LOTShapeCircle *)item);
+      } else if (dynamic_cast<LOTShapeCircle *>(item)) {
+        QSharedPointer<LOTCircleAnimator> circleAnimator = circleAnimator.create(previousNode, dynamic_cast<LOTShapeCircle *>(item));
         previousNode = circleAnimator;
-      } else if ([item isKindOfClass:[LOTShapeGroup class]]) {
+      } else if (dynamic_cast<LOTShapeGroup *>(item)) {
         LOTShapeGroup *shapeGroup = (LOTShapeGroup *)item;
-        QSharedPointer<LOTRenderGroup> renderGroup = renderGroup.create(previousNode, shapeGroup.items, shapeGroup.keyname);
+        QSharedPointer<LOTRenderGroup> renderGroup = renderGroup.create(previousNode, shapeGroup->items, shapeGroup->keyname);
         containerLayer->insertSublayer(renderGroup->containerLayer, 0);
         previousNode = renderGroup;
-      } else if ([item isKindOfClass:[LOTShapeTransform class]]) {
-        transform = (LOTShapeTransform *)item;
-      } else if ([item isKindOfClass:[LOTShapeTrimPath class]]) {
-        QSharedPointer<LOTTrimPathNode> trim = trim.create(previousNode, (LOTShapeTrimPath *)item);
+      } else if (dynamic_cast<LOTShapeTransform *>(item)) {
+        transform = dynamic_cast<LOTShapeTransform *>(item);
+      } else if (dynamic_cast<LOTShapeTrimPath *>(item)) {
+        QSharedPointer<LOTTrimPathNode> trim = trim.create(previousNode, dynamic_cast<LOTShapeTrimPath *>(item));
         previousNode = trim;
-      } else if ([item isKindOfClass:[LOTShapeStar class]]) {
-        LOTShapeStar *star = (LOTShapeStar *)item;
-        if (star.type == LOTPolystarShapeStar) {
+      } else if (dynamic_cast<LOTShapeStar *>(item)) {
+        LOTShapeStar *star = dynamic_cast<LOTShapeStar *>(item);
+        if (star->type == LOTPolystarShapeStar) {
           QSharedPointer<LOTPolystarAnimator> starAnimator = starAnimator.create(previousNode, star);
           previousNode = starAnimator;
         }
-        if (star.type == LOTPolystarShapePolygon) {
+        if (star->type == LOTPolystarShapePolygon) {
           QSharedPointer<LOTPolygonAnimator> polygonAnimator = polygonAnimator.create(previousNode, star);
           previousNode = polygonAnimator;
         }
-      } else if ([item isKindOfClass:[LOTShapeGradientFill class]]) {
-        QSharedPointer<LOTGradientFillRender> gradientFill = gradientFill.create(previousNode, (LOTShapeGradientFill *)item);
+      } else if (dynamic_cast<LOTShapeGradientFill *>(item)) {
+        QSharedPointer<LOTGradientFillRender> gradientFill = gradientFill.create(previousNode, dynamic_cast<LOTShapeGradientFill *>(item));
         previousNode = gradientFill;
         containerLayer->insertSublayer(gradientFill->outputLayer, 0);
-      } else if ([item isKindOfClass:[LOTShapeRepeater class]]) {
-        QSharedPointer<LOTRepeaterRenderer> repeater = repeater.create(previousNode, (LOTShapeRepeater *)item);
+      } else if (dynamic_cast<LOTShapeRepeater *>(item)) {
+        QSharedPointer<LOTRepeaterRenderer> repeater = repeater.create(previousNode, dynamic_cast<LOTShapeRepeater *>(item));
         previousNode = repeater;
         containerLayer->insertSublayer(repeater->outputLayer, 0);
       }
     }
     if (transform) {
-      _opacityInterpolator = _opacityInterpolator.create(transform.opacity.keyframes);
-      _transformInterolator = _transformInterolator.create(transform.position.keyframes,
-                                                           transform.rotation.keyframes,
-                                                           transform.anchor.keyframes,
-                                                           transform.scale.keyframes);
+      _opacityInterpolator = _opacityInterpolator.create(transform->opacity->keyframes);
+      _transformInterolator = _transformInterolator.create(transform->position->keyframes,
+                                                           transform->rotation->keyframes,
+                                                           transform->anchor->keyframes,
+                                                           transform->scale->keyframes);
     }
     _rootNode = previousNode;
 }
@@ -210,7 +213,9 @@ void LOTRenderGroup::searchNodesForKeypath(LOTKeypath *keypath)
         keypath->addSearchResultForCurrentPath(sharedFromThis());
       }
       // Check child nodes
-      _rootNode->searchNodesForKeypath(keypath);
+      if (_rootNode) {
+          _rootNode->searchNodesForKeypath(keypath);
+      }
       keypath->popKey();
     }
 }
@@ -231,7 +236,9 @@ void LOTRenderGroup::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath 
       }
 
       // Check child nodes
-      _rootNode->setValueDelegate(delegate, keypath);
+      if (_rootNode) {
+          _rootNode->setValueDelegate(delegate, keypath);
+      }
 
       keypath->popKey();
     }

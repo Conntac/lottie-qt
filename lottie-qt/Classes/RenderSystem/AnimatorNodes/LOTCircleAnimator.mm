@@ -13,11 +13,11 @@
 const CGFloat kLOTEllipseControlPointPercentage = 0.55228;
 
 LOTCircleAnimator::LOTCircleAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeCircle *shapeCircle)
-: LOTAnimatorNode(inputNode, shapeCircle.keyname)
+: LOTAnimatorNode(inputNode, shapeCircle->keyname)
 {
-    _centerInterpolator = _centerInterpolator.create(shapeCircle.position.keyframes);
-    _sizeInterpolator = _sizeInterpolator.create(shapeCircle.size.keyframes);
-    _reversed = shapeCircle.reversed;
+    _centerInterpolator = _centerInterpolator.create(shapeCircle->position->keyframes);
+    _sizeInterpolator = _sizeInterpolator.create(shapeCircle->size->keyframes);
+    _reversed = shapeCircle->reversed;
 }
 
 QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTCircleAnimator::valueInterpolators() const

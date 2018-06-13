@@ -9,31 +9,42 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-typedef enum : NSUInteger {
+#include "lotbase.h"
+
+enum LOTLineCapType {
   LOTLineCapTypeButt,
   LOTLineCapTypeRound,
   LOTLineCapTypeUnknown
-} LOTLineCapType;
+};
 
-typedef enum : NSUInteger {
+enum LOTLineJoinType {
   LOTLineJoinTypeMiter,
   LOTLineJoinTypeRound,
   LOTLineJoinTypeBevel
-} LOTLineJoinType;
+};
 
-@interface LOTShapeStroke : NSObject
+class LOTShapeStroke : public LOTShapeItem
+{
+public:
+    LOTShapeStroke(const QVariantMap &jsonDictionary);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    bool fillEnabled;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *color = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *opacity = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *width = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *dashOffset = nullptr;
+//@property (nonatomic, readonly)
+    LOTLineCapType capType = LOTLineCapTypeButt;
+//@property (nonatomic, readonly)
+    LOTLineJoinType joinType = LOTLineJoinTypeMiter;
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) BOOL fillEnabled;
-@property (nonatomic, readonly) LOTKeyframeGroup *color;
-@property (nonatomic, readonly) LOTKeyframeGroup *opacity;
-@property (nonatomic, readonly) LOTKeyframeGroup *width;
-@property (nonatomic, readonly) LOTKeyframeGroup *dashOffset;
-@property (nonatomic, readonly) LOTLineCapType capType;
-@property (nonatomic, readonly) LOTLineJoinType joinType;
-
-@property (nonatomic, readonly) NSArray *lineDashPattern;
-
-@end
+//@property (nonatomic, readonly)
+    QList<LOTKeyframeGroup *> lineDashPattern;
+};

@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTColorInterpolator : public LOTValueInterpolator
 {
 public:
-    LOTColorInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    LOTColorInterpolator(const QList<LOTKeyframe *> &keyframes);
 
     QColor colorForFrame(qreal frame);
 
@@ -26,9 +26,5 @@ public:
     bool hasDelegateOverride() const override;
     void setValueDelegate(id<LOTValueDelegate> delegate) override;
 };
-
-
-
-
 
 NS_ASSUME_NONNULL_END

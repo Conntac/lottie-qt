@@ -8,38 +8,21 @@
 
 #import "LOTShapeRectangle.h"
 
-@implementation LOTShapeRectangle
+LOTShapeRectangle::LOTShapeRectangle(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    if (jsonDictionary.contains("p")) {
+      position = new LOTKeyframeGroup(jsonDictionary.value("p"));
+    }
+
+    if (jsonDictionary.contains("r")) {
+      cornerRadius = new LOTKeyframeGroup(jsonDictionary.value("r"));
+    }
+
+    if (jsonDictionary.contains("s")) {
+      size = new LOTKeyframeGroup(jsonDictionary.value("s"));
+    }
+
+    reversed = jsonDictionary.value("d").toInt() == 3;
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSDictionary *position = jsonDictionary[@"p"];
-  if (position) {
-    _position = [[LOTKeyframeGroup alloc] initWithData:position];
-  }
-  
-  NSDictionary *cornerRadius = jsonDictionary[@"r"];
-  if (cornerRadius) {
-    _cornerRadius = [[LOTKeyframeGroup alloc] initWithData:cornerRadius];
-  }
-  
-  NSDictionary *size = jsonDictionary[@"s"];
-  if (size) {
-    _size = [[LOTKeyframeGroup alloc] initWithData:size];
-  }
-  NSNumber *reversed = jsonDictionary[@"d"];
-  _reversed = (reversed.integerValue == 3);
-}
-
-@end

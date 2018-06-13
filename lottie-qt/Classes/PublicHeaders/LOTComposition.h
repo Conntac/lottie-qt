@@ -10,42 +10,42 @@
 #import <CoreGraphics/CoreGraphics.h>
 
 #include <QString>
+#include <QRectF>
+#include <QVariantMap>
 
-@class LOTLayerGroup;
-@class LOTLayer;
-@class LOTAssetGroup;
+class LOTLayerGroup;
+class LOTLayer;
+class LOTAssetGroup;
 
-@interface LOTComposition : NSObject
+class LOTComposition
+{
+public:
+    LOTComposition(const QString &filePath);
 
-/// Load animation by name from the default bundle, Images are also loaded from the bundle
-+ (nullable instancetype)animationNamed:(nonnull NSString *)animationName NS_SWIFT_NAME(init(name:));
+//@property (nonatomic, readonly)
+    QRectF compBounds;
+//@property (nonatomic, readonly, nullable)
+    int startFrame;
+//@property (nonatomic, readonly, nullable)
+    int endFrame;
+//@property (nonatomic, readonly, nullable)
+    qreal framerate = 0.0;
+//@property (nonatomic, readonly)
+    qreal timeDuration = 0.0;
+//@property (nonatomic, readonly, nullable)
+    LOTLayerGroup *layerGroup = nullptr;
+//@property (nonatomic, readonly, nullable)
+    LOTAssetGroup *assetGroup = nullptr;
+//@property (nonatomic, readwrite, nullable)
+    void setRootDirectory(const QString &rootDirectory);
+    QString rootDirectory() const;
+//@property (nonatomic, readonly, nullable)
+    NSBundle *assetBundle = nil;
+//@property (nonatomic, copy, nullable)
+    QString cacheKey;
 
-/// Loads animation by name from specified bundle, Images are also loaded from the bundle
-+ (nullable instancetype)animationNamed:(nonnull NSString *)animationName
-                              inBundle:(nonnull NSBundle *)bundle NS_SWIFT_NAME(init(name:bundle:));
+private:
+    void mapFromJSON(const QVariantMap &jsonDictionary);
 
-/// Loads an animation from a specific file path. WARNING Do not use a web URL for file path.
-+ (nullable instancetype)animationWithFilePath:(const QString&)filePath;
-
-/// Creates an animation from the deserialized JSON Dictionary
-+ (nonnull instancetype)animationFromJSON:(nonnull NSDictionary *)animationJSON NS_SWIFT_NAME(init(json:));
-
-/// Creates an animation from the deserialized JSON Dictionary, images are loaded from the specified bundle
-+ (nonnull instancetype)animationFromJSON:(nullable NSDictionary *)animationJSON
-                                 inBundle:(nullable NSBundle *)bundle NS_SWIFT_NAME(init(json:bundle:));
-
-- (instancetype _Nonnull)initWithJSON:(NSDictionary * _Nullable)jsonDictionary
-                      withAssetBundle:(NSBundle * _Nullable)bundle;
-
-@property (nonatomic, readonly) CGRect compBounds;
-@property (nonatomic, readonly, nullable) NSNumber *startFrame;
-@property (nonatomic, readonly, nullable) NSNumber *endFrame;
-@property (nonatomic, readonly, nullable) NSNumber *framerate;
-@property (nonatomic, readonly) NSTimeInterval timeDuration;
-@property (nonatomic, readonly, nullable) LOTLayerGroup *layerGroup;
-@property (nonatomic, readonly, nullable) LOTAssetGroup *assetGroup;
-@property (nonatomic, readwrite, nullable) NSString *rootDirectory;
-@property (nonatomic, readonly, nullable) NSBundle *assetBundle;
-@property (nonatomic, copy, nullable) NSString *cacheKey;
-
-@end
+    QString _rootDirectory;
+};

@@ -8,28 +8,38 @@
 
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
+#include "lotbase.h"
 
-typedef enum : NSUInteger {
+enum LOTPolystarShape {
   LOTPolystarShapeNone,
   LOTPolystarShapeStar,
   LOTPolystarShapePolygon
-} LOTPolystarShape;
+};
 
-@interface LOTShapeStar : NSObject
+class LOTShapeStar : public LOTShapeItem
+{
+public:
+    LOTShapeStar(const QVariantMap &jsonDictionary);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *outerRadius = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *outerRoundness = nullptr;
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) LOTKeyframeGroup *outerRadius;
-@property (nonatomic, readonly) LOTKeyframeGroup *outerRoundness;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *innerRadius = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *innerRoundness = nullptr;
 
-@property (nonatomic, readonly) LOTKeyframeGroup *innerRadius;
-@property (nonatomic, readonly) LOTKeyframeGroup *innerRoundness;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *position = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *numberOfPoints = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *rotation = nullptr;
 
-@property (nonatomic, readonly) LOTKeyframeGroup *position;
-@property (nonatomic, readonly) LOTKeyframeGroup *numberOfPoints;
-@property (nonatomic, readonly) LOTKeyframeGroup *rotation;
-
-@property (nonatomic, readonly) LOTPolystarShape type;
-
-@end
+//@property (nonatomic, readonly)
+    LOTPolystarShape type;
+};

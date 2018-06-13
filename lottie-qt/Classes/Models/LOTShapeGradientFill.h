@@ -9,26 +9,33 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#include "lotbase.h"
 
-typedef enum : NSUInteger {
+enum LOTGradientType {
   LOTGradientTypeLinear,
   LOTGradientTypeRadial
-} LOTGradientType;
+};
 
-@interface LOTShapeGradientFill : NSObject
+class LOTShapeGradientFill : public LOTShapeItem
+{
+public:
+    LOTShapeGradientFill(const QVariantMap &jsonDictionary);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    int numberOfColors = 0;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *startPoint = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *endPoint = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *gradient = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *opacity = nullptr;
+//@property (nonatomic, readonly)
+    bool evenOddFillRule;
+//@property (nonatomic, readonly)
+    LOTGradientType type;
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) NSNumber *numberOfColors;
-@property (nonatomic, readonly) LOTKeyframeGroup *startPoint;
-@property (nonatomic, readonly) LOTKeyframeGroup *endPoint;
-@property (nonatomic, readonly) LOTKeyframeGroup *gradient;
-@property (nonatomic, readonly) LOTKeyframeGroup *opacity;
-@property (nonatomic, readonly) BOOL evenOddFillRule;
-@property (nonatomic, readonly) LOTGradientType type;
-
-@end
-
-NS_ASSUME_NONNULL_END
+};

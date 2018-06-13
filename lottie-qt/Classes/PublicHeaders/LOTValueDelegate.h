@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+#include <QColor>
+
 /*!
  @brief LOTValueDelegate is not intended to be used directly. It is used for type safety.
  @discussion LOTValueDelegates are used to dynamically change animation data at runtime. A delegate is set for a keypath, defined by LOTKeypath. While the animation is running the delegate is asked for the value for the keypath at each frame of the animation. The delegate is given the computed animation value for the the current frame. See LOTKeypath and the setValueDelegate:forKeypath methond on LOTAnimationView.
@@ -36,13 +38,13 @@
  @return CGColorRef the color to set the keypath node for the current frame
  */
 
-- (CGColorRef)colorForFrame:(CGFloat)currentFrame
+- (QColor)colorForFrame:(CGFloat)currentFrame
               startKeyframe:(CGFloat)startKeyframe
                 endKeyframe:(CGFloat)endKeyframe
        interpolatedProgress:(CGFloat)interpolatedProgress
-                 startColor:(CGColorRef)startColor
-                   endColor:(CGColorRef)endColor
-               currentColor:(CGColorRef)interpolatedColor;
+                 startColor:(QColor)startColor
+                   endColor:(QColor)endColor
+               currentColor:(QColor)interpolatedColor;
 
 
 @end

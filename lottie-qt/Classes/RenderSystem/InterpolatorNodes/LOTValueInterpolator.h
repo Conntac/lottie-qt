@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTValueInterpolator
 {
 public:
-    explicit LOTValueInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    explicit LOTValueInterpolator(const QList<LOTKeyframe *> &keyframes);
     virtual ~LOTValueInterpolator();
 
     // Properties
@@ -34,7 +34,7 @@ public:
 private:
     void updateKeyframeSpanForFrame(qreal frame);
 
-    NSArray <LOTKeyframe *> *keyframes;
+    QList<LOTKeyframe *> keyframes;
 };
 
 NS_ASSUME_NONNULL_END

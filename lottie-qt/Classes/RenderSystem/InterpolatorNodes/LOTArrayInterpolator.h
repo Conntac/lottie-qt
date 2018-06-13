@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTArrayInterpolator : public LOTValueInterpolator
 {
 public:
-    LOTArrayInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    LOTArrayInterpolator(const QList<LOTKeyframe *> &keyframes);
 
-    NSArray *numberArrayForFrame(qreal frame);
+    QList<qreal> numberArrayForFrame(qreal frame);
 };
 
 NS_ASSUME_NONNULL_END

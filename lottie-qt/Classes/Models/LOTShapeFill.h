@@ -9,18 +9,21 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#include "lotbase.h"
 
-@interface LOTShapeFill : NSObject
+class LOTShapeFill : public LOTShapeItem
+{
+public:
+    LOTShapeFill(const QVariantMap &jsonDictionary);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
-
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) BOOL fillEnabled;
-@property (nonatomic, readonly) LOTKeyframeGroup *color;
-@property (nonatomic, readonly) LOTKeyframeGroup *opacity;
-@property (nonatomic, readonly) BOOL evenOddFillRule;
-
-@end
-
-NS_ASSUME_NONNULL_END
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    bool fillEnabled;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *color = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *opacity = nullptr;
+//@property (nonatomic, readonly)
+    bool evenOddFillRule;
+};

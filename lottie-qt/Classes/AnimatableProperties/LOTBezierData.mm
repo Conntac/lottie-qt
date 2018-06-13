@@ -9,22 +9,26 @@
 #import "LOTBezierData.h"
 #import "CGGeometry+LOTAdditions.h"
 
-static QPointF _vertexAtIndex(int idx, NSArray *points) {
-  Q_ASSERT_X((idx < points.count),
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(logLOTBezierData, "lottie.bezier_data")
+
+static QPointF _vertexAtIndex(int idx, const QVariantList &points) {
+  Q_ASSERT_X((idx < points.size()),
              "_vertexAtIndex",
              "Lottie: Vertex Point out of bounds");
+
+  QVariantList pointArray = points[idx].toList();
   
-  NSArray *pointArray = points[idx];
-  
-  Q_ASSERT_X((pointArray.count >= 2 &&
-            [pointArray.firstObject isKindOfClass:[NSNumber class]]),
+  Q_ASSERT_X((pointArray.size() >= 2 &&
+             pointArray.at(0).type() == QVariant::Double),
             "_vertexAtIndex",
             "Lottie: Point Data Malformed");
   
-  return QPointF([(NSNumber *)pointArray[0] floatValue], [(NSNumber *)pointArray[1] floatValue]);
+  return QPointF(pointArray.at(0).toReal(), pointArray.at(1).toReal());
 }
 
-LOTBezierData::LOTBezierData(NSDictionary *bezierData)
+LOTBezierData::LOTBezierData(const QVariantMap &bezierData)
 {
     initializeData(bezierData);
 }
@@ -73,29 +77,30 @@ QPointF LOTBezierData::outTangentAtIndex(int index) const
     return _outTangents[index];
 }
 
-void LOTBezierData::initializeData(NSDictionary *bezierData)
+void LOTBezierData::initializeData(const QVariantMap &bezierData)
 {
-    NSArray *pointsArray = bezierData[@"v"];
-    NSArray *inTangents = bezierData[@"i"];
-    NSArray *outTangents = bezierData[@"o"];
+    QVariantList pointsArray = bezierData["v"].toList();
+    QVariantList inTangents = bezierData["i"].toList();
+    QVariantList outTangents = bezierData["o"].toList();
 
-    if (pointsArray.count == 0) {
-      NSLog(@"%s: Warning: shape has no vertices", __PRETTY_FUNCTION__);
-      return ;
+    if (pointsArray.size() == 0) {
+        qCWarning(logLOTBezierData) << "Shape has no vertices";
+        Q_ASSERT(false); // TODO: We might want to return null to the caller?!
+        return;
     }
 
-    Q_ASSERT_X((pointsArray.count == inTangents.count &&
-               pointsArray.count == outTangents.count),
+    Q_ASSERT_X((pointsArray.size() == inTangents.size() &&
+               pointsArray.size() == outTangents.size()),
                "initializeData",
                "Lottie: Incorrect number of points and tangents");
-    _count = pointsArray.count;
-    _vertices = new QPointF[pointsArray.count];
-    _inTangents = new QPointF[pointsArray.count];
-    _outTangents = new QPointF[pointsArray.count];
-    if (bezierData[@"c"]) {
-      _closed = [bezierData[@"c"] boolValue];
+    _count = pointsArray.size();
+    _vertices = new QPointF[pointsArray.size()];
+    _inTangents = new QPointF[pointsArray.size()];
+    _outTangents = new QPointF[pointsArray.size()];
+    if (bezierData.contains("c")) {
+      _closed = bezierData["c"].toBool();
     }
-    for (int i = 0; i < pointsArray.count; i ++) {
+    for (int i = 0; i < pointsArray.size(); ++i) {
       QPointF vertex = _vertexAtIndex(i, pointsArray);
       QPointF outTan = LOT_PointAddedToPoint(vertex, _vertexAtIndex(i, outTangents));
       QPointF inTan = LOT_PointAddedToPoint(vertex, _vertexAtIndex(i, inTangents));

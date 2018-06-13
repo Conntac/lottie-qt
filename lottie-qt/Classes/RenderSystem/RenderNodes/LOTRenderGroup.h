@@ -14,7 +14,7 @@ class LOTTransformInterpolator;
 class LOTRenderGroup : public LOTRenderNode
 {
 public:
-    explicit LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, NSArray * _Nonnull contents, const QString &keyname);
+    explicit LOTRenderGroup(const QSharedPointer<LOTAnimatorNode> &inputNode, const QList<LOTBase *> &contents, const QString &keyname);
 
 //@property (nonatomic, strong, readonly)
 //    CALayer * _Nonnull containerLayer;
@@ -33,7 +33,7 @@ public:
     void setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath) override;
 
 private:
-    void buildContents(NSArray *contents);
+    void buildContents(const QList<LOTBase *> &contents);
 
     QSharedPointer<LOTAnimatorNode> _rootNode;
     QSharedPointer<LOTBezierPath> _outputPath;

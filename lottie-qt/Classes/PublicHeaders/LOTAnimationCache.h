@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class LOTComposition;
+class LOTComposition;
 
 @interface LOTAnimationCache : NSObject
 

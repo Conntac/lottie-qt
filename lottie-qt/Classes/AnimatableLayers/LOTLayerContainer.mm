@@ -14,6 +14,7 @@
 #import "LOTHelpers.h"
 #import "LOTMaskContainer.h"
 #import "LOTAsset.h"
+#import "LOTShapeGroup.h"
 
 #include <QSharedPointer>
 #include <QMap>
@@ -92,11 +93,11 @@ void LOTLayerContainer::displayWithFrame(qreal frame)
 void LOTLayerContainer::displayWithFrame(qreal frame, bool forceUpdate)
 {
     qreal newFrame = frame / timeStretchFactor;
-    if (ENABLE_DEBUG_LOGGING) NSLog(@"View %ld Displaying Frame %f, with local time %f", this, frame, newFrame);
-    BOOL hidden = NO;
+    if (ENABLE_DEBUG_LOGGING) NSLog(@"View %ld Displaying Frame %lf, with local time %lf", this, frame, newFrame);
+    bool hidden = NO;
     if (_inFrame && _outFrame) {
-      hidden = (frame < _inFrame.floatValue ||
-                frame > _outFrame.floatValue);
+      hidden = (frame < _inFrame ||
+                frame > _outFrame);
     }
     setHidden(hidden);
     if (hidden) {
@@ -192,48 +193,48 @@ void LOTLayerContainer::commonInitializeWith(LOTLayer *layer, LOTLayerGroup *lay
     if (layer == nil) {
       return;
     }
-    layerName = layer.layerName;
-    if (layer.layerType == LOTLayerTypeImage ||
-        layer.layerType == LOTLayerTypeSolid ||
-        layer.layerType == LOTLayerTypePrecomp) {
-      wrapperLayer->bounds = QRectF(0, 0, layer.layerWidth.floatValue, layer.layerHeight.floatValue);
+    layerName = layer->layerName;
+    if (layer->layerType == LOTLayerTypeImage ||
+        layer->layerType == LOTLayerTypeSolid ||
+        layer->layerType == LOTLayerTypePrecomp) {
+      wrapperLayer->bounds = QRectF(0, 0, layer->layerWidth, layer->layerHeight);
       wrapperLayer->anchorPoint = QPointF(0, 0);
       wrapperLayer->masksToBounds = true;
       DEBUG_Center->position = LOT_RectGetCenterPoint(bounds);
     }
 
-    if (layer.layerType == LOTLayerTypeImage) {
+    if (layer->layerType == LOTLayerTypeImage) {
         Q_ASSERT(false);
 //      [self _setImageForAsset:layer.imageAsset];
     }
 
-    _inFrame = [layer.inFrame copy];
-    _outFrame = [layer.outFrame copy];
+    _inFrame = layer->inFrame;
+    _outFrame = layer->outFrame;
 
-    timeStretchFactor = layer.timeStretch.floatValue;
+    timeStretchFactor = layer->timeStretch;
     _transformInterpolator = LOTTransformInterpolator::transformForLayer(layer);
 
-    if (layer.parentID) {
-      NSNumber *parentID = layer.parentID;
+    if (layer->parentID != -1) {
+      int parentID = layer->parentID;
       QSharedPointer<LOTTransformInterpolator> childInterpolator = _transformInterpolator;
-      while (parentID != nil) {
-        LOTLayer *parentModel = [layerGroup layerModelForID:parentID];
+      while (parentID /*!= nil*/) {
+        LOTLayer *parentModel = layerGroup->layerModelForID(parentID);
         QSharedPointer<LOTTransformInterpolator> interpolator = LOTTransformInterpolator::transformForLayer(parentModel);
         childInterpolator->inputNode = interpolator;
         childInterpolator = interpolator;
-        parentID = parentModel.parentID;
+        parentID = parentModel->parentID;
       }
     }
-    _opacityInterpolator = _opacityInterpolator.create(layer.opacity.keyframes);
-    if (layer.layerType == LOTLayerTypeShape &&
-        layer.shapes.count) {
-      buildContents(layer.shapes);
+    _opacityInterpolator = _opacityInterpolator.create(layer->opacity->keyframes);
+    if (layer->layerType == LOTLayerTypeShape &&
+        !layer->shapes.isEmpty()) {
+      buildContents(qlist_cast<LOTBase *>(layer->shapes));
     }
-    if (layer.layerType == LOTLayerTypeSolid) {
-      wrapperLayer->backgroundColor = layer.solidColor;
+    if (layer->layerType == LOTLayerTypeSolid) {
+      wrapperLayer->backgroundColor = layer->solidColor;
     }
-    if (layer.masks.count) {
-      _maskLayer = _maskLayer.create(layer.masks);
+    if (!layer->masks.isEmpty()) {
+      _maskLayer = _maskLayer.create(layer->masks);
       wrapperLayer->mask = _maskLayer;
     }
 
@@ -265,7 +266,7 @@ void LOTLayerContainer::commonInitializeWith(LOTLayer *layer, LOTLayerGroup *lay
     valueInterpolators = interpolators;
 }
 
-void LOTLayerContainer::buildContents(NSArray *contents)
+void LOTLayerContainer::buildContents(const QList<LOTBase *> &contents)
 {
     _contentsGroup = _contentsGroup.create(nil, contents, layerName);
     wrapperLayer->addSublayer(_contentsGroup->containerLayer);

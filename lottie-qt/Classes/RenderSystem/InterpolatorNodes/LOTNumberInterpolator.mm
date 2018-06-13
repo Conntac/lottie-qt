@@ -9,7 +9,7 @@
 #import "LOTNumberInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-LOTNumberInterpolator::LOTNumberInterpolator(NSArray<LOTKeyframe *> *keyframes)
+LOTNumberInterpolator::LOTNumberInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
 {
 }
@@ -19,19 +19,19 @@ qreal LOTNumberInterpolator::floatValueForFrame(qreal frame)
     CGFloat progress = progressForFrame(frame);
     CGFloat returnValue;
     if (progress == 0) {
-      returnValue = leadingKeyframe.floatValue;
+      returnValue = leadingKeyframe->floatValue;
     } else if (progress == 1) {
-      returnValue = trailingKeyframe.floatValue;
+      returnValue = trailingKeyframe->floatValue;
     } else {
-      returnValue = LOT_RemapValue(progress, 0, 1, leadingKeyframe.floatValue, trailingKeyframe.floatValue);
+      returnValue = LOT_RemapValue(progress, 0, 1, leadingKeyframe->floatValue, trailingKeyframe->floatValue);
     }
     if (hasDelegateOverride()) {
       return [delegate floatValueForFrame:frame
-                                 startKeyframe:leadingKeyframe.keyframeTime.floatValue
-                                   endKeyframe:trailingKeyframe.keyframeTime.floatValue
+                                 startKeyframe:leadingKeyframe->keyframeTime
+                                   endKeyframe:trailingKeyframe->keyframeTime
                           interpolatedProgress:progress
-                                    startValue:leadingKeyframe.floatValue
-                                      endValue:trailingKeyframe.floatValue
+                                    startValue:leadingKeyframe->floatValue
+                                      endValue:trailingKeyframe->floatValue
                                   currentValue:returnValue];
     }
 

@@ -15,169 +15,149 @@
 #import "LOTMask.h"
 #import "LOTHelpers.h"
 
-@implementation LOTLayer
+#include <QLoggingCategory>
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary
-              withAssetGroup:(LOTAssetGroup *)assetGroup
-               withFramerate:(NSNumber *)framerate {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary
-     withAssetGroup:assetGroup
-     withFramerate:framerate];
-  }
-  return self;
-}
+Q_LOGGING_CATEGORY(logLOTLayer, "lottie.layer")
 
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary
-      withAssetGroup:(LOTAssetGroup *)assetGroup
-       withFramerate:(NSNumber *)framerate {
-
-  _layerName = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  _layerID = [jsonDictionary[@"ind"] copy];
-  
-  NSNumber *layerType = jsonDictionary[@"ty"];
-  _layerType = (LOTLayerType)layerType.integerValue;
-  
-  if (jsonDictionary[@"refId"]) {
-    _referenceID = [jsonDictionary[@"refId"] copy];
-  }
-  
-  _parentID = [jsonDictionary[@"parent"] copy];
-  
-  if (jsonDictionary[@"st"]) {
-    _startFrame = [jsonDictionary[@"st"] copy];
-  }
-  _inFrame = [jsonDictionary[@"ip"] copy];
-  _outFrame = [jsonDictionary[@"op"] copy];
-
-  if (jsonDictionary[@"sr"]) {
-    _timeStretch = [jsonDictionary[@"sr"] copy];
-  } else {
-    _timeStretch = @1;
-  }
-
-  if (_layerType == LOTLayerTypePrecomp) {
-    _layerHeight = [jsonDictionary[@"h"] copy];
-    _layerWidth = [jsonDictionary[@"w"] copy];
-    [assetGroup buildAssetNamed:_referenceID withFramerate:framerate];
-  } else if (_layerType == LOTLayerTypeImage) {
-    [assetGroup buildAssetNamed:_referenceID withFramerate:framerate];
-    _imageAsset = [assetGroup assetModelForID:_referenceID];
-    _layerWidth = [_imageAsset.assetWidth copy];
-    _layerHeight = [_imageAsset.assetHeight copy];
-  } else if (_layerType == LOTLayerTypeSolid) {
-    _layerWidth = jsonDictionary[@"sw"];
-    _layerHeight = jsonDictionary[@"sh"];
-    NSString *solidColor = jsonDictionary[@"sc"];
-    _solidColor = QColor(QString::fromNSString(solidColor));
-  }
-  
-  _layerBounds = CGRectMake(0, 0, _layerWidth.floatValue, _layerHeight.floatValue);
-  
-  NSDictionary *ks = jsonDictionary[@"ks"];
-  
-  NSDictionary *opacity = ks[@"o"];
-  if (opacity) {
-    _opacity = [[LOTKeyframeGroup alloc] initWithData:opacity];
-    [_opacity remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, 0, 100, 0, 1);
-    }];
-  }
-
-  NSDictionary *timeRemap = jsonDictionary[@"tm"];
-  if (timeRemap) {
-    _timeRemapping = [[LOTKeyframeGroup alloc] initWithData:timeRemap];
-    [_timeRemapping remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return inValue * framerate.doubleValue;
-    }];
-  }
-  
-  NSDictionary *rotation = ks[@"r"];
-  if (rotation == nil) {
-    rotation = ks[@"rz"];
-  }
-  if (rotation) {
-    _rotation = [[LOTKeyframeGroup alloc] initWithData:rotation];
-    [_rotation remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_DegreesToRadians(inValue);
-    }];
-  }
-  
-  NSDictionary *position = ks[@"p"];
-  if ([position[@"s"] boolValue]) {
-    // Separate dimensions
-    _positionX = [[LOTKeyframeGroup alloc] initWithData:position[@"x"]];
-    _positionY = [[LOTKeyframeGroup alloc] initWithData:position[@"y"]];
-  } else {
-    _position = [[LOTKeyframeGroup alloc] initWithData:position ];
-  }
-  
-  NSDictionary *anchor = ks[@"a"];
-  if (anchor) {
-    _anchor = [[LOTKeyframeGroup alloc] initWithData:anchor];
-  }
-  
-  NSDictionary *scale = ks[@"s"];
-  if (scale) {
-    _scale = [[LOTKeyframeGroup alloc] initWithData:scale];
-    [_scale remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, -100, 100, -1, 1);
-    }];
-  }
-  
-  _matteType = (LOTMatteType)[jsonDictionary[@"tt"] integerValue];
-  
-  
-  NSMutableArray *masks = [NSMutableArray array];
-  for (NSDictionary *maskJSON in jsonDictionary[@"masksProperties"]) {
-    LOTMask *mask = [[LOTMask alloc] initWithJSON:maskJSON];
-    [masks addObject:mask];
-  }
-  _masks = masks.count ? masks : nil;
-  
-  NSMutableArray *shapes = [NSMutableArray array];
-  for (NSDictionary *shapeJSON in jsonDictionary[@"shapes"]) {
-    id shapeItem = [LOTShapeGroup shapeItemWithJSON:shapeJSON];
-    if (shapeItem) {
-      [shapes addObject:shapeItem];
-    }
-  }
-  _shapes = shapes;
-    
-  NSArray *effects = jsonDictionary[@"ef"];
-  if (effects.count > 0) {
-    
-    NSDictionary *effectNames = @{ @0: @"slider",
-                                   @1: @"angle",
-                                   @2: @"color",
-                                   @3: @"point",
-                                   @4: @"checkbox",
-                                   @5: @"group",
-                                   @6: @"noValue",
-                                   @7: @"dropDown",
-                                   @9: @"customValue",
-                                   @10: @"layerIndex",
-                                   @20: @"tint",
-                                   @21: @"fill" };
-                             
-    for (NSDictionary *effect in effects) {
-      NSNumber *typeNumber = effect[@"ty"];
-      NSString *name = effect[@"nm"];
-      NSString *internalName = effect[@"mn"];
-      NSString *typeString = effectNames[typeNumber];
-      if (typeString) {
-        NSLog(@"%s: Warning: %@ effect not supported: %@ / %@", __PRETTY_FUNCTION__, typeString, internalName, name);
-      }
-    }
-  }
-}
-
+/*
 - (NSString *)description {
     NSMutableString *text = [[super description] mutableCopy];
     [text appendFormat:@" %@ id: %d pid: %d frames: %d-%d", _layerName.toNSString(), (int)_layerID.integerValue, (int)_parentID.integerValue,
      (int)_inFrame.integerValue, (int)_outFrame.integerValue];
     return text;
 }
+*/
 
-@end
+LOTLayer::LOTLayer(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup, qreal framerate)
+{
+    layerName = jsonDictionary.value("nm").toString();
+    layerID = jsonDictionary.value("ind").toInt();
+
+    layerType = static_cast<LOTLayerType>(jsonDictionary.value("ty").toInt());
+
+    referenceID = jsonDictionary.value("refId").toString();
+
+    parentID = jsonDictionary.value("parent").toInt();
+
+    startFrame = jsonDictionary.value("st").toReal(); // Asumme 0.0 default
+//    if (jsonDictionary[@"st"]) {
+//      _startFrame = [jsonDictionary[@"st"] copy];
+//    }
+    inFrame = jsonDictionary.value("ip").toReal();
+    outFrame = jsonDictionary.value("op").toReal();
+
+    timeStretch = jsonDictionary.value("sr", 1.0).toReal();
+
+    if (layerType == LOTLayerTypePrecomp) {
+      layerHeight = jsonDictionary.value("h").toReal();
+      layerWidth = jsonDictionary.value("w").toReal();
+      assetGroup->buildAssetNamed(referenceID, framerate);
+    } else if (layerType == LOTLayerTypeImage) {
+      assetGroup->buildAssetNamed(referenceID, framerate);
+      imageAsset = assetGroup->assetModelForID(referenceID);
+      layerWidth = imageAsset->assetWidth;
+      layerHeight = imageAsset->assetHeight;
+    } else if (layerType == LOTLayerTypeSolid) {
+      layerWidth = jsonDictionary.value("sw").toReal();
+      layerHeight = jsonDictionary.value("sh").toReal();
+      solidColor = QColor(jsonDictionary.value("sc").toString());
+    }
+
+    layerBounds = QRectF(0, 0, layerWidth, layerHeight);
+
+    QVariantMap ks = jsonDictionary.value("ks").toMap();
+
+    QVariantMap opacity = ks.value("o").toMap();
+    if (!opacity.isEmpty()) {
+      this->opacity = new LOTKeyframeGroup(opacity);
+      this->opacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, 0, 100, 0, 1);
+      });
+    }
+
+    QVariantMap timeRemap = jsonDictionary.value("tm").toMap();
+    if (!timeRemap.isEmpty()) {
+      timeRemapping = new LOTKeyframeGroup(timeRemap);
+      timeRemapping->remapKeyframesWithBlock([=](qreal inValue) -> qreal {
+        return inValue * framerate;
+      });
+    }
+
+    QVariantMap rotation = ks.value("r").toMap();
+    if (rotation.isEmpty()) {
+      rotation = ks.value("rz").toMap();
+    }
+    if (!rotation.isEmpty()) {
+      this->rotation = new LOTKeyframeGroup(rotation);
+      this->rotation->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_DegreesToRadians(inValue);
+      });
+    }
+
+    QVariantMap position = ks.value("p").toMap();
+    if (position.value("s").toBool()) {
+      // Separate dimensions
+      positionX = new LOTKeyframeGroup(position.value("x"));
+      positionY = new LOTKeyframeGroup(position.value("y"));
+    } else {
+      this->position = new LOTKeyframeGroup(position);
+    }
+
+    QVariantMap anchor = ks.value("a").toMap();
+    if (!anchor.isEmpty()) {
+        this->anchor = new LOTKeyframeGroup(anchor);
+    }
+
+    QVariantMap scale = ks.value("s").toMap();
+    if (!scale.isEmpty()) {
+      this->scale = new LOTKeyframeGroup(scale);
+      this->scale->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, -100, 100, -1, 1);
+      });
+    }
+
+    matteType = static_cast<LOTMatteType>(jsonDictionary.value("tt").toInt());
+
+    for(const QVariant &variant : jsonDictionary.value("masksProperties").toList()) {
+        LOTMask *mask = new LOTMask(variant.toMap());
+        masks.append(mask);
+    }
+
+    for(const QVariant &variant : jsonDictionary.value("shapes").toList()) {
+        LOTShapeGroup *shapeItem = new LOTShapeGroup(variant.toMap());
+        // FIXME: Handle parsing errors (return null)
+        if (shapeItem) {
+            shapes.append(shapeItem);
+        }
+    }
+
+    QVariantList effects = jsonDictionary.value("ef").toList();
+    if (effects.size() > 0) {
+      QMap<int, QString> effectNames = {
+         {0,  "slider"},
+         {1,  "angle"},
+         {2,  "color"},
+         {3,  "point"},
+         {4,  "checkbox"},
+         {5,  "group"},
+         {6,  "noValue"},
+         {7,  "dropDown"},
+         {9,  "customValue"},
+         {10, "layerIndex"},
+         {20, "tint"},
+         {21, "fill"}
+      };
+
+      for(const QVariant &variant : effects) {
+          QVariantMap effect = variant.toMap();
+
+          int typeNumber = effect.value("ty").toInt();
+          QString name = effect.value("nm").toString();
+          QString internalName = effect.value("mn").toString();
+          QString typeString = effectNames.value(typeNumber);
+          if (!typeString.isNull()) {
+              qCWarning(logLOTLayer) << typeString << "effect not supported:" << internalName << "/" << name;
+          }
+      }
+    }
+}

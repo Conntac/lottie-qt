@@ -14,40 +14,63 @@
 #include <QSharedPointer>
 #include <QPointF>
 #include <QSizeF>
+#include <QVariant>
+#include <QColor>
 
-NS_ASSUME_NONNULL_BEGIN
+class LOTKeyframe
+{
+public:
+    explicit LOTKeyframe(const QVariantMap &keyframe);
+    explicit LOTKeyframe(const QVariant &value);
+    explicit LOTKeyframe(const LOTKeyframe *keyframe);
 
-@interface LOTKeyframe : NSObject
+    void remapValueWithBlock(std::function<qreal(qreal inValue)> remapBlock);
+    LOTKeyframe *copyWithData(id data);
 
-- (instancetype)initWithKeyframe:(NSDictionary *)keyframe;
-- (instancetype)initWithValue:(id)value;
-- (void)remapValueWithBlock:(CGFloat (^)(CGFloat inValue))remapBlock;
-- (LOTKeyframe *)copyWithData:(id)data;
+//@property (nonatomic, readonly)
+    qreal keyframeTime;
+//@property (nonatomic, readonly)
+    bool isHold = false;
+//@property (nonatomic, readonly)
+    QPointF inTangent;
+//@property (nonatomic, readonly)
+    QPointF outTangent;
+//@property (nonatomic, readonly)
+    QPointF spatialInTangent;
+//@property (nonatomic, readonly)
+    QPointF spatialOutTangent;
 
-@property (nonatomic, readonly) NSNumber *keyframeTime;
-@property (nonatomic, readonly) BOOL isHold;
-@property (nonatomic, readonly) QPointF inTangent;
-@property (nonatomic, readonly) QPointF outTangent;
-@property (nonatomic, readonly) QPointF spatialInTangent;
-@property (nonatomic, readonly) QPointF spatialOutTangent;
+//@property (nonatomic, readonly)
+    qreal floatValue;
+//@property (nonatomic, readonly)
+    QPointF pointValue;
+//@property (nonatomic, readonly)
+    QSizeF sizeValue;
+//@property (nonatomic, readonly)
+    QColor colorValue;
+//@property (nonatomic, readonly)
+    QSharedPointer<LOTBezierData> pathData;
+//@property (nonatomic, readonly)
+    QList<qreal> arrayValue;
 
-@property (nonatomic, readonly) CGFloat floatValue;
-@property (nonatomic, readonly) QPointF pointValue;
-@property (nonatomic, readonly) QSizeF sizeValue;
-@property (nonatomic, readonly) UIColor *colorValue;
-@property (nonatomic, readonly) QSharedPointer<LOTBezierData> pathData;
-@property (nonatomic, readonly) NSArray *arrayValue;
+private:
+    void setupOutputWithData(const QVariant &data);
+    QPointF _pointFromValueArray(const QVariantList &values);
+    QPointF _pointFromValueDict(const QVariantMap &values);
+    QColor _colorValueFromArray(const QVariantList &colorArray);
+};
 
-@end
+class LOTKeyframeGroup
+{
+public:
+    LOTKeyframeGroup(const QVariant &data);
 
-@interface LOTKeyframeGroup : NSObject
+    void remapKeyframesWithBlock(std::function<qreal(qreal inValue)> remapBlock);
 
-- (instancetype)initWithData:(id)data;
+//@property (nonatomic, readonly)
+    QList<LOTKeyframe *> keyframes;
 
-- (void)remapKeyframesWithBlock:(CGFloat (^)(CGFloat inValue))remapBlock;
+private:
+    void buildKeyframesFromData(const QVariant &data);
+};
 
-@property (nonatomic, readonly) NSArray<LOTKeyframe *> *keyframes;
-
-@end
-
-NS_ASSUME_NONNULL_END

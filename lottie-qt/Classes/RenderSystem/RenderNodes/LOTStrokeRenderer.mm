@@ -14,41 +14,42 @@
 #include <QList>
 
 LOTStrokeRenderer::LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStroke *stroke)
-: LOTRenderNode(inputNode, stroke.keyname)
+: LOTRenderNode(inputNode, stroke->keyname)
 {
-  _colorInterpolator = _colorInterpolator.create(stroke.color.keyframes);
-  _opacityInterpolator = _opacityInterpolator.create(stroke.opacity.keyframes);
-  _widthInterpolator = _widthInterpolator.create(stroke.width.keyframes);
+  _colorInterpolator = _colorInterpolator.create(stroke->color->keyframes);
+  _opacityInterpolator = _opacityInterpolator.create(stroke->opacity->keyframes);
+  _widthInterpolator = _widthInterpolator.create(stroke->width->keyframes);
 
   QList<QSharedPointer<LOTNumberInterpolator>> dashPatternIntpolators;
-  NSMutableArray *dashPatterns = [NSMutableArray array];
-  for (LOTKeyframeGroup *keyframegroup in stroke.lineDashPattern) {
-    QSharedPointer<LOTNumberInterpolator> interpolator = interpolator.create(keyframegroup.keyframes);
+  QVector<qreal> dashPatterns;
+  for (LOTKeyframeGroup *keyframegroup : stroke->lineDashPattern) {
+    QSharedPointer<LOTNumberInterpolator> interpolator = interpolator.create(keyframegroup->keyframes);
     dashPatternIntpolators.append(interpolator);
-    if (dashPatterns && keyframegroup.keyframes.count == 1) {
-      LOTKeyframe *first = keyframegroup.keyframes.firstObject;
-      [dashPatterns addObject:@(first.floatValue)];
+    if (/*dashPatterns &&*/ keyframegroup->keyframes.size() == 1) {
+      LOTKeyframe *first = keyframegroup->keyframes.first();
+      dashPatterns.append(first->floatValue);
     }
-    if (keyframegroup.keyframes.count > 1) {
-      dashPatterns = nil;
+    if (keyframegroup->keyframes.size() > 1) {
+      dashPatterns.clear();
+      Q_ASSERT(false); // this code block is wrong
     }
   }
 
-  if (dashPatterns.count) {
+  if (dashPatterns.size()) {
       Q_ASSERT(false);
-//    outputLayer.lineDashPattern = dashPatterns;
+    outputLayer->setDashPattern(dashPatterns);
   } else {
     _dashPatternInterpolators = dashPatternIntpolators;
   }
 
-  if (stroke.dashOffset) {
-    _dashOffsetInterpolator = _dashOffsetInterpolator.create(stroke.dashOffset.keyframes);
+  if (stroke->dashOffset) {
+    _dashOffsetInterpolator = _dashOffsetInterpolator.create(stroke->dashOffset->keyframes);
   }
 
   // TODO: This might be a nil color?
   outputLayer->setFillColor(QColor(Qt::transparent));
-  outputLayer->setCapStyle(stroke.capType == LOTLineCapTypeRound ? Qt::RoundCap : Qt::FlatCap);
-  switch (stroke.joinType) {
+  outputLayer->setCapStyle(stroke->capType == LOTLineCapTypeRound ? Qt::RoundCap : Qt::FlatCap);
+  switch (stroke->joinType) {
     case LOTLineJoinTypeBevel:
       outputLayer->setJoinStyle(Qt::BevelJoin);
       break;

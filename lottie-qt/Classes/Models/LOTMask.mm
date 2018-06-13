@@ -9,51 +9,37 @@
 #import "LOTMask.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTMask
+LOTMask::LOTMask(const QVariantMap &jsonDictionary)
+{
+    closed = jsonDictionary.value("cl").toBool();
+    inverted = jsonDictionary.value("inv").toBool();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    QString mode = jsonDictionary.value("mode").toString();
+    if (mode == "a") {
+      maskMode = LOTMaskModeAdd;
+    } else if (mode == "s") {
+      maskMode = LOTMaskModeSubtract;
+    } else if (mode == "i") {
+      maskMode = LOTMaskModeIntersect;
+    } else {
+      maskMode = LOTMaskModeUnknown;
+    }
+
+    QVariantMap maskshape = jsonDictionary.value("pt").toMap();
+    if (!maskshape.isEmpty()) {
+      maskPath = new LOTKeyframeGroup(maskshape);
+    }
+
+    QVariantMap opacity = jsonDictionary.value("o").toMap();
+    if (!opacity.isEmpty()) {
+      this->opacity = new LOTKeyframeGroup(opacity);
+      this->opacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, 0, 100, 0, 1);
+      });
+    }
+
+    QVariantMap expansion = jsonDictionary.value("x").toMap();
+    if (!expansion.isEmpty()) {
+      this->expansion = new LOTKeyframeGroup(expansion);
+    }
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  NSNumber *closed = jsonDictionary[@"cl"];
-  _closed = closed.boolValue;
-  
-  NSNumber *inverted = jsonDictionary[@"inv"];
-  _inverted = inverted.boolValue;
-  
-  NSString *mode = jsonDictionary[@"mode"];
-  if ([mode isEqualToString:@"a"]) {
-    _maskMode = LOTMaskModeAdd;
-  } else if ([mode isEqualToString:@"s"]) {
-    _maskMode = LOTMaskModeSubtract;
-  } else if ([mode isEqualToString:@"i"]) {
-    _maskMode = LOTMaskModeIntersect;
-  } else {
-    _maskMode = LOTMaskModeUnknown;
-  }
-  
-  NSDictionary *maskshape = jsonDictionary[@"pt"];
-  if (maskshape) {
-    _maskPath = [[LOTKeyframeGroup alloc] initWithData:maskshape];
-  }
-  
-  NSDictionary *opacity = jsonDictionary[@"o"];
-  if (opacity) {
-    _opacity = [[LOTKeyframeGroup alloc] initWithData:opacity];
-    [_opacity remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, 0, 100, 0, 1);
-    }];
-  }
-  
-  NSDictionary *expansion = jsonDictionary[@"x"];
-  if (expansion) {
-    _expansion = [[LOTKeyframeGroup alloc] initWithData:expansion];
-  }
-}
-
-@end

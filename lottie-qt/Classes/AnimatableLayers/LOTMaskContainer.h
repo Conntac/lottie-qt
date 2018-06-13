@@ -16,7 +16,7 @@ class LOTMaskNodeLayer;
 class LOTMaskContainer : public QQuickLottieLayer
 {
 public:
-    explicit LOTMaskContainer(NSArray<LOTMask *> * _Nonnull masks);
+    explicit LOTMaskContainer(const QList<LOTMask *> &masks);
 
     void setCurrentFrame(qreal currentFrame);
     qreal currentFrame() const;

@@ -8,28 +8,13 @@
 
 #import "LOTShapePath.h"
 
-@implementation LOTShapePath
+LOTShapePath::LOTShapePath(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    index = jsonDictionary["ind"].toInt();
+    closed = jsonDictionary["closed"].toBool();
+    if (jsonDictionary.contains("ks")) {
+      shapePath = new LOTKeyframeGroup(jsonDictionary.value("ks"));
+    }
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  _index = jsonDictionary[@"ind"];
-  _closed = [jsonDictionary[@"closed"] boolValue];
-  NSDictionary *shape = jsonDictionary[@"ks"];
-  if (shape) {
-    _shapePath = [[LOTKeyframeGroup alloc] initWithData:shape];
-  }
-}
-
-@end

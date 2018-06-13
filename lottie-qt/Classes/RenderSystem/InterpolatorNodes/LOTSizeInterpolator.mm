@@ -10,7 +10,7 @@
 #import "LOTSizeInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-LOTSizeInterpolator::LOTSizeInterpolator(NSArray<LOTKeyframe *> *keyframes)
+LOTSizeInterpolator::LOTSizeInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
 {
 }
@@ -20,19 +20,19 @@ QSizeF LOTSizeInterpolator::sizeValueForFrame(qreal frame)
     CGFloat progress = progressForFrame(frame);
     QSizeF returnSize;
     if (progress == 0) {
-      returnSize = leadingKeyframe.sizeValue;
+      returnSize = leadingKeyframe->sizeValue;
     }else if (progress == 1) {
-      returnSize = trailingKeyframe.sizeValue;
+      returnSize = trailingKeyframe->sizeValue;
     } else {
-      returnSize = QSizeF(LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.width(), trailingKeyframe.sizeValue.width()),
-                          LOT_RemapValue(progress, 0, 1, leadingKeyframe.sizeValue.height(), trailingKeyframe.sizeValue.height()));
+      returnSize = QSizeF(LOT_RemapValue(progress, 0, 1, leadingKeyframe->sizeValue.width(), trailingKeyframe->sizeValue.width()),
+                          LOT_RemapValue(progress, 0, 1, leadingKeyframe->sizeValue.height(), trailingKeyframe->sizeValue.height()));
     }
     if (hasDelegateOverride()) {
       returnSize = QSizeF::fromCGSize([delegate sizeForFrame:frame
-                           startKeyframe:leadingKeyframe.keyframeTime.floatValue
-                             endKeyframe:trailingKeyframe.keyframeTime.floatValue
-                    interpolatedProgress:progress startSize:leadingKeyframe.sizeValue.toCGSize()
-                                 endSize:trailingKeyframe.sizeValue.toCGSize()
+                           startKeyframe:leadingKeyframe->keyframeTime
+                             endKeyframe:trailingKeyframe->keyframeTime
+                    interpolatedProgress:progress startSize:leadingKeyframe->sizeValue.toCGSize()
+                                 endSize:trailingKeyframe->sizeValue.toCGSize()
                              currentSize:returnSize.toCGSize()]);
     }
     return returnSize;

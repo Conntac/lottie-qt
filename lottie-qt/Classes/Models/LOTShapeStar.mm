@@ -8,59 +8,37 @@
 
 #import "LOTShapeStar.h"
 
-@implementation LOTShapeStar
+LOTShapeStar::LOTShapeStar(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    if (jsonDictionary.contains("or")) {
+      outerRadius = new LOTKeyframeGroup(jsonDictionary.value("or"));
+    }
+
+    if (jsonDictionary.contains("os")) {
+      outerRoundness = new LOTKeyframeGroup(jsonDictionary.value("os"));
+    }
+
+    if (jsonDictionary.contains("ir")) {
+      innerRadius = new LOTKeyframeGroup(jsonDictionary.value("ir"));
+    }
+
+    if (jsonDictionary.contains("is")) {
+      innerRoundness = new LOTKeyframeGroup(jsonDictionary.value("is"));
+    }
+
+    if (jsonDictionary.contains("p")) {
+      position = new LOTKeyframeGroup(jsonDictionary.value("p"));
+    }
+
+    if (jsonDictionary.contains("pt")) {
+      numberOfPoints = new LOTKeyframeGroup(jsonDictionary.value("pt"));
+    }
+
+    if (jsonDictionary.contains("r")) {
+      rotation = new LOTKeyframeGroup(jsonDictionary.value("r"));
+    }
+
+    type = static_cast<LOTPolystarShape>(jsonDictionary.value("sy").toInt());
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSDictionary *outerRadius = jsonDictionary[@"or"];
-  if (outerRadius) {
-    _outerRadius = [[LOTKeyframeGroup alloc] initWithData:outerRadius];
-  }
-  
-  NSDictionary *outerRoundness = jsonDictionary[@"os"];
-  if (outerRoundness) {
-    _outerRoundness = [[LOTKeyframeGroup alloc] initWithData:outerRoundness];
-  }
-  
-  NSDictionary *innerRadius = jsonDictionary[@"ir"];
-  if (innerRadius) {
-    _innerRadius = [[LOTKeyframeGroup alloc] initWithData:innerRadius];
-  }
-  
-  NSDictionary *innerRoundness = jsonDictionary[@"is"];
-  if (innerRoundness) {
-    _innerRoundness = [[LOTKeyframeGroup alloc] initWithData:innerRoundness];
-  }
-  
-  NSDictionary *position = jsonDictionary[@"p"];
-  if (position) {
-    _position = [[LOTKeyframeGroup alloc] initWithData:position];
-  }
-  
-  NSDictionary *numberOfPoints = jsonDictionary[@"pt"];
-  if (numberOfPoints) {
-    _numberOfPoints = [[LOTKeyframeGroup alloc] initWithData:numberOfPoints];
-  }
-  
-  NSDictionary *rotation = jsonDictionary[@"r"];
-  if (rotation) {
-    _rotation = [[LOTKeyframeGroup alloc] initWithData:rotation];
-  }
-  
-  NSNumber *type = jsonDictionary[@"sy"];
-  _type = (LOTPolystarShape)type.integerValue;
-}
-
-@end

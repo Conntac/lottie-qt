@@ -8,36 +8,19 @@
 
 #import "LOTShapeTrimPath.h"
 
-@implementation LOTShapeTrimPath
+LOTShapeTrimPath::LOTShapeTrimPath(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    if (jsonDictionary.contains("s")) {
+      start = new LOTKeyframeGroup(jsonDictionary.value("s"));
+    }
+
+    if (jsonDictionary.contains("e")) {
+      end = new LOTKeyframeGroup(jsonDictionary.value("e"));
+    }
+
+    if (jsonDictionary.contains("o")) {
+      offset = new LOTKeyframeGroup(jsonDictionary.value("o"));
+    }
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSDictionary *start = jsonDictionary[@"s"];
-  if (start) {
-    _start = [[LOTKeyframeGroup alloc] initWithData:start];
-  }
-  
-  NSDictionary *end = jsonDictionary[@"e"];
-  if (end) {
-    _end = [[LOTKeyframeGroup alloc] initWithData:end];
-  }
-  
-  NSDictionary *offset = jsonDictionary[@"o"];
-  if (offset) {
-    _offset = [[LOTKeyframeGroup alloc] initWithData:offset];
-  }
-}
-
-@end

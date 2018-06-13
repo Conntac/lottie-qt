@@ -9,15 +9,19 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+#include "lotbase.h"
+
 #include <QString>
 
-@interface LOTShapeGroup : NSObject
+class LOTShapeGroup : public LOTShapeItem
+{
+public:
+    LOTShapeGroup(const QVariantMap &jsonDictionary);
 
-- (instancetype _Nonnull)initWithJSON:(NSDictionary *_Nonnull)jsonDictionary;
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly, nonnull)
+    QList<LOTBase *> items;
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly, nonnull) NSArray *items;
-
-+ (id _Nullable)shapeItemWithJSON:(NSDictionary * _Nonnull)itemJSON;
-
-@end
+    static LOTShapeItem *shapeItemWithJSON(const QVariantMap &itemJSON);
+};

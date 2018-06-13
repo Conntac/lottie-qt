@@ -10,32 +10,34 @@
 
 // TODO BW Perf update, Cache transform
 
-LOTTransformInterpolator::LOTTransformInterpolator(NSArray<LOTKeyframe *> *position, NSArray<LOTKeyframe *> *rotation, NSArray<LOTKeyframe *> *anchor, NSArray<LOTKeyframe *> *scale)
+LOTTransformInterpolator::LOTTransformInterpolator(const QList<LOTKeyframe *> &position, const QList<LOTKeyframe *> &rotation, const QList<LOTKeyframe *> &anchor, const QList<LOTKeyframe *> &scale)
 {
-    initialize(nil, nil, position, rotation, anchor, scale);
+    QList<LOTKeyframe *> empty;
+    initialize(empty, empty, position, rotation, anchor, scale);
 }
 
-LOTTransformInterpolator::LOTTransformInterpolator(NSArray<LOTKeyframe *> *positionX, NSArray<LOTKeyframe *> *positionY, NSArray<LOTKeyframe *> *rotation, NSArray<LOTKeyframe *> *anchor, NSArray<LOTKeyframe *> *scale)
+LOTTransformInterpolator::LOTTransformInterpolator(const QList<LOTKeyframe *> &positionX, const QList<LOTKeyframe *> &positionY, const QList<LOTKeyframe *> &rotation, const QList<LOTKeyframe *> &anchor, const QList<LOTKeyframe *> &scale)
 {
-    initialize(positionX, positionY, nil, rotation, anchor, scale);
+    QList<LOTKeyframe *> empty;
+    initialize(positionX, positionY, empty, rotation, anchor, scale);
 }
 
 QSharedPointer<LOTTransformInterpolator> LOTTransformInterpolator::transformForLayer(LOTLayer *layer)
 {
     QSharedPointer<LOTTransformInterpolator> interpolator;
-    if (layer.position) {
-      interpolator = interpolator.create(layer.position.keyframes,
-                                         layer.rotation.keyframes,
-                                         layer.anchor.keyframes,
-                                         layer.scale.keyframes);
+    if (layer->position) {
+      interpolator = interpolator.create(layer->position->keyframes,
+                                         layer->rotation->keyframes,
+                                         layer->anchor->keyframes,
+                                         layer->scale->keyframes);
     } else {
-      interpolator = interpolator.create(layer.positionX.keyframes,
-                                         layer.positionY.keyframes,
-                                         layer.rotation.keyframes,
-                                         layer.anchor.keyframes,
-                                         layer.scale.keyframes);
+      interpolator = interpolator.create(layer->positionX->keyframes,
+                                         layer->positionY->keyframes,
+                                         layer->rotation->keyframes,
+                                         layer->anchor->keyframes,
+                                         layer->scale->keyframes);
     }
-    interpolator->parentKeyName = layer.layerName;
+    interpolator->parentKeyName = layer->layerName;
     return interpolator;
 }
 
@@ -87,15 +89,15 @@ bool LOTTransformInterpolator::hasUpdateForFrame(qreal frame)
             rotationInterpolator->hasUpdateForFrame(frame));
 }
 
-void LOTTransformInterpolator::initialize(NSArray<LOTKeyframe *> *positionX, NSArray<LOTKeyframe *> *positionY, NSArray<LOTKeyframe *> *position, NSArray<LOTKeyframe *> *rotation, NSArray<LOTKeyframe *> *anchor, NSArray<LOTKeyframe *> *scale)
+void LOTTransformInterpolator::initialize(const QList<LOTKeyframe *> &positionX, const QList<LOTKeyframe *> &positionY, const QList<LOTKeyframe *> &position, const QList<LOTKeyframe *> &rotation, const QList<LOTKeyframe *> &anchor, const QList<LOTKeyframe *> &scale)
 {
-    if (position) {
+    if (!position.isEmpty()) {
       positionInterpolator = positionInterpolator.create(position);
     }
-    if (positionY) {
+    if (!positionY.isEmpty()) {
       positionYInterpolator = positionYInterpolator.create(positionY);
     }
-    if (positionX) {
+    if (!positionX.isEmpty()) {
       positionXInterpolator = positionXInterpolator.create(positionX);
     }
     anchorInterpolator = anchorInterpolator.create(anchor);

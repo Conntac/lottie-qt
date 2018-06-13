@@ -9,30 +9,38 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#include <QString>
+#include <QVariantMap>
 
-@class LOTLayerGroup;
-@class LOTLayer;
-@class LOTAssetGroup;
+class LOTLayerGroup;
+class LOTLayer;
+class LOTAssetGroup;
 
-@interface LOTAsset : NSObject
+class LOTAsset
+{
+public:
+    LOTAsset(const QVariantMap &jsonDictionary,
+             LOTAssetGroup * _Nullable assetGroup,
+             qreal framerate);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary
-              withAssetGroup:(LOTAssetGroup * _Nullable)assetGroup
-             withAssetBundle:(NSBundle *_Nonnull)bundle
-               withFramerate:(NSNumber *)framerate;
+//@property (nonatomic, readonly, nullable)
+    QString referenceID;
+//@property (nonatomic, readonly, nullable)
+    qreal assetWidth;
+//@property (nonatomic, readonly, nullable)
+    qreal assetHeight;
 
-@property (nonatomic, readonly, nullable) NSString *referenceID;
-@property (nonatomic, readonly, nullable) NSNumber *assetWidth;
-@property (nonatomic, readonly, nullable) NSNumber *assetHeight;
+//@property (nonatomic, readonly, nullable)
+    QString imageName;
+//@property (nonatomic, readonly, nullable)
+    QString imageDirectory;
 
-@property (nonatomic, readonly, nullable) NSString *imageName;
-@property (nonatomic, readonly, nullable) NSString *imageDirectory;
+//@property (nonatomic, readonly, nullable)
+    LOTLayerGroup *layerGroup;
 
-@property (nonatomic, readonly, nullable) LOTLayerGroup *layerGroup;
+//@property (nonatomic, readwrite)
+    QString rootDirectory;
+//@property (nonatomic, readonly)
+    NSBundle *assetBundle = nullptr;
+};
 
-@property (nonatomic, readwrite) NSString *rootDirectory;
-@property (nonatomic, readonly) NSBundle *assetBundle;
-@end
-
-NS_ASSUME_NONNULL_END

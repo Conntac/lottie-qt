@@ -14,16 +14,16 @@
 #include <QSharedPointer>
 
 LOTRepeaterRenderer::LOTRepeaterRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeRepeater *repeater)
-: LOTRenderNode(inputNode, repeater.keyname)
+: LOTRenderNode(inputNode, repeater->keyname)
 {
-    _transformInterpolator = _transformInterpolator.create(repeater.position.keyframes,
-                                                           repeater.rotation.keyframes,
-                                                           repeater.anchorPoint.keyframes,
-                                                           repeater.scale.keyframes);
-    _copiesInterpolator = _copiesInterpolator.create(repeater.copies.keyframes);
-    _offsetInterpolator = _offsetInterpolator.create(repeater.offset.keyframes);
-    _startOpacityInterpolator = _startOpacityInterpolator.create(repeater.startOpacity.keyframes);
-    _endOpacityInterpolator = _endOpacityInterpolator.create(repeater.endOpacity.keyframes);
+    _transformInterpolator = _transformInterpolator.create(repeater->position->keyframes,
+                                                           repeater->rotation->keyframes,
+                                                           repeater->anchorPoint->keyframes,
+                                                           repeater->scale->keyframes);
+    _copiesInterpolator = _copiesInterpolator.create(repeater->copies->keyframes);
+    _offsetInterpolator = _offsetInterpolator.create(repeater->offset->keyframes);
+    _startOpacityInterpolator = _startOpacityInterpolator.create(repeater->startOpacity->keyframes);
+    _endOpacityInterpolator = _endOpacityInterpolator.create(repeater->endOpacity->keyframes);
 
     _instanceLayer = _instanceLayer.create();
     recursivelyAddChildLayers(inputNode);

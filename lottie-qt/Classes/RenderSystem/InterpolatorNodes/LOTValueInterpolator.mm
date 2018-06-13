@@ -9,7 +9,7 @@
 #import "LOTValueInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-LOTValueInterpolator::LOTValueInterpolator(NSArray<LOTKeyframe *> *keyframes)
+LOTValueInterpolator::LOTValueInterpolator(const QList<LOTKeyframe *> &keyframes)
 : keyframes(keyframes)
 {
 }
@@ -41,32 +41,32 @@ bool LOTValueInterpolator::hasUpdateForFrame(qreal frame)
      */
     if (leadingKeyframe &&
         trailingKeyframe == nil &&
-        leadingKeyframe.keyframeTime.floatValue < frame) {
+        leadingKeyframe->keyframeTime < frame) {
       // Frame is after bounds of keyframes. Clip
       return NO;
     }
     if (trailingKeyframe &&
         leadingKeyframe == nil &&
-        trailingKeyframe.keyframeTime.floatValue > frame) {
+        trailingKeyframe->keyframeTime > frame) {
       // Frame is before keyframes bounds. Clip.
       return NO;
     }
     if (leadingKeyframe && trailingKeyframe &&
-        leadingKeyframe.isHold &&
-        leadingKeyframe.keyframeTime.floatValue < frame &&
-        trailingKeyframe.keyframeTime.floatValue > frame) {
+        leadingKeyframe->isHold &&
+        leadingKeyframe->keyframeTime < frame &&
+        trailingKeyframe->keyframeTime > frame) {
       // Frame is in span and current span is a hold keyframe
-      return NO;
+      return false;
     }
 
-    return YES;
+    return true;
 }
 
 qreal LOTValueInterpolator::progressForFrame(qreal frame)
 {
     updateKeyframeSpanForFrame(frame);
     // At this point frame definitely exists between leading and trailing keyframes
-    if (leadingKeyframe.keyframeTime == @(frame)) {
+    if (leadingKeyframe->keyframeTime == frame) {
       // Frame is leading keyframe
       return 0;
     }
@@ -74,7 +74,7 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
       // Frame is after end of keyframe timeline
       return 0;
     }
-    if (leadingKeyframe.isHold) {
+    if (leadingKeyframe->isHold) {
       // Hold Keyframe
       return 0;
     }
@@ -83,14 +83,14 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
       return 1;
     }
 
-    qreal progession = LOT_RemapValue(frame, leadingKeyframe.keyframeTime.floatValue, trailingKeyframe.keyframeTime.floatValue, 0, 1);
+    qreal progession = LOT_RemapValue(frame, leadingKeyframe->keyframeTime, trailingKeyframe->keyframeTime, 0, 1);
 
-    if ((leadingKeyframe.outTangent.x() != leadingKeyframe.outTangent.y() ||
-        trailingKeyframe.inTangent.x() != trailingKeyframe.inTangent.y()) &&
-        (!leadingKeyframe.outTangent.isNull() &&
-         !trailingKeyframe.inTangent.isNull())) {
+    if ((leadingKeyframe->outTangent.x() != leadingKeyframe->outTangent.y() ||
+        trailingKeyframe->inTangent.x() != trailingKeyframe->inTangent.y()) &&
+        (!leadingKeyframe->outTangent.isNull() &&
+         !trailingKeyframe->inTangent.isNull())) {
       // Bezier Time Curve
-      progession = LOT_CubicBezeirInterpolate(QPointF(0, 0), leadingKeyframe.outTangent, trailingKeyframe.inTangent, QPointF(1, 1), progession);
+      progession = LOT_CubicBezeirInterpolate(QPointF(0, 0), leadingKeyframe->outTangent, trailingKeyframe->inTangent, QPointF(1, 1), progession);
     }
 
     return progession;
@@ -101,19 +101,19 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
     if (leadingKeyframe == nil &&
         trailingKeyframe == nil) {
       // Set Initial Keyframes
-      LOTKeyframe *first = keyframes.firstObject;
-      if (first.keyframeTime.floatValue > 0) {
+      LOTKeyframe *first = keyframes.first();
+      if (first->keyframeTime > 0) {
         trailingKeyframe = first;
       } else {
         leadingKeyframe = first;
-        if (keyframes.count > 1) {
+        if (keyframes.size() > 1) {
           trailingKeyframe = keyframes[1];
         }
       }
     }
-    if (trailingKeyframe && frame >= trailingKeyframe.keyframeTime.floatValue) {
+    if (trailingKeyframe && frame >= trailingKeyframe->keyframeTime) {
       // Frame is after current span, can move forward
-      NSInteger index = [keyframes indexOfObject:trailingKeyframe];
+      NSInteger index = keyframes.indexOf(trailingKeyframe);
       BOOL keyframeFound = NO;
 
       LOTKeyframe *testLeading = trailingKeyframe;
@@ -121,9 +121,9 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
 
       while (keyframeFound == NO) {
         index ++;
-        if (index < keyframes.count) {
+        if (index < keyframes.size()) {
           testTrailing = keyframes[index];
-          if (frame < testTrailing.keyframeTime.floatValue) {
+          if (frame < testTrailing->keyframeTime) {
             // This is the span.
             keyframeFound = YES;
           } else {
@@ -137,9 +137,9 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
       }
       leadingKeyframe = testLeading;
       trailingKeyframe = testTrailing;
-    } else if (leadingKeyframe && frame < leadingKeyframe.keyframeTime.floatValue) {
+    } else if (leadingKeyframe && frame < leadingKeyframe->keyframeTime) {
       // Frame is before current span, can move back a span
-      NSInteger index = [keyframes indexOfObject:leadingKeyframe];
+      NSInteger index = keyframes.indexOf(leadingKeyframe);
       BOOL keyframeFound = NO;
 
       LOTKeyframe *testLeading = nil;
@@ -149,7 +149,7 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
         index --;
         if (index >= 0) {
           testLeading = keyframes[index];
-          if (frame >= testLeading.keyframeTime.floatValue) {
+          if (frame >= testLeading->keyframeTime) {
             // This is the span.
             keyframeFound = YES;
           } else {

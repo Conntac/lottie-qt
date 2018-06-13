@@ -9,59 +9,44 @@
 #import "LOTShapeGradientFill.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTShapeGradientFill
+LOTShapeGradientFill::LOTShapeGradientFill(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
-}
+    int type = jsonDictionary.value("t").toInt();
 
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSNumber *type = jsonDictionary[@"t"];
-  
-  if (type.integerValue != 1) {
-    _type = LOTGradientTypeRadial;
-  } else {
-    _type = LOTGradientTypeLinear;
-  }
-  
-  NSDictionary *start = jsonDictionary[@"s"];
-  if (start) {
-    _startPoint = [[LOTKeyframeGroup alloc] initWithData:start];
-  }
-  
-  NSDictionary *end = jsonDictionary[@"e"];
-  if (end) {
-    _endPoint = [[LOTKeyframeGroup alloc] initWithData:end];
-  }
-  
-  NSDictionary *gradient = jsonDictionary[@"g"];
-  if (gradient) {
-    NSDictionary *unwrappedGradient = gradient[@"k"];
-    _numberOfColors = gradient[@"p"];
-    _gradient = [[LOTKeyframeGroup alloc] initWithData:unwrappedGradient];
-  }
-  
-  NSDictionary *opacity = jsonDictionary[@"o"];
-  if (opacity) {
-    _opacity = [[LOTKeyframeGroup alloc] initWithData:opacity];
-    [_opacity remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, 0, 100, 0, 1);
-    }];
-  }
-  
-  NSNumber *evenOdd = jsonDictionary[@"r"];
-  if (evenOdd.integerValue == 2) {
-    _evenOddFillRule = YES;
-  } else {
-    _evenOddFillRule = NO;
-  }
+    if (type != 1) {
+      this->type = LOTGradientTypeRadial;
+    } else {
+      this->type = LOTGradientTypeLinear;
+    }
+
+    if (jsonDictionary.contains("s")) {
+      startPoint = new LOTKeyframeGroup(jsonDictionary.value("s"));
+    }
+
+    if (jsonDictionary.contains("e")) {
+      endPoint = new LOTKeyframeGroup(jsonDictionary.value("e"));
+    }
+
+    QVariantMap gradient = jsonDictionary["g"].toMap();
+    if (!gradient.isEmpty()) {
+      QVariantMap unwrappedGradient = gradient["k"].toMap();
+      this->numberOfColors = gradient["p"].toInt();
+      this->gradient = new LOTKeyframeGroup(unwrappedGradient);
+    }
+
+    if (jsonDictionary.contains("o")) {
+      opacity = new LOTKeyframeGroup(jsonDictionary.value("o"));
+      opacity->remapKeyframesWithBlock([](CGFloat inValue) -> qreal {
+        return LOT_RemapValue(inValue, 0, 100, 0, 1);
+      });
+    }
+
+    int evenOdd = jsonDictionary.value("r").toInt();
+    if (evenOdd == 2) {
+      evenOddFillRule = true;
+    } else {
+      evenOddFillRule = false;
+    }
 }
-@end

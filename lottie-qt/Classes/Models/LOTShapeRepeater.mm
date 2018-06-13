@@ -9,75 +9,53 @@
 #import "LOTShapeRepeater.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTShapeRepeater
+LOTShapeRepeater::LOTShapeRepeater(const QVariantMap &jsonDictionary)
+{
+    keyname = jsonDictionary.value("nm").toString();
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary  {
-  self = [super init];
-  if (self) {
-    [self _mapFromJSON:jsonDictionary];
-  }
-  return self;
+    if (jsonDictionary.contains("c")) {
+      copies = new LOTKeyframeGroup(jsonDictionary.value("c"));
+    }
+
+    if (jsonDictionary.contains("o")) {
+      offset = new LOTKeyframeGroup(jsonDictionary.value("o"));
+    }
+
+    QVariantMap transform = jsonDictionary["tr"].toMap();
+
+    if (transform.contains("r")) {
+      rotation = new LOTKeyframeGroup(transform.value("r"));
+      rotation->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_DegreesToRadians(inValue);
+      });
+    }
+
+    if (transform.contains("so")) {
+      startOpacity = new LOTKeyframeGroup(transform.value("so"));
+      startOpacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, 0, 100, 0, 1);
+      });
+    }
+
+    if (transform.contains("eo")) {
+      endOpacity = new LOTKeyframeGroup(transform.value("eo"));
+      endOpacity->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, 0, 100, 0, 1);
+      });
+    }
+
+    if (transform.contains("a")) {
+      anchorPoint = new LOTKeyframeGroup(transform.value("a"));
+    }
+
+    if (transform.contains("p")) {
+      position = new LOTKeyframeGroup(transform.value("p"));
+    }
+
+    if (transform.contains("s")) {
+      scale = new LOTKeyframeGroup(transform.value("s"));
+      scale->remapKeyframesWithBlock([](qreal inValue) -> qreal {
+        return LOT_RemapValue(inValue, -100, 100, -1, 1);
+      });
+    }
 }
-
-- (void)_mapFromJSON:(NSDictionary *)jsonDictionary {
-  
-  if (jsonDictionary[@"nm"] ) {
-    _keyname = QString::fromNSString([jsonDictionary[@"nm"] copy]);
-  }
-  
-  NSDictionary *copies = jsonDictionary[@"c"];
-  if (copies) {
-    _copies = [[LOTKeyframeGroup alloc] initWithData:copies];
-  }
-  
-  NSDictionary *offset = jsonDictionary[@"o"];
-  if (offset) {
-    _offset = [[LOTKeyframeGroup alloc] initWithData:offset];
-  }
-  
-  NSDictionary *transform = jsonDictionary[@"tr"];
-  
-  NSDictionary *rotation = transform[@"r"];
-  if (rotation) {
-    _rotation = [[LOTKeyframeGroup alloc] initWithData:rotation];
-    [_rotation remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_DegreesToRadians(inValue);
-    }];
-  }
-  
-  NSDictionary *startOpacity = transform[@"so"];
-  if (startOpacity) {
-    _startOpacity = [[LOTKeyframeGroup alloc] initWithData:startOpacity];
-    [_startOpacity remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, 0, 100, 0, 1);
-    }];
-  }
-  
-  NSDictionary *endOpacity = transform[@"eo"];
-  if (endOpacity) {
-    _endOpacity = [[LOTKeyframeGroup alloc] initWithData:endOpacity];
-    [_endOpacity remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, 0, 100, 0, 1);
-    }];
-  }
-  
-  NSDictionary *anchorPoint = transform[@"a"];
-  if (anchorPoint) {
-    _anchorPoint = [[LOTKeyframeGroup alloc] initWithData:anchorPoint];
-  }
-  
-  NSDictionary *position = transform[@"p"];
-  if (position) {
-    _position = [[LOTKeyframeGroup alloc] initWithData:position];
-  }
-  
-  NSDictionary *scale = transform[@"s"];
-  if (scale) {
-    _scale = [[LOTKeyframeGroup alloc] initWithData:scale];
-    [_scale remapKeyframesWithBlock:^CGFloat(CGFloat inValue) {
-      return LOT_RemapValue(inValue, -100, 100, -1, 1);
-    }];
-  }
-}
-
-@end

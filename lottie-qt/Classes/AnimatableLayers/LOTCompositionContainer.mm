@@ -33,14 +33,14 @@ LOTCompositionContainer::LOTCompositionContainer(LOTLayer *layer, LOTLayerGroup 
     if (ENABLE_DEBUG_SHAPES) {
       wrapperLayer->addSublayer(DEBUG_Center);
     }
-    if (layer.startFrame) {
-      _frameOffset = layer.startFrame.floatValue;
+    if (layer && layer->startFrame) {
+      _frameOffset = layer->startFrame;
     } else {
       _frameOffset = 0.0;
     }
 
-    if (layer.timeRemapping) {
-      _timeInterpolator = _timeInterpolator.create(layer.timeRemapping.keyframes);
+    if (layer && layer->timeRemapping) {
+      _timeInterpolator = _timeInterpolator.create(layer->timeRemapping->keyframes);
     }
 
     initializeWithChildGroup(childLayerGroup, assetGroup);
@@ -125,7 +125,7 @@ void LOTCompositionContainer::setViewportBounds(const QRectF &viewportBounds)
 
 void LOTCompositionContainer::displayWithFrame(qreal frame, bool forceUpdate)
 {
-    if (ENABLE_DEBUG_LOGGING) NSLog(@"-------------------- Composition Displaying Frame %d --------------------", frame);
+    if (ENABLE_DEBUG_LOGGING) NSLog(@"-------------------- Composition Displaying Frame %lf --------------------", frame);
     LOTLayerContainer::displayWithFrame(frame, forceUpdate);
     qreal newFrame = (frame  - _frameOffset) / timeStretchFactor;
     if (_timeInterpolator) {
@@ -142,20 +142,24 @@ void LOTCompositionContainer::initializeWithChildGroup(LOTLayerGroup *childGroup
 {
     QMap<QString, QSharedPointer<LOTLayerContainer>> childMap;
     QList<QSharedPointer<LOTLayerContainer>> children;
-    NSArray *reversedItems = [[childGroup.layers reverseObjectEnumerator] allObjects];
+
+    QListIterator<LOTLayer *> iter(childGroup->layers);
+    iter.toBack();
 
     QSharedPointer<QQuickLottieLayer> maskedLayer;
-    for (LOTLayer *layer in reversedItems) {
-      LOTAsset *asset;
-      if (layer.referenceID) {
+    while (iter.hasPrevious()) {
+      LOTLayer *layer = iter.previous();
+
+      LOTAsset *asset = nullptr;
+      if (!layer->referenceID.isNull()) {
         // Get relevant Asset
-        asset = [assetGroup assetModelForID:layer.referenceID];
+        asset = assetGroup->assetModelForID(layer->referenceID);
       }
 
       QSharedPointer<LOTLayerContainer> child;
-      if (asset.layerGroup) {
+      if (asset && asset->layerGroup) {
         // Layer is a precomp
-        QSharedPointer<LOTCompositionContainer> compLayer = compLayer.create(layer, childGroup, asset.layerGroup, assetGroup);
+        QSharedPointer<LOTCompositionContainer> compLayer = compLayer.create(layer, childGroup, asset->layerGroup, assetGroup);
         child = compLayer;
       } else {
         child = child.create(layer, childGroup);
@@ -164,7 +168,7 @@ void LOTCompositionContainer::initializeWithChildGroup(LOTLayerGroup *childGroup
         maskedLayer->mask = child;
         maskedLayer.clear();
       } else {
-        if (layer.matteType == LOTMatteTypeAdd) {
+        if (layer->matteType == LOTMatteTypeAdd) {
           maskedLayer = child;
         }
         wrapperLayer->addSublayer(child);

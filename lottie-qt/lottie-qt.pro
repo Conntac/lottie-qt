@@ -155,7 +155,7 @@ SOURCES += \
     $$LOTTIE_PATH/Models/LOTShapeStroke.mm \
     $$LOTTIE_PATH/Models/LOTShapeTransform.mm \
     $$LOTTIE_PATH/Models/LOTShapeTrimPath.mm \
-    $$LOTTIE_PATH/Private/LOTAnimationCache.mm \
+#    $$LOTTIE_PATH/Private/LOTAnimationCache.mm \
 #    $$LOTTIE_PATH/Private/LOTAnimationView.mm \
     $$LOTTIE_PATH/Private/LOTBlockCallback.mm \
     $$LOTTIE_PATH/Private/LOTComposition.mm \

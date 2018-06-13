@@ -9,22 +9,26 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#include <QVariantMap>
 
-@class LOTLayer;
-@class LOTAssetGroup;
+class LOTLayer;
+class LOTAssetGroup;
 
-@interface LOTLayerGroup : NSObject
+class LOTLayerGroup
+{
+public:
+    LOTLayerGroup(const QVariantList &layersJSON,
+                  LOTAssetGroup * _Nullable assetGroup,
+                  qreal framerate);
 
-- (instancetype)initWithLayerJSON:(NSArray *)layersJSON
-                   withAssetGroup:(LOTAssetGroup * _Nullable)assetGroup
-                    withFramerate:(NSNumber *)framerate;
+//@property (nonatomic, readonly)
+    QList<LOTLayer *> layers;
 
-@property (nonatomic, readonly) NSArray <LOTLayer *> *layers;
+    LOTLayer *layerModelForID(int layerID);
+    LOTLayer *layerForReferenceID(const QString &referenceID);
 
-- (LOTLayer *)layerModelForID:(NSNumber *)layerID;
-- (LOTLayer *)layerForReferenceID:(NSString *)referenceID;
+private:
+    QMap<int, LOTLayer *> _modelMap;
+    QMap<QString, LOTLayer *> _referenceIDMap;
+};
 
-@end
-
-NS_ASSUME_NONNULL_END

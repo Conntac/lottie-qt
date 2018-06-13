@@ -5,7 +5,7 @@
 #include "qquickshape_p.h"
 #include "qquickshapegenericrenderer_p.h"
 
-#import "LOTAnimationView.h"
+//#import "LOTAnimationView.h"
 
 #include "LOTComposition.h"
 #include "LOTCompositionContainer.h"
@@ -60,15 +60,15 @@ void LottieAnimation::Private::loadAnimation()
         path.remove(0, 3);
     }
 
-    LOTComposition *composition = [LOTComposition animationWithFilePath:path];
+    LOTComposition *composition = new LOTComposition(path);
     if (composition) {
-        container = container.create(nil, nil, composition.layerGroup, composition.assetGroup);
+        container = container.create(nil, nil, composition->layerGroup, composition->assetGroup);
 
-        startFrame = composition.startFrame.floatValue;
-        endFrame = composition.endFrame.floatValue;
-        frameRate = composition.framerate.floatValue;
+        startFrame = composition->startFrame;
+        endFrame = composition->endFrame;
+        frameRate = composition->framerate;
 
-        QRectF bound = QRectF::fromCGRect(composition.compBounds);
+//        QRectF bound = QRectF::fromCGRect(composition.compBounds);
 
         emit q->startFrameChanged();
         emit q->endFrameChanged();

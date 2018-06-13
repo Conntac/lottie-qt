@@ -12,68 +12,92 @@
 
 #include <QString>
 #include <QColor>
+#include <QRectF>
 
-@class LOTShapeGroup;
-@class LOTMask;
-@class LOTAsset;
-@class LOTAssetGroup;
+class LOTShapeGroup;
+class LOTMask;
+class LOTAsset;
+class LOTAssetGroup;
 
-typedef enum : NSInteger {
+enum LOTLayerType {
   LOTLayerTypePrecomp,
   LOTLayerTypeSolid,
   LOTLayerTypeImage,
   LOTLayerTypeNull,
   LOTLayerTypeShape,
   LOTLayerTypeUnknown
-} LOTLayerType;
+};
 
-typedef enum : NSInteger {
+enum LOTMatteType {
   LOTMatteTypeNone,
   LOTMatteTypeAdd,
   LOTMatteTypeInvert,
   LOTMatteTypeUnknown
-} LOTMatteType;
+};
 
-NS_ASSUME_NONNULL_BEGIN
 
-@interface LOTLayer : NSObject
+class LOTLayer
+{
+public:
+    LOTLayer(const QVariantMap &jsonDictionary,
+             LOTAssetGroup * _Nullable assetGroup,
+             qreal framerate);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary
-              withAssetGroup:(LOTAssetGroup * _Nullable)assetGroup
-               withFramerate:(NSNumber *)framerate;
+//@property (nonatomic, readonly)
+    QString layerName;
+//@property (nonatomic, readonly, nullable)
+    QString referenceID;
+//@property (nonatomic, readonly)
+    int layerID = -1; // default might also be a good -1
+//@property (nonatomic, readonly)
+    LOTLayerType layerType;
+//@property (nonatomic, readonly, nullable)
+    int parentID = -1; // default might also be a good -1
+//@property (nonatomic, readonly)
+    qreal startFrame;
+//@property (nonatomic, readonly)
+    qreal inFrame;
+//@property (nonatomic, readonly)
+    qreal outFrame;
+//@property (nonatomic, readonly)
+    qreal timeStretch;
+//@property (nonatomic, readonly)
+    QRectF layerBounds;
 
-@property (nonatomic, readonly) QString layerName;
-@property (nonatomic, readonly, nullable) NSString *referenceID;
-@property (nonatomic, readonly) NSNumber *layerID;
-@property (nonatomic, readonly) LOTLayerType layerType;
-@property (nonatomic, readonly, nullable) NSNumber *parentID;
-@property (nonatomic, readonly) NSNumber *startFrame;
-@property (nonatomic, readonly) NSNumber *inFrame;
-@property (nonatomic, readonly) NSNumber *outFrame;
-@property (nonatomic, readonly) NSNumber *timeStretch;
-@property (nonatomic, readonly) CGRect layerBounds;
+//@property (nonatomic, readonly, nullable)
+    QList<LOTShapeGroup *> shapes;
+//@property (nonatomic, readonly, nullable)
+    QList<LOTMask *> masks;
 
-@property (nonatomic, readonly, nullable) NSArray<LOTShapeGroup *> *shapes;
-@property (nonatomic, readonly, nullable) NSArray<LOTMask *> *masks;
+//@property (nonatomic, readonly, nullable)
+    qreal layerWidth;
+//@property (nonatomic, readonly, nullable)
+    qreal layerHeight;
+//@property (nonatomic, readonly)
+    QColor solidColor;
+//@property (nonatomic, readonly, nullable)
+    LOTAsset *imageAsset;
 
-@property (nonatomic, readonly, nullable) NSNumber *layerWidth;
-@property (nonatomic, readonly, nullable) NSNumber *layerHeight;
-@property (nonatomic, readonly) QColor solidColor;
-@property (nonatomic, readonly, nullable) LOTAsset *imageAsset;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *opacity;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *timeRemapping;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *rotation;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *position;
 
-@property (nonatomic, readonly) LOTKeyframeGroup *opacity;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *timeRemapping;
-@property (nonatomic, readonly) LOTKeyframeGroup *rotation;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *position;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *positionX;
+//@property (nonatomic, readonly, nullable)
+    LOTKeyframeGroup *positionY;
 
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *positionX;
-@property (nonatomic, readonly, nullable) LOTKeyframeGroup *positionY;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *anchor;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *scale;
 
-@property (nonatomic, readonly) LOTKeyframeGroup *anchor;
-@property (nonatomic, readonly) LOTKeyframeGroup *scale;
+//@property (nonatomic, readonly)
+    LOTMatteType matteType;
+};
 
-@property (nonatomic, readonly) LOTMatteType matteType;
-
-@end
-
-NS_ASSUME_NONNULL_END

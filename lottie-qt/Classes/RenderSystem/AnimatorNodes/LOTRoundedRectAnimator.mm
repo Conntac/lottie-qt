@@ -78,12 +78,12 @@ static void addCorner(const QPointF &cornerPoint, CGFloat radius, QSharedPointer
 }
 
 LOTRoundedRectAnimator::LOTRoundedRectAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeRectangle *shapeRectangle)
-: LOTAnimatorNode(inputNode, shapeRectangle.keyname)
+: LOTAnimatorNode(inputNode, shapeRectangle->keyname)
 {
-    _centerInterpolator = _centerInterpolator.create(shapeRectangle.position.keyframes);
-    _sizeInterpolator = _sizeInterpolator.create(shapeRectangle.size.keyframes);
-    _cornerRadiusInterpolator = _cornerRadiusInterpolator.create(shapeRectangle.cornerRadius.keyframes);
-    _reversed = shapeRectangle.reversed;
+    _centerInterpolator = _centerInterpolator.create(shapeRectangle->position->keyframes);
+    _sizeInterpolator = _sizeInterpolator.create(shapeRectangle->size->keyframes);
+    _cornerRadiusInterpolator = _cornerRadiusInterpolator.create(shapeRectangle->cornerRadius->keyframes);
+    _reversed = shapeRectangle->reversed;
 }
 
 QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTRoundedRectAnimator::valueInterpolators() const

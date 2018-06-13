@@ -9,17 +9,20 @@
 #import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#include "lotbase.h"
 
-@interface LOTShapeCircle : NSObject
+class LOTShapeCircle : public LOTShapeItem
+{
+public:
+    LOTShapeCircle(const QVariantMap &jsonDictionary);
 
-- (instancetype)initWithJSON:(NSDictionary *)jsonDictionary;
+//@property (nonatomic, readonly)
+    QString keyname;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *position = nullptr;
+//@property (nonatomic, readonly)
+    LOTKeyframeGroup *size = nullptr;
+//@property (nonatomic, readonly)
+    bool reversed;
+};
 
-@property (nonatomic, readonly) QString keyname;
-@property (nonatomic, readonly) LOTKeyframeGroup *position;
-@property (nonatomic, readonly) LOTKeyframeGroup *size;
-@property (nonatomic, readonly) BOOL reversed;
-
-@end
-
-NS_ASSUME_NONNULL_END

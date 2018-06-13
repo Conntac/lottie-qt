@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 class LOTPointInterpolator : public LOTValueInterpolator
 {
 public:
-    LOTPointInterpolator(NSArray <LOTKeyframe *> *keyframes);
+    LOTPointInterpolator(const QList<LOTKeyframe *> &keyframes);
 
     // Functions
     QPointF pointValueForFrame(qreal frame);

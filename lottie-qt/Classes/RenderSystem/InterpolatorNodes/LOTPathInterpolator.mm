@@ -9,7 +9,7 @@
 #import "LOTPathInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
-LOTPathInterpolator::LOTPathInterpolator(NSArray<LOTKeyframe *> *keyframes)
+LOTPathInterpolator::LOTPathInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
 {
 }
@@ -19,16 +19,22 @@ QSharedPointer<LOTBezierPath> LOTPathInterpolator::pathForFrame(qreal frame, boo
     CGFloat progress = progressForFrame(frame);
     if (hasDelegateOverride()) {
       CGPathRef callBackPath = [delegate pathForFrame:frame
-                                             startKeyframe:leadingKeyframe.keyframeTime.floatValue
-                                               endKeyframe:trailingKeyframe.keyframeTime.floatValue
+                                             startKeyframe:leadingKeyframe->keyframeTime
+                                               endKeyframe:trailingKeyframe->keyframeTime
                                       interpolatedProgress:progress];
       return QSharedPointer<LOTBezierPath>::create(callBackPath);
     }
 
     QSharedPointer<LOTBezierPath> returnPath = returnPath.create();
     returnPath->cacheLengths = cacheLengths;
-    QSharedPointer<LOTBezierData> leadingData = leadingKeyframe.pathData;
-    QSharedPointer<LOTBezierData> trailingData = trailingKeyframe.pathData;
+    QSharedPointer<LOTBezierData> leadingData;
+    if (leadingKeyframe) {
+        leadingData = leadingKeyframe->pathData;
+    }
+    QSharedPointer<LOTBezierData> trailingData;
+    if (trailingKeyframe) {
+        trailingData = trailingKeyframe->pathData;
+    }
     int vertexCount = leadingData ? leadingData->count() : trailingData->count();
     bool closePath = leadingData ? leadingData->closed() : trailingData->closed();
     QPointF cp1;
