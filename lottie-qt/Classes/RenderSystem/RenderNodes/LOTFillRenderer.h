@@ -18,7 +18,7 @@ public:
     explicit LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeFill *_Nonnull fill);
 
     // LOTRenderNode interface
-    NSDictionary *actionsForRenderLayer() const override;
+//    NSDictionary *actionsForRenderLayer() const override;
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

@@ -6,7 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "LOTValueInterpolator.h"
 #import "LOTValueDelegate.h"
 
@@ -19,9 +18,9 @@ public:
     qreal floatValueForFrame(qreal frame);
 
     // Properties
-    id<LOTNumberValueDelegate> delegate = nil;
+    LOTNumberValueDelegate *delegate = nullptr;
 
     // LOTValueInterpolator interface
     bool hasDelegateOverride() const override;
-    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+    void setValueDelegate(LOTValueDelegate *delegate) override;
 };

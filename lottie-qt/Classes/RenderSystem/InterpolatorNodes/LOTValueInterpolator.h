@@ -6,13 +6,8 @@
 //
 //
 
-#import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 #import "LOTValueDelegate.h"
-
-#include <QtCore>
-
-NS_ASSUME_NONNULL_BEGIN
 
 class LOTValueInterpolator
 {
@@ -26,7 +21,7 @@ public:
 
     // Functions
     virtual bool hasDelegateOverride() const;
-    virtual void setValueDelegate(id<LOTValueDelegate> _Nonnull delegate);
+    virtual void setValueDelegate(LOTValueDelegate *delegate);
 
     bool hasUpdateForFrame(qreal frame);
     qreal progressForFrame(qreal frame);
@@ -37,4 +32,3 @@ private:
     QList<LOTKeyframe *> keyframes;
 };
 
-NS_ASSUME_NONNULL_END

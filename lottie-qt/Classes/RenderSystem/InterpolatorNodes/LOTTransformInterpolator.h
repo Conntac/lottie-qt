@@ -6,7 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "LOTNumberInterpolator.h"
 #import "LOTPointInterpolator.h"
 #import "LOTSizeInterpolator.h"
@@ -14,8 +13,6 @@
 #import "LOTLayer.h"
 
 #include <QTransform>
-
-NS_ASSUME_NONNULL_BEGIN
 
 class LOTTransformInterpolator
 {
@@ -56,5 +53,3 @@ private:
                     const QList<LOTKeyframe *> &anchor,
                     const QList<LOTKeyframe *> &scale);
 };
-
-NS_ASSUME_NONNULL_END

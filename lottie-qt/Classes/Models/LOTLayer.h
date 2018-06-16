@@ -6,8 +6,6 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "LOTPlatformCompat.h"
 #import "LOTKeyframe.h"
 
 #include "lotbase.h"

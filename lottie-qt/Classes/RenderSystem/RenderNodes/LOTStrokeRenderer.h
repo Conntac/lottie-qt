@@ -18,7 +18,7 @@ public:
     explicit LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStroke *_Nonnull stroke);
 
     // LOTRenderNode interface
-    NSDictionary *actionsForRenderLayer() const override;
+//    NSDictionary *actionsForRenderLayer() const override;
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

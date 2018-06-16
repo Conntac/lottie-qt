@@ -6,10 +6,9 @@
 //  Copyright © 2018 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-
 #include <QColor>
+#include <QSizeF>
+#include <QPainterPath>
 
 /*!
  @brief LOTValueDelegate is not intended to be used directly. It is used for type safety.
@@ -19,12 +18,15 @@
  See LOTColorValueDelegate, LOTNumberValueDelegate, LOTPointValueDelegate, LOTSizeValueDelegate, LOTPathValueDelegate.
  */
 
-@protocol LOTValueDelegate <NSObject>
+class LOTValueDelegate {
+public:
+    virtual ~LOTValueDelegate() = default;
+};
 
-@end
-
-@protocol LOTColorValueDelegate <LOTValueDelegate>
-@required
+class LOTColorValueDelegate : public LOTValueDelegate
+{
+public:
+//@required
 /*!
  @brief LOTColorValueDelegate is called at runtime to override the color value of a property in a LOTAnimation. The property is defined by at LOTKeypath. The delegate is set via setValueDelegate:forKeypath on LOTAnimationView.
  @discussion LOTValueDelegates are used to dynamically change animation data at runtime. A delegate is set for a keypath, defined by LOTKeypath. While the animation is running the delegate is asked for the value for the keypath at each frame of the animation. The delegate is given the computed animation value for the the current frame. See LOTKeypath and the setValueDelegate:forKeypath methond on LOTAnimationView.
@@ -38,19 +40,19 @@
  @return CGColorRef the color to set the keypath node for the current frame
  */
 
-- (QColor)colorForFrame:(CGFloat)currentFrame
-              startKeyframe:(CGFloat)startKeyframe
-                endKeyframe:(CGFloat)endKeyframe
-       interpolatedProgress:(CGFloat)interpolatedProgress
-                 startColor:(QColor)startColor
-                   endColor:(QColor)endColor
-               currentColor:(QColor)interpolatedColor;
+    virtual QColor colorForFrame(qreal currentFrame,
+                                 qreal startKeyframe,
+                                 qreal endKeyframe,
+                                 qreal interpolatedProgress,
+                                 const QColor &startColor,
+                                 const QColor &endColor,
+                                 const QColor &interpolatedColor) = 0;
+};
 
-
-@end
-
-@protocol LOTNumberValueDelegate <LOTValueDelegate>
-@required
+class LOTNumberValueDelegate : public LOTValueDelegate
+{
+public:
+//@required
 /*!
  @brief LOTNumberValueDelegate is called at runtime to override the number value of a property in a LOTAnimation. The property is defined by at LOTKeypath. The delegate is set via setValueDelegate:forKeypath on LOTAnimationView.
  @discussion LOTValueDelegates are used to dynamically change animation data at runtime. A delegate is set for a keypath, defined by LOTKeypath. While the animation is running the delegate is asked for the value for the keypath at each frame of the animation. The delegate is given the computed animation value for the the current frame. See LOTKeypath and the setValueDelegate:forKeypath methond on LOTAnimationView.
@@ -64,18 +66,20 @@
  @return CGFloat the number to set the keypath node for the current frame
  */
 
-- (CGFloat)floatValueForFrame:(CGFloat)currentFrame
-                startKeyframe:(CGFloat)startKeyframe
-                  endKeyframe:(CGFloat)endKeyframe
-         interpolatedProgress:(CGFloat)interpolatedProgress
-                   startValue:(CGFloat)startValue
-                     endValue:(CGFloat)endValue
-                 currentValue:(CGFloat)interpolatedValue;
+    virtual qreal floatValueForFrame(qreal currentFrame,
+                                     qreal startKeyframe,
+                                     qreal endKeyframe,
+                                     qreal interpolatedProgress,
+                                     qreal startValue,
+                                     qreal endValue,
+                                     qreal interpolatedValue) = 0;
 
-@end
+};
 
-@protocol LOTPointValueDelegate <LOTValueDelegate>
-@required
+class LOTPointValueDelegate : public LOTValueDelegate
+{
+public:
+//@required
 /*!
  @brief LOTPointValueDelegate is called at runtime to override the point value of a property in a LOTAnimation. The property is defined by at LOTKeypath. The delegate is set via setValueDelegate:forKeypath on LOTAnimationView.
  @discussion LOTValueDelegates are used to dynamically change animation data at runtime. A delegate is set for a keypath, defined by LOTKeypath. While the animation is running the delegate is asked for the value for the keypath at each frame of the animation. The delegate is given the computed animation value for the the current frame. See LOTKeypath and the setValueDelegate:forKeypath methond on LOTAnimationView.
@@ -89,18 +93,19 @@
  @return CGPoint the point to set the keypath node for the current frame
  */
 
-- (CGPoint)pointForFrame:(CGFloat)currentFrame
-           startKeyframe:(CGFloat)startKeyframe
-             endKeyframe:(CGFloat)endKeyframe
-    interpolatedProgress:(CGFloat)interpolatedProgress
-              startPoint:(CGPoint)startPoint
-                endPoint:(CGPoint)endPoint
-            currentPoint:(CGPoint)interpolatedPoint;
+    virtual QPointF pointForFrame(qreal currentFrame,
+                                  qreal startKeyframe,
+                                  qreal endKeyframe,
+                                  qreal interpolatedProgress,
+                                  const QPointF &startPoint,
+                                  const QPointF &endPoint,
+                                  const QPointF &interpolatedPoint) = 0;
+};
 
-@end
-
-@protocol LOTSizeValueDelegate <LOTValueDelegate>
-@required
+class LOTSizeValueDelegate : public LOTValueDelegate
+{
+public:
+//@required
 /*!
  @brief LOTSizeValueDelegate is called at runtime to override the size value of a property in a LOTAnimation. The property is defined by at LOTKeypath. The delegate is set via setValueDelegate:forKeypath on LOTAnimationView.
  @discussion LOTValueDelegates are used to dynamically change animation data at runtime. A delegate is set for a keypath, defined by LOTKeypath. While the animation is running the delegate is asked for the value for the keypath at each frame of the animation. The delegate is given the computed animation value for the the current frame. See LOTKeypath and the setValueDelegate:forKeypath methond on LOTAnimationView.
@@ -114,19 +119,19 @@
  @return CGSize the size to set the keypath node for the current frame
  */
 
-- (CGSize)sizeForFrame:(CGFloat)currentFrame
-         startKeyframe:(CGFloat)startKeyframe
-           endKeyframe:(CGFloat)endKeyframe
-  interpolatedProgress:(CGFloat)interpolatedProgress
-             startSize:(CGSize)startSize
-               endSize:(CGSize)endSize
-           currentSize:(CGSize)interpolatedSize;
+    virtual QSizeF sizeForFrame(qreal currentFrame,
+                               qreal startKeyframe,
+                               qreal endKeyframe,
+                               qreal interpolatedProgress,
+                               const QSizeF &startSize,
+                               const QSizeF &endSize,
+                               const QSizeF &interpolatedSize) = 0;
+};
 
-
-@end
-
-@protocol LOTPathValueDelegate <LOTValueDelegate>
-@required
+class LOTPathValueDelegate : public LOTValueDelegate
+{
+public:
+//@required
 /*!
  @brief LOTPathValueDelegate is called at runtime to override the path value of a property in a LOTAnimation. The property is defined by at LOTKeypath. The delegate is set via setValueDelegate:forKeypath on LOTAnimationView.
  @discussion LOTValueDelegates are used to dynamically change animation data at runtime. A delegate is set for a keypath, defined by LOTKeypath. While the animation is running the delegate is asked for the value for the keypath at each frame of the animation. The delegate is given the computed animation value for the the current frame. See LOTKeypath and the setValueDelegate:forKeypath methond on LOTAnimationView.
@@ -137,10 +142,8 @@
  @return CGPathRef the path to set the keypath node for the current frame
  */
 
-- (CGPathRef)pathForFrame:(CGFloat)currentFrame
-            startKeyframe:(CGFloat)startKeyframe
-              endKeyframe:(CGFloat)endKeyframe
-     interpolatedProgress:(CGFloat)interpolatedProgress;
-
-
-@end
+    virtual QPainterPath pathForFrame(qreal currentFrame,
+                                      qreal startKeyframe,
+                                      qreal endKeyframe,
+                                      qreal interpolatedProgress) = 0;
+};

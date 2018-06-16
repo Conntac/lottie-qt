@@ -9,48 +9,38 @@
 #import "LOTInterpolatorCallback.h"
 #import "CGGeometry+LOTAdditions.h"
 
-@implementation LOTFloatInterpolatorCallback
-
-+ (instancetype _Nonnull)withFromFloat:(CGFloat)fromFloat toFloat:(CGFloat)toFloat {
-  LOTFloatInterpolatorCallback *interpolator = [[self alloc] init];
-  interpolator.fromFloat = fromFloat;
-  interpolator.toFloat = toFloat;
-  return interpolator;
-}
-- (CGFloat)floatValueForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startValue:(CGFloat)startValue endValue:(CGFloat)endValue currentValue:(CGFloat)interpolatedValue {
-  return LOT_RemapValue(self.currentProgress, 0, 1, self.fromFloat, self.toFloat);
+LOTPointInterpolatorCallback::LOTPointInterpolatorCallback(const QPointF &fromPoint, const QPointF &toPoint)
+: fromPoint(fromPoint)
+, toPoint(toPoint)
+{
 }
 
-@end
-
-@implementation LOTPointInterpolatorCallback
-
-+ (instancetype _Nonnull)withFromPoint:(CGPoint)fromPoint toPoint:(CGPoint)toPoint {
-  LOTPointInterpolatorCallback *interpolator = [[self alloc] init];
-  interpolator.fromPoint = fromPoint;
-  interpolator.toPoint = toPoint;
-  return interpolator;
-}
-- (CGPoint)pointForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint currentPoint:(CGPoint)interpolatedPoint {
-  return LOT_PointInLine(QPointF::fromCGPoint(self.fromPoint), QPointF::fromCGPoint(self.toPoint), self.currentProgress).toCGPoint();
+QPointF LOTPointInterpolatorCallback::pointForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QPointF &startPoint, const QPointF &endPoint, const QPointF &interpolatedPoint)
+{
+    return LOT_PointInLine(fromPoint, toPoint, currentProgress);
 }
 
-@end
-
-@implementation LOTSizeInterpolatorCallback
-
-+ (instancetype)withFromSize:(CGSize)fromSize toSize:(CGSize)toSize {
-  LOTSizeInterpolatorCallback *interpolator = [[self alloc] init];
-  interpolator.fromSize = fromSize;
-  interpolator.toSize = toSize;
-  return interpolator;
+LOTSizeInterpolatorCallback::LOTSizeInterpolatorCallback(const QSizeF &fromSize, const QSizeF &toSize)
+: fromSize(fromSize)
+, toSize(toSize)
+{
 }
 
-- (CGSize)sizeForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startSize:(CGSize)startSize endSize:(CGSize)endSize currentSize:(CGSize)interpolatedSize {
-  QPointF from(self.fromSize.width, self.fromSize.height);
-  QPointF to(self.toSize.width, self.toSize.height);
-  QPointF returnPoint = LOT_PointInLine(from, to, self.currentProgress);
-  return CGSizeMake(returnPoint.x(), returnPoint.y());
+QSizeF LOTSizeInterpolatorCallback::sizeForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QSizeF &startSize, const QSizeF &endSize, const QSizeF &interpolatedSize)
+{
+    QPointF from(fromSize.width(), fromSize.height());
+    QPointF to(toSize.width(), toSize.height());
+    QPointF returnPoint = LOT_PointInLine(from, to, currentProgress);
+    return QSizeF(returnPoint.x(), returnPoint.y());
 }
 
-@end
+LOTFloatInterpolatorCallback::LOTFloatInterpolatorCallback(qreal fromFloat, qreal toFloat)
+: fromFloat(fromFloat)
+, toFloat(toFloat)
+{
+}
+
+qreal LOTFloatInterpolatorCallback::floatValueForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, qreal startValue, qreal endValue, qreal interpolatedValue)
+{
+    return LOT_RemapValue(currentProgress, 0, 1, fromFloat, toFloat);
+}

@@ -6,8 +6,6 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import "LOTPlatformCompat.h"
 #import "LOTBezierPath.h"
 #import "LOTKeypath.h"
 #import "LOTValueDelegate.h"
@@ -18,7 +16,7 @@
 
 class LOTValueInterpolator;
 
-extern NSInteger indentation_level;
+extern int indentation_level;
 
 class LOTAnimatorNode : public LOTBase
 {
@@ -55,7 +53,7 @@ public:
 
     /// Sets the current frame and performs any updates. Returns true if any updates were performed, locally or upstream.
     bool updateWithFrame(qreal frame);
-    virtual bool updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode * _Nonnull inputNode)> modifier, bool forceUpdate);
+    virtual bool updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode *inputNode)> modifier, bool forceUpdate);
 
     void forceSetCurrentFrame(qreal frame);
 
@@ -69,12 +67,12 @@ public:
     /// Rebuild all outputs for the node. This is called after upstream updates have been performed.
     virtual void rebuildOutputs();
 
-    void logString(NSString *_Nullable string);
+    void logString(const QString &string);
 
-    virtual void searchNodesForKeypath(LOTKeypath *_Nonnull keypath);
+    virtual void searchNodesForKeypath(LOTKeypath *keypath);
 
-    virtual void setValueDelegate(id<LOTValueDelegate> _Nonnull delegate,
-                                  LOTKeypath * _Nonnull keypath);
+    virtual void setValueDelegate(LOTValueDelegate *delegate,
+                                  LOTKeypath *keypath);
 
 private:
     QSharedPointer<LOTBezierPath> _localPath;

@@ -6,9 +6,6 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-
 #include <QString>
 #include <QVariantMap>
 
@@ -41,6 +38,6 @@ public:
 //@property (nonatomic, readwrite)
     QString rootDirectory;
 //@property (nonatomic, readonly)
-    NSBundle *assetBundle = nullptr;
+//    NSBundle *assetBundle = nullptr;
 };
 

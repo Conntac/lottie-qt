@@ -30,7 +30,7 @@ public:
     void performLocalUpdate() override;
     void rebuildOutputs() override;
     void searchNodesForKeypath(LOTKeypath *keypath) override;
-    void setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath) override;
+    void setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath) override;
 
 private:
     void buildContents(const QList<LOTBase *> &contents);

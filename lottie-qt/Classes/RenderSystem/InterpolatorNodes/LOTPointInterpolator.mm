@@ -32,13 +32,13 @@ QPointF LOTPointInterpolator::pointValueForFrame(qreal frame)
       returnPoint = LOT_PointInLine(leadingKeyframe->pointValue, trailingKeyframe->pointValue, progress);
     }
     if (hasDelegateOverride()) {
-      returnPoint = QPointF::fromCGPoint([delegate pointForFrame:frame
-                            startKeyframe:leadingKeyframe->keyframeTime
-                              endKeyframe:trailingKeyframe->keyframeTime
-                     interpolatedProgress:progress
-                               startPoint:leadingKeyframe->pointValue.toCGPoint()
-                                 endPoint:trailingKeyframe->pointValue.toCGPoint()
-                             currentPoint:returnPoint.toCGPoint()]);
+      returnPoint = delegate->pointForFrame(frame,
+                                            leadingKeyframe->keyframeTime,
+                                            trailingKeyframe->keyframeTime,
+                                            progress,
+                                            leadingKeyframe->pointValue,
+                                            trailingKeyframe->pointValue,
+                                            returnPoint);
     }
     return returnPoint;
 }
@@ -48,8 +48,8 @@ bool LOTPointInterpolator::hasDelegateOverride() const
     return delegate != nil;
 }
 
-void LOTPointInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+void LOTPointInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 {
-    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTPointValueDelegate)]), "setValueDelegate", "Point Interpolator set with incorrect callback type. Expected LOTPointValueDelegate");
-    this->delegate = (id<LOTPointValueDelegate>)delegate;
+    Q_ASSERT_X(dynamic_cast<LOTPointValueDelegate *>(delegate), "setValueDelegate", "Point Interpolator set with incorrect callback type. Expected LOTPointValueDelegate");
+    this->delegate = dynamic_cast<LOTPointValueDelegate *>(delegate);
 }

@@ -13,7 +13,7 @@
 
 LOTAsset::LOTAsset(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup, qreal framerate)
 {
-    assetBundle = nil;
+//    assetBundle = nil;
 
     referenceID = jsonDictionary.value("id").toString();
 

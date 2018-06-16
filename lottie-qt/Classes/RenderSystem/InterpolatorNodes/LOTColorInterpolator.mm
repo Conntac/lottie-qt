@@ -7,11 +7,10 @@
 //
 
 #import "LOTColorInterpolator.h"
-#import "LOTPlatformCompat.h"
-#import "UIColor+Expanded.h"
 
 #include <QColor>
 
+/*
 QColor qcolorFromCGColor(CGColorRef cgcolor)
 {
     QColor pc;
@@ -30,10 +29,16 @@ QColor qcolorFromCGColor(CGColorRef cgcolor)
     }
     return pc;
 }
+*/
+
+template<class T>
+inline const T& clamp(const T& x, const T& upper, const T& lower) {
+    return qMin(upper, qMax(x, lower));
+}
 
 static QColor LOT_colorByLerpingFromColor(QColor fromColor, QColor toColor, qreal amount) {
   Q_ASSERT_X((!toColor.isValid() && !fromColor.isValid()), "LOT_colorByLerpingFromColor", "Passing Nil Color");
-  amount = CLAMP(amount, 0.f, 1.f);
+  amount = clamp(amount, 0.0, 1.0);
 
   qreal fromComponents[4];
   fromColor.getRgbF(&fromComponents[0], &fromComponents[1], &fromComponents[2], &fromComponents[3]);
@@ -57,7 +62,7 @@ LOTColorInterpolator::LOTColorInterpolator(const QList<LOTKeyframe *> &keyframes
 
 QColor LOTColorInterpolator::colorForFrame(qreal frame)
 {
-    CGFloat progress = progressForFrame(frame);
+    qreal progress = progressForFrame(frame);
     QColor returnColor;
 
     if (progress == 0) {
@@ -68,25 +73,25 @@ QColor LOTColorInterpolator::colorForFrame(qreal frame)
       returnColor = LOT_colorByLerpingFromColor(leadingKeyframe->colorValue, trailingKeyframe->colorValue, progress);
     }
     if (hasDelegateOverride()) {
-      return [delegate colorForFrame:frame
-                       startKeyframe:leadingKeyframe->keyframeTime
-                         endKeyframe:trailingKeyframe->keyframeTime
-                interpolatedProgress:progress
-                          startColor:leadingKeyframe->colorValue
-                            endColor:trailingKeyframe->colorValue
-                        currentColor:returnColor];
+      return delegate->colorForFrame(frame,
+                                     leadingKeyframe->keyframeTime,
+                                     trailingKeyframe->keyframeTime,
+                                     progress,
+                                     leadingKeyframe->colorValue,
+                                     trailingKeyframe->colorValue,
+                                     returnColor);
     }
 
     return returnColor;
 }
 
-void LOTColorInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+void LOTColorInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 {
-    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTColorValueDelegate)]), "setValueDelegate", "Color Interpolator set with incorrect callback type. Expected LOTColorValueDelegate");
-    this->delegate = (id<LOTColorValueDelegate>)delegate;
+    Q_ASSERT_X(dynamic_cast<LOTColorValueDelegate *>(delegate), "setValueDelegate", "Color Interpolator set with incorrect callback type. Expected LOTColorValueDelegate");
+    this->delegate = dynamic_cast<LOTColorValueDelegate *>(delegate);
 }
 
 bool LOTColorInterpolator::hasDelegateOverride() const
 {
-    return delegate != nil;
+    return delegate != nullptr;
 }

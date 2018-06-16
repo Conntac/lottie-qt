@@ -23,8 +23,9 @@ bool LOTValueInterpolator::hasDelegateOverride() const
     return false;
 }
 
-void LOTValueInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+void LOTValueInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 {
+    Q_UNUSED(delegate);
     Q_ASSERT_X(false, "setValueDelegate", "Interpolator does not support value callbacks");
 }
 
@@ -66,7 +67,7 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
 {
     updateKeyframeSpanForFrame(frame);
     // At this point frame definitely exists between leading and trailing keyframes
-    if (leadingKeyframe->keyframeTime == frame) {
+    if (leadingKeyframe && leadingKeyframe->keyframeTime == frame) {
       // Frame is leading keyframe
       return 0;
     }
@@ -74,7 +75,7 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
       // Frame is after end of keyframe timeline
       return 0;
     }
-    if (leadingKeyframe->isHold) {
+    if (leadingKeyframe && leadingKeyframe->isHold) {
       // Hold Keyframe
       return 0;
     }

@@ -28,12 +28,12 @@ LOTFillRenderer::LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNod
     outputLayer->setFillRule(_evenOddFillRule ? Qt::OddEvenFill : Qt::WindingFill);
 }
 
-NSDictionary *LOTFillRenderer::actionsForRenderLayer() const
-{
-    return @{@"backgroundColor": [NSNull null],
-             @"fillColor": [NSNull null],
-             @"opacity" : [NSNull null]};
-}
+//NSDictionary *LOTFillRenderer::actionsForRenderLayer() const
+//{
+//    return @{@"backgroundColor": [NSNull null],
+//             @"fillColor": [NSNull null],
+//             @"opacity" : [NSNull null]};
+//}
 
 QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTFillRenderer::valueInterpolators() const
 {

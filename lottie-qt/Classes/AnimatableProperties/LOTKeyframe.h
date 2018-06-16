@@ -6,9 +6,7 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import <QuartzCore/QuartzCore.h>
-#import "LOTPlatformCompat.h"
+
 #import "LOTBezierData.h"
 
 #include <QSharedPointer>

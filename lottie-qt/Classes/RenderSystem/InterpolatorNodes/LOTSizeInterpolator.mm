@@ -6,7 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPlatformCompat.h"
 #import "LOTSizeInterpolator.h"
 #import "CGGeometry+LOTAdditions.h"
 
@@ -28,12 +27,13 @@ QSizeF LOTSizeInterpolator::sizeValueForFrame(qreal frame)
                           LOT_RemapValue(progress, 0, 1, leadingKeyframe->sizeValue.height(), trailingKeyframe->sizeValue.height()));
     }
     if (hasDelegateOverride()) {
-      returnSize = QSizeF::fromCGSize([delegate sizeForFrame:frame
-                           startKeyframe:leadingKeyframe->keyframeTime
-                             endKeyframe:trailingKeyframe->keyframeTime
-                    interpolatedProgress:progress startSize:leadingKeyframe->sizeValue.toCGSize()
-                                 endSize:trailingKeyframe->sizeValue.toCGSize()
-                             currentSize:returnSize.toCGSize()]);
+      returnSize = delegate->sizeForFrame(frame,
+                                          leadingKeyframe->keyframeTime,
+                                          trailingKeyframe->keyframeTime,
+                                          progress,
+                                          leadingKeyframe->sizeValue,
+                                          trailingKeyframe->sizeValue,
+                                          returnSize);
     }
     return returnSize;
 }
@@ -43,8 +43,8 @@ bool LOTSizeInterpolator::hasDelegateOverride() const
     return delegate != nil;
 }
 
-void LOTSizeInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+void LOTSizeInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 {
-    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTSizeValueDelegate)]), "setValueDelegate", "Size Interpolator set with incorrect callback type. Expected LOTSizeValueDelegate");
-    this->delegate = (id<LOTSizeValueDelegate>)delegate;
+    Q_ASSERT_X(dynamic_cast<LOTSizeValueDelegate *>(delegate), "setValueDelegate", "Size Interpolator set with incorrect callback type. Expected LOTSizeValueDelegate");
+    this->delegate = dynamic_cast<LOTSizeValueDelegate *>(delegate);
 }

@@ -15,57 +15,67 @@
  @discussion LOTPointInterpolatorCallback is used in conjunction with LOTAnimationView setValueDelegate:forKeypoint to set a point value of an animation property.
  */
 
-@interface LOTPointInterpolatorCallback : NSObject <LOTPointValueDelegate>
+class LOTPointInterpolatorCallback : public LOTPointValueDelegate
+{
+public:
+    LOTPointInterpolatorCallback(const QPointF &fromPoint, const QPointF &toPoint);
 
-+ (instancetype _Nonnull)withFromPoint:(CGPoint)fromPoint toPoint:(CGPoint)toPoint NS_SWIFT_NAME(init(from:to:));
+    /*!
+     @brief As currentProgess changes from 0 to 1 the point sent to the animation view is interpolated between fromPoint and toPoint.
+     */
+    qreal currentProgress = 0.0;
 
-@property (nonatomic) CGPoint fromPoint;
-@property (nonatomic) CGPoint toPoint;
+    // LOTPointValueDelegate interface
+    QPointF pointForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QPointF &startPoint, const QPointF &endPoint, const QPointF &interpolatedPoint) override;
 
-/*!
- @brief As currentProgess changes from 0 to 1 the point sent to the animation view is interpolated between fromPoint and toPoint.
- */
-
-@property (nonatomic, assign) CGFloat currentProgress;
-
-@end
+private:
+    QPointF fromPoint;
+    QPointF toPoint;
+};
 
 /*!
  @brief LOTSizeInterpolatorCallback is a container for a CGSizeRef. This container is a LOTSizeValueDelegate that will return the size interpolated at currentProgress between fromSize and toSize. Externally changing currentProgress will change the size of the animation.
  @discussion LOTSizeInterpolatorCallback is used in conjunction with LOTAnimationView setValueDelegate:forKeysize to set a size value of an animation property.
  */
 
-@interface LOTSizeInterpolatorCallback : NSObject <LOTSizeValueDelegate>
+class LOTSizeInterpolatorCallback : public LOTSizeValueDelegate
+{
+public:
+    LOTSizeInterpolatorCallback(const QSizeF &fromSize, const QSizeF &toSize);
 
-+ (instancetype _Nonnull)withFromSize:(CGSize)fromSize toSize:(CGSize)toSize NS_SWIFT_NAME(init(from:to:));
+    /*!
+     @brief As currentProgess changes from 0 to 1 the size sent to the animation view is interpolated between fromSize and toSize.
+     */
+    qreal currentProgress = 0.0;
 
-@property (nonatomic) CGSize fromSize;
-@property (nonatomic) CGSize toSize;
+    // LOTSizeValueDelegate interface
+    QSizeF sizeForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QSizeF &startSize, const QSizeF &endSize, const QSizeF &interpolatedSize) override;
 
-/*!
- @brief As currentProgess changes from 0 to 1 the size sent to the animation view is interpolated between fromSize and toSize.
- */
-
-@property (nonatomic, assign) CGFloat currentProgress;
-
-@end
+private:
+    QSizeF fromSize;
+    QSizeF toSize;
+};
 
 /*!
  @brief LOTFloatInterpolatorCallback is a container for a CGFloatRef. This container is a LOTFloatValueDelegate that will return the float interpolated at currentProgress between fromFloat and toFloat. Externally changing currentProgress will change the float of the animation.
  @discussion LOTFloatInterpolatorCallback is used in conjunction with LOTAnimationView setValueDelegate:forKeyfloat to set a float value of an animation property.
  */
 
-@interface LOTFloatInterpolatorCallback : NSObject <LOTNumberValueDelegate>
+class LOTFloatInterpolatorCallback : public LOTNumberValueDelegate
+{
+public:
+    LOTFloatInterpolatorCallback(qreal fromFloat, qreal toFloat);
 
-+ (instancetype _Nonnull)withFromFloat:(CGFloat)fromFloat toFloat:(CGFloat)toFloat NS_SWIFT_NAME(init(from:to:));
+    /*!
+     @brief As currentProgess changes from 0 to 1 the float sent to the animation view is interpolated between fromFloat and toFloat.
+     */
+    qreal currentProgress = 0.0;
 
-@property (nonatomic) CGFloat fromFloat;
-@property (nonatomic) CGFloat toFloat;
+    // LOTNumberValueDelegate interface
+    qreal floatValueForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, qreal startValue, qreal endValue, qreal interpolatedValue) override;
 
-/*!
- @brief As currentProgess changes from 0 to 1 the float sent to the animation view is interpolated between fromFloat and toFloat.
- */
+private:
+    qreal fromFloat;
+    qreal toFloat;
+};
 
-@property (nonatomic, assign) CGFloat currentProgress;
-
-@end

@@ -8,8 +8,6 @@
 
 #import "LOTValueInterpolator.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
 class LOTArrayInterpolator : public LOTValueInterpolator
 {
 public:
@@ -17,5 +15,3 @@ public:
 
     QList<qreal> numberArrayForFrame(qreal frame);
 };
-
-NS_ASSUME_NONNULL_END

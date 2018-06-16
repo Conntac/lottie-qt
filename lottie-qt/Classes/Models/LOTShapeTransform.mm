@@ -61,3 +61,15 @@ LOTShapeTransform::LOTShapeTransform(const QVariantMap &jsonDictionary)
         qCWarning(logLOTShapeTransform) << "skew is not supported:" << keyname;
     }
 }
+
+/*
+QString LOTShapeTransform::toString() const
+{
+    return QString("LOTShapeTransform \"Position: %1 Anchor: %2 Scale: %3 Rotation: %4 Opacity: %5\"")
+            .arg(_position->toString())
+            .arg(_anchor.description)
+            .arg(_scale.description)
+            .arg(_rotation.description)
+            .arg(_opacity.description);
+}
+*/

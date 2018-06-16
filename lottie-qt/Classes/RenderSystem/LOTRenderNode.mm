@@ -18,10 +18,10 @@ LOTRenderNode::LOTRenderNode(const QSharedPointer<LOTAnimatorNode> &inputNode, c
 }
 
 /// Layer Properties that need to disable implicit animations
-NSDictionary * _Nonnull LOTRenderNode::actionsForRenderLayer() const
-{
-    return @{@"path": [NSNull null]};
-}
+//NSDictionary * _Nonnull LOTRenderNode::actionsForRenderLayer() const
+//{
+//    return @{@"path": [NSNull null]};
+//}
 
 QSharedPointer<LOTBezierPath> LOTRenderNode::localPath() const
 {

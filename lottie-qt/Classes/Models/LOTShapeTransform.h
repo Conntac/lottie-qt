@@ -18,6 +18,8 @@ class LOTShapeTransform : public LOTShapeItem
 public:
     LOTShapeTransform(const QVariantMap &jsonDictionary);
 
+    QString toString() const;
+
 //@property (nonatomic, readonly)
     QString keyname;
 //@property (nonatomic, readonly)

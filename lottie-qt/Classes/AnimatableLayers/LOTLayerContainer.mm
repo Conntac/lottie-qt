@@ -146,7 +146,7 @@ void LOTLayerContainer::searchNodesForKeypath(LOTKeypath *keypath)
     _contentsGroup->searchNodesForKeypath(keypath);
 }
 
-void LOTLayerContainer::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
+void LOTLayerContainer::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath)
 {
     if (keypath->pushKey(layerName)) {
       // Matches self.

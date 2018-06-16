@@ -7,11 +7,8 @@
 //
 
 #import "LOTValueInterpolator.h"
-#import "LOTPlatformCompat.h"
 #import "LOTBezierPath.h"
 #import "LOTValueDelegate.h"
-
-NS_ASSUME_NONNULL_BEGIN
 
 class LOTPathInterpolator : public LOTValueInterpolator
 {
@@ -21,11 +18,9 @@ public:
     QSharedPointer<LOTBezierPath> pathForFrame(qreal frame, bool cacheLengths);
 
 //@property (nonatomic, weak, nullable)
-    id<LOTPathValueDelegate> delegate = nil;
+    LOTPathValueDelegate *delegate = nullptr;
 
     // LOTValueInterpolator interface
     bool hasDelegateOverride() const override;
-    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+    void setValueDelegate(LOTValueDelegate *delegate) override;
 };
-
-NS_ASSUME_NONNULL_END

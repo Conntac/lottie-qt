@@ -61,6 +61,10 @@ void LottieAnimation::Private::loadAnimation()
         path.remove(0, 3);
     }
 
+    if (source.scheme() == "file") {
+        path = source.toLocalFile();
+    }
+
     LOTComposition *composition = new LOTComposition(path);
     if (composition) {
         container = container.create(nil, nil, composition->layerGroup, composition->assetGroup);
@@ -93,7 +97,7 @@ void LottieAnimation::Private::sync()
 
     const int count = flatLayers.size();
 
-//    qCDebug(logLottieAnimation) << "Collected" << count << "layers";
+    qCDebug(logLottieAnimation) << "Collected" << count << "layers";
 
     renderer.beginSync(count);
 
@@ -114,6 +118,7 @@ void LottieAnimation::Private::sync()
         }
 
         renderer.setTransform(i, absoluteTransform);
+//        renderer.setTransform(i, layer->transform());
         renderer.setHidden(i, layer->hidden());
         renderer.setOpacity(i, layer->opacity());
         renderer.setPath(i, layer->path());

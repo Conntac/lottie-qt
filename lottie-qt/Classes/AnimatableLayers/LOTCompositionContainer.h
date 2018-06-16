@@ -19,8 +19,9 @@ public:
                                      LOTLayerGroup * _Nullable childLayerGroup,
                                      LOTAssetGroup * _Nullable assetGroup);
 
-    QStringList keysForKeyPath(LOTKeypath *_Nonnull keypath);
+    QStringList keysForKeyPath(LOTKeypath *keypath);
 
+    /*
     CGPoint convertPointToKeypathLayer(CGPoint point,
                          LOTKeypath *_Nonnull keypath,
                          CALayer *_Nonnull parent);
@@ -42,6 +43,7 @@ public:
 
     void maskSublayer(CALayer *_Nonnull subLayer,
                       LOTKeypath *_Nonnull keypath);
+    */
 
 //    @property (nonatomic, readonly, nonnull)
     QList<QSharedPointer<LOTLayerContainer>> childLayers;
@@ -52,13 +54,13 @@ public:
     void setViewportBounds(const QRectF &viewportBounds) override;
     void displayWithFrame(qreal frame, bool forceUpdate) override;
     void searchNodesForKeypath(LOTKeypath *keypath) override;
-    void setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath) override;
+    void setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath) override;
 
 private:
     void initializeWithChildGroup(LOTLayerGroup *childGroup,
                                   LOTAssetGroup *assetGroup);
 
-    CALayer *_layerForKeypath(LOTKeypath *_Nonnull keypath);
+//    CALayer *_layerForKeypath(LOTKeypath *_Nonnull keypath);
 
     qreal _frameOffset = 0.0;
     QSharedPointer<QQuickLottieLayer> DEBUG_Center;

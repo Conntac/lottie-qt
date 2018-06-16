@@ -14,7 +14,7 @@
 
 Q_LOGGING_CATEGORY(logAnimatorNode, "lottie.animator_node")
 
-NSInteger indentation_level = 0;
+int indentation_level = 0;
 
 LOTAnimatorNode::LOTAnimatorNode(const QSharedPointer<LOTAnimatorNode> &inputNode, const QString &keyname)
 : inputNode(inputNode)
@@ -61,7 +61,7 @@ bool LOTAnimatorNode::updateWithFrame(qreal frame, std::function<void(LOTAnimato
     if (ENABLE_DEBUG_LOGGING) qCDebug(logAnimatorNode) << (quint64)this << keyname << "Checking for update";
     BOOL localUpdate = needsUpdateForFrame(frame) || forceUpdate;
     if (localUpdate && ENABLE_DEBUG_LOGGING) {
-      logString([NSString stringWithFormat:@"%lu %@ Performing update", (unsigned long)this, keyname.toNSString()]);
+      logString(QString("%1 %2 Performing update").arg((unsigned long)this).arg(keyname));
     }
     bool inputUpdated = inputNode ? inputNode->updateWithFrame(frame, modifier, forceUpdate) : false;
     currentFrame = frame;
@@ -114,9 +114,9 @@ void LOTAnimatorNode::rebuildOutputs()
     }
 }
 
-void LOTAnimatorNode::logString(NSString *string)
+void LOTAnimatorNode::logString(const QString &string)
 {
-    qCDebug(logAnimatorNode) << "|" << QString(indentation_level*2, QLatin1Char(' ')) << QString::fromNSString(string);
+    qCDebug(logAnimatorNode) << "|" << QString(indentation_level*2, QLatin1Char(' ')) << string;
 }
 
 void LOTAnimatorNode::searchNodesForKeypath(LOTKeypath *keypath)
@@ -137,7 +137,7 @@ void LOTAnimatorNode::searchNodesForKeypath(LOTKeypath *keypath)
     }
 }
 
-void LOTAnimatorNode::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
+void LOTAnimatorNode::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath)
 {
     if (keypath->pushKey(keyname)) {
       // Matches self. Check interpolators

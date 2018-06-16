@@ -15,6 +15,9 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(logLOTComposition, "lottie.composition")
 
 /*
 
@@ -91,7 +94,11 @@ LOTComposition::LOTComposition(const QString &filePath)
         if (error.error == QJsonParseError::NoError) {
             QJsonObject obj = doc.object();
             mapFromJSON(obj.toVariantMap());
+        } else {
+            qCCritical(logLOTComposition) << "Error parsing" << filePath << "as JSON:" << error.errorString();
         }
+    } else {
+        qCCritical(logLOTComposition) << "Unable to open" << filePath << ":" << file.errorString();
     }
 }
 

@@ -6,9 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-
 #include <QPointF>
 #include <QVariantMap>
 

@@ -17,10 +17,10 @@ class LOTNumberInterpolator;
 class LOTGradientFillRender : public LOTRenderNode
 {
 public:
-    explicit LOTGradientFillRender(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeGradientFill *_Nonnull fill);
+    explicit LOTGradientFillRender(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeGradientFill *fill);
 
     // LOTRenderNode interface
-    NSDictionary *actionsForRenderLayer() const override;
+//    NSDictionary *actionsForRenderLayer() const override;
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
@@ -29,13 +29,13 @@ public:
     void rebuildOutputs() override;
 
 private:
-    BOOL _evenOddFillRule;
-    CALayer *centerPoint_DEBUG;
+    bool _evenOddFillRule;
+    QSharedPointer<QQuickLottieLayer> centerPoint_DEBUG;
 
-    CAShapeLayer *_maskShape;
-    LOTRadialGradientLayer *_gradientOpacityLayer;
-    LOTRadialGradientLayer *_gradientLayer;
-    NSInteger _numberOfPositions;
+    QSharedPointer<QQuickLottieLayer> _maskShape;
+//    QSharedPointer<LOTRadialGradientLayer> _gradientOpacityLayer;
+//    QSharedPointer<LOTRadialGradientLayer> _gradientLayer;
+    int _numberOfPositions;
 
     QPointF _startPoint;
     QPointF _endPoint;

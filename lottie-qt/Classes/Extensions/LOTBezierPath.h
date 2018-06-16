@@ -6,8 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPlatformCompat.h"
-
 #include <QPointF>
 #include <QRectF>
 #include <QPainterPath>
@@ -15,10 +13,8 @@
 #include <QTransform>
 #include <QEnableSharedFromThis>
 
-NS_ASSUME_NONNULL_BEGIN
-
 struct LOT_Subpath {
-  CGPathElementType type;
+  QPainterPath::ElementType type;
   qreal length;
   QPointF endPoint;
   QPointF controlPoint1;
@@ -30,7 +26,7 @@ class LOTBezierPath : public QEnableSharedFromThis<LOTBezierPath>
 {
 public:
     LOTBezierPath();
-    explicit LOTBezierPath(CGPathRef path);
+    explicit LOTBezierPath(const QPainterPath &path);
     ~LOTBezierPath();
 
     QSharedPointer<LOTBezierPath> copy();
@@ -54,7 +50,7 @@ public:
     void LOT_applyTransform(const QTransform &transform);
 
 //    @property (nonatomic, assign)
-    BOOL cacheLengths;
+    bool cacheLengths;
 
 //    @property (nonatomic, readonly)
     qreal length() const;
@@ -64,11 +60,11 @@ public:
 //    @property (nonatomic, readonly)
     QPointF currentPoint() const;
 //    @property (nonatomic)
-    CGFloat lineWidth;
+    qreal lineWidth;
 //    @property (nonatomic)
-    CGLineCap lineCapStyle;
+    Qt::PenCapStyle lineCapStyle;
 //    @property (nonatomic)
-    CGLineJoin lineJoinStyle;
+    Qt::PenJoinStyle lineJoinStyle;
 //    @property (nonatomic)
     qreal miterLimit;
 //    @property (nonatomic)
@@ -83,8 +79,8 @@ public:
 private:
     void _clearPathData();
     bool containsPoint(const QPointF &point) const;
-    void setWithCGPath(CGPathRef path);
-    void addSubpathWithType(CGPathElementType type,
+    void setWithCGPath(const QPainterPath &path);
+    void addSubpathWithType(QPainterPath::ElementType type,
                             qreal length,
                             const QPointF &endPoint,
                             const QPointF &controlPoint1,
@@ -108,4 +104,3 @@ private:
     Q_DISABLE_COPY(LOTBezierPath)
 };
 
-NS_ASSUME_NONNULL_END

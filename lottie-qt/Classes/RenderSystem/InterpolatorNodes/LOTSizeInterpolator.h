@@ -11,8 +11,6 @@
 
 #include <QSizeF>
 
-NS_ASSUME_NONNULL_BEGIN
-
 class LOTSizeInterpolator : public LOTValueInterpolator
 {
 public:
@@ -22,11 +20,9 @@ public:
     QSizeF sizeValueForFrame(qreal frame);
 
     // Properties
-    id<LOTSizeValueDelegate> delegate;
+    LOTSizeValueDelegate *delegate = nullptr;
 
     // LOTValueInterpolator interface
     bool hasDelegateOverride() const override;
-    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+    void setValueDelegate(LOTValueDelegate *delegate) override;
 };
-
-NS_ASSUME_NONNULL_END

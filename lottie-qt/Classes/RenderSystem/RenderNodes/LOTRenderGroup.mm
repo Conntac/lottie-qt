@@ -219,7 +219,7 @@ void LOTRenderGroup::searchNodesForKeypath(LOTKeypath *keypath)
     }
 }
 
-void LOTRenderGroup::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
+void LOTRenderGroup::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath)
 {
     if (keypath->pushKey(keyname)) {
       // Matches self. Dig deeper.

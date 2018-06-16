@@ -61,6 +61,7 @@ QStringList LOTCompositionContainer::keysForKeyPath(LOTKeypath *keypath)
     return keypath->searchResults().keys();
 }
 
+/*
 CGPoint LOTCompositionContainer::convertPointToKeypathLayer(CGPoint point, LOTKeypath *keypath, CALayer *parent)
 {
     CALayer *layer = _layerForKeypath(keypath);
@@ -114,6 +115,7 @@ void LOTCompositionContainer::maskSublayer(CALayer *subLayer, LOTKeypath *keypat
       subLayer.mask = layer;
     }
 }
+*/
 
 void LOTCompositionContainer::setViewportBounds(const QRectF &viewportBounds)
 {
@@ -182,6 +184,7 @@ void LOTCompositionContainer::initializeWithChildGroup(LOTLayerGroup *childGroup
     this->childLayers = children;
 }
 
+/*
 CALayer *LOTCompositionContainer::_layerForKeypath(LOTKeypath *keypath)
 {
     auto node = _keypathCache[keypath->absoluteKeypath()];
@@ -207,6 +210,7 @@ CALayer *LOTCompositionContainer::_layerForKeypath(LOTKeypath *keypath)
   //  return renderNode.outputLayer;
     return nil;
 }
+*/
 
 void LOTCompositionContainer::searchNodesForKeypath(LOTKeypath *keypath)
 {
@@ -224,7 +228,7 @@ void LOTCompositionContainer::searchNodesForKeypath(LOTKeypath *keypath)
     }
 }
 
-void LOTCompositionContainer::setValueDelegate(id<LOTValueDelegate> delegate, LOTKeypath *keypath)
+void LOTCompositionContainer::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath)
 {
     if (layerName != nil) {
       LOTLayerContainer::setValueDelegate(delegate, keypath);

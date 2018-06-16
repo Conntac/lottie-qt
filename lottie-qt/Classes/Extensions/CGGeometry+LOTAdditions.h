@@ -1,6 +1,4 @@
 
-#import "LOTPlatformCompat.h"
-
 #import <CoreGraphics/CoreGraphics.h>
 
 #include <QPointF>

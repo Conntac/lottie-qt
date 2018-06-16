@@ -121,7 +121,8 @@ void LOTKeyframe::setupOutputWithData(const QVariant &data)
       }
       arrayValue = listFromVariant<qreal>(numberArray);
     } else if (isDictArray) {
-      pathData = pathData.create(data.toList().at(0).toMap());
+      QVariantList list = data.toList();
+      pathData = pathData.create(list.at(0).toMap());
     } else if (data.type() == QVariant::Map) {
       pathData = pathData.create(data.toMap());
     }

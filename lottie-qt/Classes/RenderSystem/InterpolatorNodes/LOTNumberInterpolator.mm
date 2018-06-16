@@ -16,8 +16,8 @@ LOTNumberInterpolator::LOTNumberInterpolator(const QList<LOTKeyframe *> &keyfram
 
 qreal LOTNumberInterpolator::floatValueForFrame(qreal frame)
 {
-    CGFloat progress = progressForFrame(frame);
-    CGFloat returnValue;
+    qreal progress = progressForFrame(frame);
+    qreal returnValue;
     if (progress == 0) {
       returnValue = leadingKeyframe->floatValue;
     } else if (progress == 1) {
@@ -26,13 +26,13 @@ qreal LOTNumberInterpolator::floatValueForFrame(qreal frame)
       returnValue = LOT_RemapValue(progress, 0, 1, leadingKeyframe->floatValue, trailingKeyframe->floatValue);
     }
     if (hasDelegateOverride()) {
-      return [delegate floatValueForFrame:frame
-                                 startKeyframe:leadingKeyframe->keyframeTime
-                                   endKeyframe:trailingKeyframe->keyframeTime
-                          interpolatedProgress:progress
-                                    startValue:leadingKeyframe->floatValue
-                                      endValue:trailingKeyframe->floatValue
-                                  currentValue:returnValue];
+      return delegate->floatValueForFrame(frame,
+                                          leadingKeyframe->keyframeTime,
+                                          trailingKeyframe->keyframeTime,
+                                          progress,
+                                          leadingKeyframe->floatValue,
+                                          trailingKeyframe->floatValue,
+                                          returnValue);
     }
 
     return returnValue;
@@ -43,8 +43,8 @@ bool LOTNumberInterpolator::hasDelegateOverride() const
     return delegate != nil;
 }
 
-void LOTNumberInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+void LOTNumberInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 {
-    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTNumberValueDelegate)]), "setValueDelegate", "Number Interpolator set with incorrect callback type. Expected LOTNumberValueDelegate");
-    this->delegate = (id<LOTNumberValueDelegate>)delegate;
+    Q_ASSERT_X(dynamic_cast<LOTNumberValueDelegate *>(delegate), "setValueDelegate", "Number Interpolator set with incorrect callback type. Expected LOTNumberValueDelegate");
+    this->delegate = dynamic_cast<LOTNumberValueDelegate *>(delegate);
 }

@@ -11,8 +11,6 @@
 
 #include <QPointF>
 
-NS_ASSUME_NONNULL_BEGIN
-
 class LOTPointInterpolator : public LOTValueInterpolator
 {
 public:
@@ -22,11 +20,9 @@ public:
     QPointF pointValueForFrame(qreal frame);
 
     // Properties
-    id<LOTPointValueDelegate> delegate = nil;
+    LOTPointValueDelegate *delegate = nullptr;
 
     // LOTValueInterpolator interface
     bool hasDelegateOverride() const override;
-    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+    void setValueDelegate(LOTValueDelegate *delegate) override;
 };
-
-NS_ASSUME_NONNULL_END

@@ -64,12 +64,12 @@ LOTStrokeRenderer::LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inpu
   }
 }
 
-NSDictionary *LOTStrokeRenderer::actionsForRenderLayer() const
-{
-    return @{@"strokeColor": [NSNull null],
-             @"lineWidth": [NSNull null],
-             @"opacity" : [NSNull null]};
-}
+//NSDictionary *LOTStrokeRenderer::actionsForRenderLayer() const
+//{
+//    return @{@"strokeColor": [NSNull null],
+//             @"lineWidth": [NSNull null],
+//             @"opacity" : [NSNull null]};
+//}
 
 QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTStrokeRenderer::valueInterpolators() const
 {

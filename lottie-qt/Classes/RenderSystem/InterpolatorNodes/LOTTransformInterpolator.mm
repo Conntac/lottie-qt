@@ -47,22 +47,22 @@ QTransform LOTTransformInterpolator::transformForFrame(qreal frame)
     if (inputNode) {
       baseXform = inputNode->transformForFrame(frame);
     }
-    CGPoint position = CGPointZero;
+    QPointF position;
     if (positionInterpolator) {
-      position = positionInterpolator->pointValueForFrame(frame).toCGPoint();
+      position = positionInterpolator->pointValueForFrame(frame);
     }
     if (positionXInterpolator &&
         positionYInterpolator) {
-      position.x = positionXInterpolator->floatValueForFrame(frame);
-      position.y = positionYInterpolator->floatValueForFrame(frame);
+      position.setX(positionXInterpolator->floatValueForFrame(frame));
+      position.setY(positionYInterpolator->floatValueForFrame(frame));
     }
-    CGPoint anchor = anchorInterpolator->pointValueForFrame(frame).toCGPoint();
-    CGSize scale = scaleInterpolator->sizeValueForFrame(frame).toCGSize();
-    CGFloat rotation = rotationInterpolator->floatValueForFrame(frame);
-    baseXform.translate(position.x, position.y);
+    QPointF anchor = anchorInterpolator->pointValueForFrame(frame);
+    QSizeF scale = scaleInterpolator->sizeValueForFrame(frame);
+    qreal rotation = rotationInterpolator->floatValueForFrame(frame);
+    baseXform.translate(position.x(), position.y());
     baseXform.rotate(rotation);
-    baseXform.scale(scale.width, scale.height);
-    baseXform.translate(-1 * anchor.x, -1 * anchor.y);
+    baseXform.scale(scale.width(), scale.height());
+    baseXform.translate(-1 * anchor.x(), -1 * anchor.y());
 //    CATransform3D translateXform = CATransform3DTranslate(baseXform, position.x, position.y, 0);
 //    CATransform3D rotateXform = CATransform3DRotate(translateXform, rotation, 0, 0, 1);
 //    CATransform3D scaleXform = CATransform3DScale(rotateXform, scale.width, scale.height, 1);

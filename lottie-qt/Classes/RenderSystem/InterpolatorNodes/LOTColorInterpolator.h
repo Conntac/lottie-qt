@@ -7,10 +7,7 @@
 //
 
 #import "LOTValueInterpolator.h"
-#import "LOTPlatformCompat.h"
 #import "LOTValueDelegate.h"
-
-NS_ASSUME_NONNULL_BEGIN
 
 class LOTColorInterpolator : public LOTValueInterpolator
 {
@@ -20,11 +17,9 @@ public:
     QColor colorForFrame(qreal frame);
 
 //    @property (nonatomic, weak, nullable)
-    id<LOTColorValueDelegate> delegate = nil;
+    LOTColorValueDelegate *delegate = nullptr;
 
     // LOTValueInterpolator interface
     bool hasDelegateOverride() const override;
-    void setValueDelegate(id<LOTValueDelegate> delegate) override;
+    void setValueDelegate(LOTValueDelegate *delegate) override;
 };
-
-NS_ASSUME_NONNULL_END

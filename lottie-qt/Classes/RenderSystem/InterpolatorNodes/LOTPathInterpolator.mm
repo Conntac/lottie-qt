@@ -16,12 +16,12 @@ LOTPathInterpolator::LOTPathInterpolator(const QList<LOTKeyframe *> &keyframes)
 
 QSharedPointer<LOTBezierPath> LOTPathInterpolator::pathForFrame(qreal frame, bool cacheLengths)
 {
-    CGFloat progress = progressForFrame(frame);
+    qreal progress = progressForFrame(frame);
     if (hasDelegateOverride()) {
-      CGPathRef callBackPath = [delegate pathForFrame:frame
-                                             startKeyframe:leadingKeyframe->keyframeTime
-                                               endKeyframe:trailingKeyframe->keyframeTime
-                                      interpolatedProgress:progress];
+      QPainterPath callBackPath = delegate->pathForFrame(frame,
+                                                      leadingKeyframe->keyframeTime,
+                                                      trailingKeyframe->keyframeTime,
+                                                      progress);
       return QSharedPointer<LOTBezierPath>::create(callBackPath);
     }
 
@@ -85,8 +85,8 @@ bool LOTPathInterpolator::hasDelegateOverride() const
     return delegate != nil;
 }
 
-void LOTPathInterpolator::setValueDelegate(id<LOTValueDelegate> delegate)
+void LOTPathInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 {
-    Q_ASSERT_X(([delegate conformsToProtocol:@protocol(LOTPathValueDelegate)]), "setValueDelegate", "Path Interpolator set with incorrect callback type. Expected LOTPathValueDelegate");
-    this->delegate = (id<LOTPathValueDelegate>)delegate;
+    Q_ASSERT_X(dynamic_cast<LOTPathValueDelegate *>(delegate), "setValueDelegate", "Path Interpolator set with incorrect callback type. Expected LOTPathValueDelegate");
+    this->delegate = dynamic_cast<LOTPathValueDelegate *>(delegate);
 }

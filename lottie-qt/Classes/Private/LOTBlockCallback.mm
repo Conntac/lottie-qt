@@ -8,73 +8,53 @@
 
 #import "LOTBlockCallback.h"
 
-@implementation LOTColorBlockCallback
-
-+ (instancetype)withBlock:(LOTColorValueCallbackBlock)block {
-  LOTColorBlockCallback *colorCallback = [[self alloc] init];
-  colorCallback.callback = block;
-  return colorCallback;
+LOTColorBlockCallback::LOTColorBlockCallback(LOTColorValueCallbackBlock block)
+: callback(block)
+{
 }
 
-- (CGColorRef)colorForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startColor:(CGColorRef)startColor endColor:(CGColorRef)endColor currentColor:(CGColorRef)interpolatedColor {
-  return self.callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startColor, endColor, interpolatedColor);
+QColor LOTColorBlockCallback::colorForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QColor &startColor, const QColor &endColor, const QColor &interpolatedColor)
+{
+    return callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startColor, endColor, interpolatedColor);
 }
 
-@end
 
-@implementation LOTNumberBlockCallback
-
-+ (instancetype)withBlock:(LOTNumberValueCallbackBlock)block {
-  LOTNumberBlockCallback *numberCallback = [[self alloc] init];
-  numberCallback.callback = block;
-  return numberCallback;
+LOTNumberBlockCallback::LOTNumberBlockCallback(LOTNumberValueCallbackBlock block)
+: callback(block)
+{
 }
 
-- (CGFloat)floatValueForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startValue:(CGFloat)startValue endValue:(CGFloat)endValue currentValue:(CGFloat)interpolatedValue {
-  return self.callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startValue, endValue, interpolatedValue);
+qreal LOTNumberBlockCallback::floatValueForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, qreal startValue, qreal endValue, qreal interpolatedValue)
+{
+    return callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startValue, endValue, interpolatedValue);
 }
 
-@end
-
-@implementation LOTPointBlockCallback
-
-+ (instancetype)withBlock:(LOTPointValueCallbackBlock)block {
-  LOTPointBlockCallback *callback = [[self alloc] init];
-  callback.callback = block;
-  return callback;
+LOTPointBlockCallback::LOTPointBlockCallback(LOTPointValueCallbackBlock block)
+: callback(block)
+{
 }
 
-- (CGPoint)pointForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint currentPoint:(CGPoint)interpolatedPoint {
-  return self.callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startPoint, endPoint, interpolatedPoint);
+QPointF LOTPointBlockCallback::pointForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QPointF &startPoint, const QPointF &endPoint, const QPointF &interpolatedPoint)
+{
+    return callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startPoint, endPoint, interpolatedPoint);
 }
 
-@end
-
-@implementation LOTSizeBlockCallback
-
-+ (instancetype)withBlock:(LOTSizeValueCallbackBlock)block {
-  LOTSizeBlockCallback *callback = [[self alloc] init];
-  callback.callback = block;
-  return callback;
+LOTSizeBlockCallback::LOTSizeBlockCallback(LOTSizeValueCallbackBlock block)
+: callback(block)
+{
 }
 
-- (CGSize)sizeForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress startSize:(CGSize)startSize endSize:(CGSize)endSize currentSize:(CGSize)interpolatedSize {
-  return self.callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startSize, endSize, interpolatedSize);
+QSizeF LOTSizeBlockCallback::sizeForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QSizeF &startSize, const QSizeF &endSize, const QSizeF &interpolatedSize)
+{
+    return callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress, startSize, endSize, interpolatedSize);
 }
 
-@end
-
-@implementation LOTPathBlockCallback
-
-+ (instancetype)withBlock:(LOTPathValueCallbackBlock)block {
-  LOTPathBlockCallback *callback = [[self alloc] init];
-  callback.callback = block;
-  return callback;
+LOTPathBlockCallback::LOTPathBlockCallback(LOTPathValueCallbackBlock block)
+: callback(block)
+{
 }
 
-- (CGPathRef)pathForFrame:(CGFloat)currentFrame startKeyframe:(CGFloat)startKeyframe endKeyframe:(CGFloat)endKeyframe interpolatedProgress:(CGFloat)interpolatedProgress {
-  return self.callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress);
+QPainterPath LOTPathBlockCallback::pathForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress)
+{
+    return callback(currentFrame, startKeyframe, endKeyframe, interpolatedProgress);
 }
-
-@end
-

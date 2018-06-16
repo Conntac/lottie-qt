@@ -51,8 +51,8 @@ LOTBezierPath::LOTBezierPath()
     headSubpath_ = NULL;
     tailSubpath_ = NULL;
     lineWidth = 1;
-    lineCapStyle = kCGLineCapButt;
-    lineJoinStyle = kCGLineJoinMiter;
+    lineCapStyle = Qt::FlatCap;
+    lineJoinStyle = Qt::MiterJoin;
     miterLimit = 10;
     flatness = 0.6;
     usesEvenOddFillRule = NO;
@@ -62,7 +62,7 @@ LOTBezierPath::LOTBezierPath()
     cacheLengths = NO;
 }
 
-LOTBezierPath::LOTBezierPath(CGPathRef path)
+LOTBezierPath::LOTBezierPath(const QPainterPath &path)
 : LOTBezierPath()
 {
     setWithCGPath(path);
@@ -93,7 +93,7 @@ QSharedPointer<LOTBezierPath> LOTBezierPath::copy()
 void LOTBezierPath::LOT_moveToPoint(const QPointF &point)
 {
     subpathStartPoint_ = point;
-    addSubpathWithType(kCGPathElementMoveToPoint, 0, point, QPointF(), QPointF());
+    addSubpathWithType(QPainterPath::MoveToElement, 0, point, QPointF(), QPointF());
     _path.moveTo(point);
 }
 
@@ -104,7 +104,7 @@ void LOTBezierPath::LOT_addLineToPoint(const QPointF &point)
       length = LOT_PointDistanceFromPoint(currentPoint(), point);
       _length = _length + length;
     }
-    addSubpathWithType(kCGPathElementAddLineToPoint, length, point, QPointF(), QPointF());
+    addSubpathWithType(QPainterPath::LineToElement, length, point, QPointF(), QPointF());
     _path.lineTo(point);
 }
 
@@ -115,7 +115,7 @@ void LOTBezierPath::LOT_addCurveToPoint(const QPointF &point, const QPointF &cp1
       length = LOT_CubicLengthWithPrecision(currentPoint(), point, cp1, cp2, 5);
       _length = _length + length;
     }
-    addSubpathWithType(kCGPathElementAddCurveToPoint, length, point, cp1, cp2);
+    addSubpathWithType(QPainterPath::CurveToElement, length, point, cp1, cp2);
     _path.cubicTo(cp1, cp2, point);
 }
 
@@ -126,7 +126,8 @@ void LOTBezierPath::LOT_closePath()
       length = LOT_PointDistanceFromPoint(currentPoint(), subpathStartPoint_);
       _length = _length + length;
     }
-    addSubpathWithType(kCGPathElementCloseSubpath, length, subpathStartPoint_, QPointF(), QPointF());
+//    Q_ASSERT(false);
+//    addSubpathWithType(kCGPathElementCloseSubpath, length, subpathStartPoint_, QPointF(), QPointF());
     _path.closeSubpath();
 }
 
@@ -174,8 +175,8 @@ void LOTBezierPath::LOT_appendPath(QSharedPointer<LOTBezierPath> bezierPath)
 
 void LOTBezierPath::trimPathFromT(qreal fromT, qreal toT, qreal offset)
 {
-    fromT = MIN(MAX(0, fromT), 1);
-    toT = MIN(MAX(0, toT), 1);
+    fromT = qMin(qMax(0.0, fromT), 1.0);
+    toT = qMin(qMax(0.0, toT), 1.0);
     if (fromT > toT) {
       qreal to = fromT;
       fromT = toT;
@@ -403,39 +404,40 @@ bool LOTBezierPath::containsPoint(const QPointF &point) const
     return _path.contains(point);
 }
 
-void LOTBezierPath::setWithCGPath(CGPathRef path)
+void LOTBezierPath::setWithCGPath(const QPainterPath &path)
 {
-    lot_enumeratePath(path, ^(const CGPathElement *element) {
-      switch (element->type) {
-        case kCGPathElementMoveToPoint: {
-          QPointF point = QPointF::fromCGPoint(element ->points[0]);
-          LOT_moveToPoint(point);
-          break;
-        }
-        case kCGPathElementAddLineToPoint: {
-          QPointF point = QPointF::fromCGPoint(element ->points[0]);
-          LOT_addLineToPoint(point);
-          break;
-        }
-        case kCGPathElementAddQuadCurveToPoint: {
-          break;
-        }
-        case kCGPathElementAddCurveToPoint: {
-          QPointF point1 = QPointF::fromCGPoint(element->points[0]);
-          QPointF point2 = QPointF::fromCGPoint(element->points[1]);
-          QPointF point3 = QPointF::fromCGPoint(element->points[2]);
-          LOT_addCurveToPoint(point3, point1, point2);
-          break;
-        }
-        case kCGPathElementCloseSubpath: {
-          LOT_closePath();
-          break;
-        }
-      }
-    });
+    Q_ASSERT(false);
+//    lot_enumeratePath(path, ^(const CGPathElement *element) {
+//      switch (element->type) {
+//        case kCGPathElementMoveToPoint: {
+//          QPointF point = QPointF::fromCGPoint(element ->points[0]);
+//          LOT_moveToPoint(point);
+//          break;
+//        }
+//        case kCGPathElementAddLineToPoint: {
+//          QPointF point = QPointF::fromCGPoint(element ->points[0]);
+//          LOT_addLineToPoint(point);
+//          break;
+//        }
+//        case kCGPathElementAddQuadCurveToPoint: {
+//          break;
+//        }
+//        case kCGPathElementAddCurveToPoint: {
+//          QPointF point1 = QPointF::fromCGPoint(element->points[0]);
+//          QPointF point2 = QPointF::fromCGPoint(element->points[1]);
+//          QPointF point3 = QPointF::fromCGPoint(element->points[2]);
+//          LOT_addCurveToPoint(point3, point1, point2);
+//          break;
+//        }
+//        case kCGPathElementCloseSubpath: {
+//          LOT_closePath();
+//          break;
+//        }
+//      }
+//    });
 }
 
-void LOTBezierPath::addSubpathWithType(CGPathElementType type, qreal length, const QPointF &endPoint, const QPointF &controlPoint1, const QPointF &controlPoint2)
+void LOTBezierPath::addSubpathWithType(QPainterPath::ElementType type, qreal length, const QPointF &endPoint, const QPointF &controlPoint1, const QPointF &controlPoint2)
 {
     LOT_Subpath *subPath = new LOT_Subpath;
     subPath->type = type;

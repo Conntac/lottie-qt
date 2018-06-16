@@ -25,44 +25,45 @@ LOTGradientFillRender::LOTGradientFillRender(const QSharedPointer<LOTAnimatorNod
   _numberOfPositions = fill->numberOfColors;
 
   _evenOddFillRule = fill->evenOddFillRule;
-  CALayer *wrapperLayer = [CALayer new];
-  _maskShape = [CAShapeLayer new];
-  _maskShape.fillRule = _evenOddFillRule ? @"even-odd" : @"non-zero";
-  _maskShape.fillColor = [UIColor whiteColor].CGColor;
-  _maskShape.actions = @{@"path": [NSNull null]};
+  QSharedPointer<QQuickLottieLayer> wrapperLayer = wrapperLayer.create();
+  _maskShape = _maskShape.create();
+  _maskShape->setFillRule(_evenOddFillRule ? Qt::OddEvenFill : Qt::WindingFill);
+  _maskShape->setFillColor(Qt::white);
+  _maskShape->actions = {{"path", QVariant()}};
 
-  _gradientOpacityLayer = [LOTRadialGradientLayer new];
-  _gradientOpacityLayer.isRadial = (fill->type == LOTGradientTypeRadial);
-  _gradientOpacityLayer.actions = @{@"startPoint" : [NSNull null],
-                                    @"endPoint" : [NSNull null],
-                                    @"opacity" : [NSNull null],
-                                    @"locations" : [NSNull null],
-                                    @"colors" : [NSNull null],
-                                    @"bounds" : [NSNull null],
-                                    @"anchorPoint" : [NSNull null],
-                                    @"isRadial" : [NSNull null]};
-  _gradientOpacityLayer.mask = _maskShape;
-  [wrapperLayer addSublayer:_gradientOpacityLayer];
+  Q_ASSERT(false);
+//  _gradientOpacityLayer = _gradientOpacityLayer.create();
+//  _gradientOpacityLayer->isRadial = (fill->type == LOTGradientTypeRadial);
+//  _gradientOpacityLayer->actions = {{"startPoint", QVariant()},
+//                                   {"endPoint", QVariant()},
+//                                   {"opacity", QVariant()},
+//                                   {"locations", QVariant()},
+//                                   {"colors", QVariant()},
+//                                   {"bounds", QVariant()},
+//                                   {"anchorPoint", QVariant()},
+//                                   {"isRadial", QVariant()}};
+//  _gradientOpacityLayer->mask = _maskShape;
+//  wrapperLayer->addSublayer(_gradientOpacityLayer);
 
-  _gradientLayer = [LOTRadialGradientLayer new];
-  _gradientLayer.isRadial = (fill->type == LOTGradientTypeRadial);
-  _gradientLayer.mask = wrapperLayer;
-  _gradientLayer.actions = [_gradientOpacityLayer.actions copy];
-//  [outputLayer addSublayer:_gradientLayer];
+//  _gradientLayer = _gradientLayer.create();
+//  _gradientLayer->isRadial = (fill->type == LOTGradientTypeRadial);
+//  _gradientLayer->mask = wrapperLayer;
+//  _gradientLayer->actions = [_gradientOpacityLayer.actions copy];
+//  outputLayer->addSublayer(_gradientLayer);
 
-  centerPoint_DEBUG = [CALayer layer];
-  centerPoint_DEBUG.bounds = CGRectMake(0, 0, 20, 20);
+  centerPoint_DEBUG = centerPoint_DEBUG.create();
+  centerPoint_DEBUG->bounds = QRectF(0, 0, 20, 20);
   if (ENABLE_DEBUG_SHAPES) {
-//    [outputLayer addSublayer:centerPoint_DEBUG];
+      outputLayer->addSublayer(centerPoint_DEBUG);
   }
 }
 
-NSDictionary *LOTGradientFillRender::actionsForRenderLayer() const
-{
-    return @{@"backgroundColor": [NSNull null],
-             @"fillColor": [NSNull null],
-             @"opacity" : [NSNull null]};
-}
+//NSDictionary *LOTGradientFillRender::actionsForRenderLayer() const
+//{
+//    return @{@"backgroundColor": [NSNull null],
+//             @"fillColor": [NSNull null],
+//             @"opacity" : [NSNull null]};
+//}
 
 QMap<QString, QSharedPointer<LOTValueInterpolator> > LOTGradientFillRender::valueInterpolators() const
 {
@@ -83,6 +84,7 @@ bool LOTGradientFillRender::needsUpdateForFrame(qreal frame)
 
 void LOTGradientFillRender::performLocalUpdate()
 {
+    Q_ASSERT(false);
 //    centerPoint_DEBUG.backgroundColor =  [UIColor magentaColor].CGColor;
 //    centerPoint_DEBUG.borderColor = [UIColor lightGrayColor].CGColor;
 //    centerPoint_DEBUG.borderWidth = 2.f;
@@ -133,9 +135,9 @@ void LOTGradientFillRender::rebuildOutputs()
                                          -frame.y() / frame.height());
 //    _maskShape.path = inputNode->outputPath()->CGPath();
     Q_ASSERT(false);
-    _gradientOpacityLayer.bounds = frame.toCGRect();
-    _gradientOpacityLayer.anchorPoint = modifiedAnchor;
+//    _gradientOpacityLayer->bounds = frame;
+//    _gradientOpacityLayer->anchorPoint = modifiedAnchor;
 
-    _gradientLayer.bounds = frame.toCGRect();
-    _gradientLayer.anchorPoint = modifiedAnchor;
+//    _gradientLayer.bounds = frame.toCGRect();
+//    _gradientLayer.anchorPoint = modifiedAnchor;
 }

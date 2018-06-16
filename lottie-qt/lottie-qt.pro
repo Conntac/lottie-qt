@@ -71,7 +71,6 @@ HEADERS += \
     $$LOTTIE_PATH/Extensions/LOTRadialGradientLayer.h \
     $$LOTTIE_PATH/Extensions/UIColor+Expanded.h \
     $$LOTTIE_PATH/MacCompatability/CALayer+Compat.h \
-    $$LOTTIE_PATH/MacCompatability/LOTPlatformCompat.h \
     $$LOTTIE_PATH/MacCompatability/NSValue+Compat.h \
 #    $$LOTTIE_PATH/MacCompatability/UIBezierPath.h \
     $$LOTTIE_PATH/MacCompatability/UIColor.h \
@@ -134,9 +133,9 @@ SOURCES += \
     $$LOTTIE_PATH/Extensions/CGGeometry+LOTAdditions.mm \
     $$LOTTIE_PATH/Extensions/LOTBezierPath.mm \
     $$LOTTIE_PATH/Extensions/LOTRadialGradientLayer.mm \
-    $$LOTTIE_PATH/Extensions/UIColor+Expanded.mm \
-    $$LOTTIE_PATH/MacCompatability/CALayer+Compat.mm \
-    $$LOTTIE_PATH/MacCompatability/NSValue+Compat.mm \
+#    $$LOTTIE_PATH/Extensions/UIColor+Expanded.mm \
+#    $$LOTTIE_PATH/MacCompatability/CALayer+Compat.mm \
+#    $$LOTTIE_PATH/MacCompatability/NSValue+Compat.mm \
 #    $$LOTTIE_PATH/MacCompatability/UIBezierPath.mm \
     $$LOTTIE_PATH/MacCompatability/UIColor.mm \
     $$LOTTIE_PATH/Models/LOTAsset.mm \
@@ -161,28 +160,28 @@ SOURCES += \
     $$LOTTIE_PATH/Private/LOTComposition.mm \
     $$LOTTIE_PATH/Private/LOTInterpolatorCallback.mm \
     $$LOTTIE_PATH/Private/LOTKeypath.mm \
-    $$LOTTIE_PATH/Private/LOTValueCallback.mm \
-    $$LOTTIE_PATH/RenderSystem/AnimatorNodes/LOTCircleAnimator.mm \
-    $$LOTTIE_PATH/RenderSystem/AnimatorNodes/LOTPathAnimator.mm \
-    $$LOTTIE_PATH/RenderSystem/AnimatorNodes/LOTPolygonAnimator.mm \
-    $$LOTTIE_PATH/RenderSystem/AnimatorNodes/LOTPolystarAnimator.mm \
-    $$LOTTIE_PATH/RenderSystem/AnimatorNodes/LOTRoundedRectAnimator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTArrayInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTColorInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTNumberInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTPathInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTPointInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTSizeInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTTransformInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/InterpolatorNodes/LOTValueInterpolator.mm \
-    $$LOTTIE_PATH/RenderSystem/ManipulatorNodes/LOTTrimPathNode.mm \
-    $$LOTTIE_PATH/RenderSystem/RenderNodes/LOTFillRenderer.mm \
-    $$LOTTIE_PATH/RenderSystem/RenderNodes/LOTGradientFillRender.mm \
-    $$LOTTIE_PATH/RenderSystem/RenderNodes/LOTRenderGroup.mm \
-    $$LOTTIE_PATH/RenderSystem/RenderNodes/LOTRepeaterRenderer.mm \
-    $$LOTTIE_PATH/RenderSystem/RenderNodes/LOTStrokeRenderer.mm \
-    $$LOTTIE_PATH/RenderSystem/LOTAnimatorNode.mm \
-    $$LOTTIE_PATH/RenderSystem/LOTRenderNode.mm
+#    $$LOTTIE_PATH/Private/LOTValueCallback.mm \
+    Classes/RenderSystem/AnimatorNodes/LOTCircleAnimator.mm \
+    Classes/RenderSystem/AnimatorNodes/LOTPathAnimator.mm \
+    Classes/RenderSystem/AnimatorNodes/LOTPolygonAnimator.mm \
+    Classes/RenderSystem/AnimatorNodes/LOTPolystarAnimator.mm \
+    Classes/RenderSystem/AnimatorNodes/LOTRoundedRectAnimator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTArrayInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTColorInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTNumberInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTPathInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTPointInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTSizeInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTTransformInterpolator.mm \
+    Classes/RenderSystem/InterpolatorNodes/LOTValueInterpolator.mm \
+    Classes/RenderSystem/ManipulatorNodes/LOTTrimPathNode.mm \
+    Classes/RenderSystem/RenderNodes/LOTFillRenderer.mm \
+    Classes/RenderSystem/RenderNodes/LOTGradientFillRender.mm \
+    Classes/RenderSystem/RenderNodes/LOTRenderGroup.mm \
+    Classes/RenderSystem/RenderNodes/LOTRepeaterRenderer.mm \
+    Classes/RenderSystem/RenderNodes/LOTStrokeRenderer.mm \
+    Classes/RenderSystem/LOTAnimatorNode.mm \
+    Classes/RenderSystem/LOTRenderNode.mm
 
 LIBS += -lobjc -framework QuartzCore -framework Foundation -framework CoreGraphics
 

@@ -19,7 +19,7 @@ public:
 //    CAShapeLayer * _Nonnull outputLayer;
     QSharedPointer<QQuickLottieLayer> outputLayer;
 
-    virtual NSDictionary *actionsForRenderLayer() const;
+//    virtual NSDictionary *actionsForRenderLayer() const;
 
     // LOTAnimatorNode interface
     QSharedPointer<LOTBezierPath> localPath() const override;

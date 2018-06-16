@@ -6,7 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPlatformCompat.h"
 #import "LOTLayer.h"
 #import "LOTLayerGroup.h"
 #import "LOTKeypath.h"
@@ -49,10 +48,10 @@ public:
     void displayWithFrame(qreal frame);
     virtual void displayWithFrame(qreal frame, bool forceUpdate);
 
-    virtual void searchNodesForKeypath(LOTKeypath * _Nonnull keypath);
+    virtual void searchNodesForKeypath(LOTKeypath *keypath);
 
-    virtual void setValueDelegate(id<LOTValueDelegate> _Nonnull delegate,
-                                  LOTKeypath * _Nonnull keypath);
+    virtual void setValueDelegate(LOTValueDelegate *delegate,
+                                  LOTKeypath *keypath);
 
     // QQuickLottieLayer interface
     void actionForKey(const QString &event) override;

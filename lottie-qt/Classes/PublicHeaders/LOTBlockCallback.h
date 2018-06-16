@@ -21,13 +21,13 @@
  @param interpolatedColor The color interpolated at the current time between startColor and endColor. This represents the keypaths current color for the current time.
  @return CGColorRef the color to set the keypath node for the current frame
  */
-typedef CGColorRef _Nonnull (^LOTColorValueCallbackBlock)(CGFloat currentFrame,
-                                                          CGFloat startKeyFrame,
-                                                          CGFloat endKeyFrame,
-                                                          CGFloat interpolatedProgress,
-                                                          CGColorRef _Nullable startColor,
-                                                          CGColorRef _Nullable endColor,
-                                                          CGColorRef _Nullable interpolatedColor);
+typedef std::function<QColor(qreal currentFrame,
+                             qreal startKeyFrame,
+                             qreal endKeyFrame,
+                             qreal interpolatedProgress,
+                             const QColor &startColor,
+                             const QColor &endColor,
+                             const QColor &interpolatedColor)> LOTColorValueCallbackBlock;
 
 /*!
  @brief A block that is used to change a Number value at keytime, the block is called continuously for a keypath while the aniamtion plays.
@@ -40,13 +40,13 @@ typedef CGColorRef _Nonnull (^LOTColorValueCallbackBlock)(CGFloat currentFrame,
  @param interpolatedValue The Number interpolated at the current time between startValue and endValue. This represents the keypaths current Number for the current time.
  @return CGFloat the number to set the keypath node for the current frame
  */
-typedef CGFloat (^LOTNumberValueCallbackBlock)(CGFloat currentFrame,
-                                               CGFloat startKeyFrame,
-                                               CGFloat endKeyFrame,
-                                               CGFloat interpolatedProgress,
-                                               CGFloat startValue,
-                                               CGFloat endValue,
-                                               CGFloat interpolatedValue);
+typedef std::function<qreal(qreal currentFrame,
+                            qreal startKeyFrame,
+                            qreal endKeyFrame,
+                            qreal interpolatedProgress,
+                            qreal startValue,
+                            qreal endValue,
+                            qreal interpolatedValue)> LOTNumberValueCallbackBlock;
 /*!
  @brief A block that is used to change a Point value at keytime, the block is called continuously for a keypath while the aniamtion plays.
  @param currentFrame The current frame of the animation in the parent compositions time space.
@@ -58,13 +58,13 @@ typedef CGFloat (^LOTNumberValueCallbackBlock)(CGFloat currentFrame,
  @param interpolatedPoint The Point interpolated at the current time between startPoint and endPoint. This represents the keypaths current Point for the current time.
  @return CGPoint the point to set the keypath node for the current frame.
  */
-typedef CGPoint (^LOTPointValueCallbackBlock)(CGFloat currentFrame,
-                                              CGFloat startKeyFrame,
-                                              CGFloat endKeyFrame,
-                                              CGFloat interpolatedProgress,
-                                              CGPoint startPoint,
-                                              CGPoint endPoint,
-                                              CGPoint interpolatedPoint);
+typedef std::function<QPointF(qreal currentFrame,
+                              qreal startKeyFrame,
+                              qreal endKeyFrame,
+                              qreal interpolatedProgress,
+                              const QPointF &startPoint,
+                              const QPointF &endPoint,
+                              const QPointF &interpolatedPoint)> LOTPointValueCallbackBlock;
 
 /*!
  @brief A block that is used to change a Size value at keytime, the block is called continuously for a keypath while the aniamtion plays.
@@ -77,13 +77,13 @@ typedef CGPoint (^LOTPointValueCallbackBlock)(CGFloat currentFrame,
  @param interpolatedSize The Size interpolated at the current time between startSize and endSize. This represents the keypaths current Size for the current time.
  @return CGSize the size to set the keypath node for the current frame.
  */
-typedef CGSize (^LOTSizeValueCallbackBlock)(CGFloat currentFrame,
-                                            CGFloat startKeyFrame,
-                                            CGFloat endKeyFrame,
-                                            CGFloat interpolatedProgress,
-                                            CGSize startSize,
-                                            CGSize endSize,
-                                            CGSize interpolatedSize);
+typedef std::function<QSizeF(qreal currentFrame,
+                             qreal startKeyFrame,
+                             qreal endKeyFrame,
+                             qreal interpolatedProgress,
+                             const QSizeF &startSize,
+                             const QSizeF &endSize,
+                             const QSizeF &interpolatedSize)> LOTSizeValueCallbackBlock;
 
 /*!
  @brief A block that is used to change a Path value at keytime, the block is called continuously for a keypath while the aniamtion plays.
@@ -93,68 +93,88 @@ typedef CGSize (^LOTSizeValueCallbackBlock)(CGFloat currentFrame,
  @param interpolatedProgress A value from 0-1 that represents the current progress between keyframes. It respects the keyframes current easing curves.
  @return UIBezierPath the path to set the keypath node for the current frame.
  */
-typedef CGPathRef  _Nonnull (^LOTPathValueCallbackBlock)(CGFloat currentFrame,
-                                                         CGFloat startKeyFrame,
-                                                         CGFloat endKeyFrame,
-                                                         CGFloat interpolatedProgress);
+typedef std::function<QPainterPath(qreal currentFrame,
+                                   qreal startKeyFrame,
+                                   qreal endKeyFrame,
+                                   qreal interpolatedProgress)> LOTPathValueCallbackBlock;
 
 /*!
  @brief LOTColorValueCallback is wrapper around a LOTColorValueCallbackBlock. This block can be used in conjunction with LOTAnimationView setValueDelegate:forKeypath to dynamically change an animation's color keypath at runtime.
  */
 
-@interface LOTColorBlockCallback : NSObject <LOTColorValueDelegate>
+class LOTColorBlockCallback : public LOTColorValueDelegate
+{
+public:
+    LOTColorBlockCallback(LOTColorValueCallbackBlock block);
 
-+ (instancetype _Nonnull)withBlock:(LOTColorValueCallbackBlock _Nonnull )block NS_SWIFT_NAME(init(block:));
+    // LOTColorValueDelegate interface
+    QColor colorForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QColor &startColor, const QColor &endColor, const QColor &interpolatedColor) override;
 
-@property (nonatomic, copy, nonnull) LOTColorValueCallbackBlock callback;
-
-@end
+private:
+    LOTColorValueCallbackBlock callback;
+};
 
 /*!
  @brief LOTNumberValueCallback is wrapper around a LOTNumberValueCallbackBlock. This block can be used in conjunction with LOTAnimationView setValueDelegate:forKeypath to dynamically change an animation's number keypath at runtime.
  */
 
-@interface LOTNumberBlockCallback : NSObject <LOTNumberValueDelegate>
+class LOTNumberBlockCallback : public LOTNumberValueDelegate
+{
+public:
+    LOTNumberBlockCallback(LOTNumberValueCallbackBlock block);
 
-+ (instancetype _Nonnull)withBlock:(LOTNumberValueCallbackBlock _Nonnull)block NS_SWIFT_NAME(init(block:));
+    // LOTNumberValueDelegate interface
+    qreal floatValueForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, qreal startValue, qreal endValue, qreal interpolatedValue) override;
 
-@property (nonatomic, copy, nonnull) LOTNumberValueCallbackBlock callback;
-
-@end
+private:
+    LOTNumberValueCallbackBlock callback;
+};
 
 /*!
  @brief LOTPointValueCallback is wrapper around a LOTPointValueCallbackBlock. This block can be used in conjunction with LOTAnimationView setValueDelegate:forKeypath to dynamically change an animation's point keypath at runtime.
  */
 
-@interface LOTPointBlockCallback : NSObject <LOTPointValueDelegate>
+class LOTPointBlockCallback : public LOTPointValueDelegate
+{
+public:
+    LOTPointBlockCallback(LOTPointValueCallbackBlock block);
 
-+ (instancetype _Nonnull)withBlock:(LOTPointValueCallbackBlock _Nonnull)block NS_SWIFT_NAME(init(block:));
+    // LOTPointValueDelegate interface
+    QPointF pointForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QPointF &startPoint, const QPointF &endPoint, const QPointF &interpolatedPoint) override;
 
-@property (nonatomic, copy, nonnull) LOTPointValueCallbackBlock callback;
-
-@end
+private:
+    LOTPointValueCallbackBlock callback;
+};
 
 /*!
  @brief LOTSizeValueCallback is wrapper around a LOTSizeValueCallbackBlock. This block can be used in conjunction with LOTAnimationView setValueDelegate:forKeypath to dynamically change an animation's size keypath at runtime.
  */
 
-@interface LOTSizeBlockCallback : NSObject <LOTSizeValueDelegate>
+class LOTSizeBlockCallback : public LOTSizeValueDelegate
+{
+public:
+    LOTSizeBlockCallback(LOTSizeValueCallbackBlock block);
 
-+ (instancetype _Nonnull)withBlock:(LOTSizeValueCallbackBlock _Nonnull)block NS_SWIFT_NAME(init(block:));
+    // LOTSizeValueDelegate interface
+    QSizeF sizeForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress, const QSizeF &startSize, const QSizeF &endSize, const QSizeF &interpolatedSize) override;
 
-@property (nonatomic, copy, nonnull) LOTSizeValueCallbackBlock callback;
-
-@end
+private:
+    LOTSizeValueCallbackBlock callback;
+};
 
 /*!
  @brief LOTPathValueCallback is wrapper around a LOTPathValueCallbackBlock. This block can be used in conjunction with LOTAnimationView setValueDelegate:forKeypath to dynamically change an animation's path keypath at runtime.
  */
 
-@interface LOTPathBlockCallback : NSObject <LOTPathValueDelegate>
+class LOTPathBlockCallback : public LOTPathValueDelegate
+{
+public:
+    LOTPathBlockCallback(LOTPathValueCallbackBlock block);
 
-+ (instancetype _Nonnull)withBlock:(LOTPathValueCallbackBlock _Nonnull)block NS_SWIFT_NAME(init(block:));
+    // LOTPathValueDelegate interface
+    QPainterPath pathForFrame(qreal currentFrame, qreal startKeyframe, qreal endKeyframe, qreal interpolatedProgress) override;
 
-@property (nonatomic, copy, nonnull) LOTPathValueCallbackBlock callback;
-
-@end
+private:
+    LOTPathValueCallbackBlock callback;
+};
 

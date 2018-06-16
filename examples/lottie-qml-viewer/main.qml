@@ -12,14 +12,48 @@ Window {
 
     LottieAnimation {
         id: animation
-        anchors.fill: parent
+        anchors.centerIn: parent
 
-        source: "animations/LottieLogo1.json"
+        width: 400
+        height: 400
+
+//        source: "animations/LottieLogo1.json"
 //        source: "animations/9squares-AlBoardman.json
 //        source: "animations/GeometryTransformTest.json"
+        source: "animations/newAnimation.json"
 
         layer.enabled: true
         layer.samples: 4
+
+        DropArea {
+            anchors.fill: parent
+
+            onEntered: {
+                if (drag.hasUrls) {
+                    var urls = drag.urls;
+                    if (urls.length === 1) {
+                        var first = urls[0];
+                        if (first.endsWith(".json")) {
+                            drag.accept(Qt.CopyAction);
+                            return;
+                        }
+                    }
+                }
+
+                drag.accepted = false;
+            }
+
+            onDropped: {
+                // Since onEntered already filters, we should only receive valid values here
+                var url = drop.urls[0];
+
+                animation.source = url;
+            }
+        }
+
+        Component.onCompleted: {
+            animation.currentFrame = animation.endFrame;
+        }
 
         NumberAnimation {
             id: playAnimation
@@ -46,7 +80,7 @@ Window {
                 id: autoPlayButton
                 text: "Autoplay"
                 checkable: true
-                checked: true
+//                checked: true
             }
 
             Slider {

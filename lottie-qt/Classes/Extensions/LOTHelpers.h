@@ -9,7 +9,7 @@
 #ifndef LOTHelpers_h
 #define LOTHelpers_h
 
-#import "UIColor+Expanded.h"
+//#import "UIColor+Expanded.h"
 #import "CGGeometry+LOTAdditions.h"
 #import "LOTBezierPath.h"
 
