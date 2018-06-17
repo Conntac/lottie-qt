@@ -10,7 +10,7 @@
 
 #include <QSharedPointer>
 
-const CGFloat kLOTEllipseControlPointPercentage = 0.55228;
+const qreal kLOTEllipseControlPointPercentage = 0.55228;
 
 LOTCircleAnimator::LOTCircleAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeCircle *shapeCircle)
 : LOTAnimatorNode(inputNode, shapeCircle->keyname)
@@ -42,8 +42,8 @@ void LOTCircleAnimator::performLocalUpdate()
     QPointF center = _centerInterpolator->pointValueForFrame(currentFrame);
     QPointF size = _sizeInterpolator->pointValueForFrame(currentFrame);
 
-    CGFloat halfWidth = size.x() / 2;
-    CGFloat halfHeight = size.y() / 2;
+    qreal halfWidth = size.x() / 2;
+    qreal halfHeight = size.y() / 2;
 
     if (_reversed) {
       halfWidth = halfWidth * -1;
@@ -54,8 +54,8 @@ void LOTCircleAnimator::performLocalUpdate()
     QPointF circleQ3(center.x(), center.y() + halfHeight);
     QPointF circleQ4(center.x() - halfWidth, center.y());
 
-    CGFloat cpW = halfWidth * kLOTEllipseControlPointPercentage;
-    CGFloat cpH = halfHeight * kLOTEllipseControlPointPercentage;
+    qreal cpW = halfWidth * kLOTEllipseControlPointPercentage;
+    qreal cpH = halfHeight * kLOTEllipseControlPointPercentage;
 
     QSharedPointer<LOTBezierPath> path = path.create();
     path->cacheLengths = pathShouldCacheLengths();

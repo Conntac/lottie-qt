@@ -14,7 +14,20 @@ HEADERS += \
 SOURCES += \
     $$LOTTIE_PATH/lottieanimation.mm \
     $$LOTTIE_PATH/qquicklottielayer.cpp \
-    $$LOTTIE_PATH/lotbase.cpp
+    $$LOTTIE_PATH/lotbase.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTNumberInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTArrayInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTColorInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTPathInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTPointInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTSizeInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTTransformInterpolator.cpp \
+    Classes/RenderSystem/InterpolatorNodes/LOTValueInterpolator.cpp \
+    Classes/RenderSystem/AnimatorNodes/LOTCircleAnimator.cpp \
+    Classes/RenderSystem/AnimatorNodes/LOTPathAnimator.cpp \
+    Classes/RenderSystem/AnimatorNodes/LOTPolygonAnimator.cpp \
+    Classes/RenderSystem/AnimatorNodes/LOTPolystarAnimator.cpp \
+    Classes/RenderSystem/AnimatorNodes/LOTRoundedRectAnimator.cpp
 
 # Shapes
 SHAPES_PATH = ../qtquick-shapes-5.10.1
@@ -130,7 +143,7 @@ SOURCES += \
     $$LOTTIE_PATH/AnimatableLayers/LOTMaskContainer.mm \
     $$LOTTIE_PATH/AnimatableProperties/LOTBezierData.mm \
     $$LOTTIE_PATH/AnimatableProperties/LOTKeyframe.mm \
-    $$LOTTIE_PATH/Extensions/CGGeometry+LOTAdditions.mm \
+#    $$LOTTIE_PATH/Extensions/CGGeometry+LOTAdditions.mm \
     $$LOTTIE_PATH/Extensions/LOTBezierPath.mm \
     $$LOTTIE_PATH/Extensions/LOTRadialGradientLayer.mm \
 #    $$LOTTIE_PATH/Extensions/UIColor+Expanded.mm \
@@ -161,19 +174,6 @@ SOURCES += \
     $$LOTTIE_PATH/Private/LOTInterpolatorCallback.mm \
     $$LOTTIE_PATH/Private/LOTKeypath.mm \
 #    $$LOTTIE_PATH/Private/LOTValueCallback.mm \
-    Classes/RenderSystem/AnimatorNodes/LOTCircleAnimator.mm \
-    Classes/RenderSystem/AnimatorNodes/LOTPathAnimator.mm \
-    Classes/RenderSystem/AnimatorNodes/LOTPolygonAnimator.mm \
-    Classes/RenderSystem/AnimatorNodes/LOTPolystarAnimator.mm \
-    Classes/RenderSystem/AnimatorNodes/LOTRoundedRectAnimator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTArrayInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTColorInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTNumberInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTPathInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTPointInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTSizeInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTTransformInterpolator.mm \
-    Classes/RenderSystem/InterpolatorNodes/LOTValueInterpolator.mm \
     Classes/RenderSystem/ManipulatorNodes/LOTTrimPathNode.mm \
     Classes/RenderSystem/RenderNodes/LOTFillRenderer.mm \
     Classes/RenderSystem/RenderNodes/LOTGradientFillRender.mm \

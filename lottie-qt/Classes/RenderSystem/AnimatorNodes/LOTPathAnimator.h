@@ -14,7 +14,7 @@ class LOTPathAnimator : public LOTAnimatorNode
 {
 public:
     explicit LOTPathAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
-                             LOTShapePath *_Nonnull shapePath);
+                             LOTShapePath *shapePath);
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

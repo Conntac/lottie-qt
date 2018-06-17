@@ -16,7 +16,7 @@ class LOTPolygonAnimator : public LOTAnimatorNode
 {
 public:
     explicit LOTPolygonAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
-                                LOTShapeStar *_Nonnull shapeStar);
+                                LOTShapeStar *shapeStar);
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

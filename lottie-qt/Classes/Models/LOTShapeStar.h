@@ -6,7 +6,6 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "LOTKeyframe.h"
 #include "lotbase.h"
 

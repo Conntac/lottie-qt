@@ -32,7 +32,7 @@ void LOTValueInterpolator::setValueDelegate(LOTValueDelegate *delegate)
 bool LOTValueInterpolator::hasUpdateForFrame(qreal frame)
 {
     if (hasDelegateOverride()) {
-      return YES;
+      return true;
     }
     /*
      Cases we dont update keyframe
@@ -44,13 +44,13 @@ bool LOTValueInterpolator::hasUpdateForFrame(qreal frame)
         trailingKeyframe == nil &&
         leadingKeyframe->keyframeTime < frame) {
       // Frame is after bounds of keyframes. Clip
-      return NO;
+      return false;
     }
     if (trailingKeyframe &&
         leadingKeyframe == nil &&
         trailingKeyframe->keyframeTime > frame) {
       // Frame is before keyframes bounds. Clip.
-      return NO;
+      return false;
     }
     if (leadingKeyframe && trailingKeyframe &&
         leadingKeyframe->isHold &&
@@ -114,52 +114,52 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
     }
     if (trailingKeyframe && frame >= trailingKeyframe->keyframeTime) {
       // Frame is after current span, can move forward
-      NSInteger index = keyframes.indexOf(trailingKeyframe);
-      BOOL keyframeFound = NO;
+      int index = keyframes.indexOf(trailingKeyframe);
+      bool keyframeFound = false;
 
       LOTKeyframe *testLeading = trailingKeyframe;
       LOTKeyframe *testTrailing = nil;
 
-      while (keyframeFound == NO) {
+      while (keyframeFound == false) {
         index ++;
         if (index < keyframes.size()) {
           testTrailing = keyframes[index];
           if (frame < testTrailing->keyframeTime) {
             // This is the span.
-            keyframeFound = YES;
+            keyframeFound = true;
           } else {
             testLeading = testTrailing;
           }
         } else {
           // Leading is Last object
           testTrailing = nil;
-          keyframeFound = YES;
+          keyframeFound = true;
         }
       }
       leadingKeyframe = testLeading;
       trailingKeyframe = testTrailing;
     } else if (leadingKeyframe && frame < leadingKeyframe->keyframeTime) {
       // Frame is before current span, can move back a span
-      NSInteger index = keyframes.indexOf(leadingKeyframe);
-      BOOL keyframeFound = NO;
+      int index = keyframes.indexOf(leadingKeyframe);
+      bool keyframeFound = false;
 
       LOTKeyframe *testLeading = nil;
       LOTKeyframe *testTrailing = leadingKeyframe;
 
-      while (keyframeFound == NO) {
+      while (keyframeFound == false) {
         index --;
         if (index >= 0) {
           testLeading = keyframes[index];
           if (frame >= testLeading->keyframeTime) {
             // This is the span.
-            keyframeFound = YES;
+            keyframeFound = true;
           } else {
             testTrailing = testLeading;
           }
         } else {
           // Trailing is first object
           testLeading = nil;
-          keyframeFound = YES;
+          keyframeFound = true;
         }
       }
       leadingKeyframe = testLeading;

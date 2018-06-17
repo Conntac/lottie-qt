@@ -1,18 +1,18 @@
 
 #import "CGGeometry+LOTAdditions.h"
+#include <math.h>
 
-const CGSize CGSizeMax = {CGFLOAT_MAX, CGFLOAT_MAX};
+const QSizeF QSizeFMax = {std::numeric_limits<qreal>::min(), std::numeric_limits<qreal>::max()};
 //
 // Core Graphics Geometry Additions
 //
 
-// CGRectIntegral returns a rectangle with the smallest integer values for its origin and size that contains the source rectangle.
+// QRectFIntegral returns a rectangle with the smallest integer values for its origin and size that contains the source rectangle.
 // For a rect with .origin={5, 5.5}, .size=(10, 10), it will return .origin={5,5}, .size={10, 11};
 // LOT_RectIntegral will return {5,5}, {10, 10}.
-CGRect LOT_RectIntegral(CGRect rect) {
-  rect.origin = CGPointMake(rintf(rect.origin.x), rintf(rect.origin.y));
-  rect.size = CGSizeMake(ceilf(rect.size.width), ceil(rect.size.height));
-  return rect;
+QRectF LOT_RectIntegral(QRectF rect) {
+  return QRectF(rintf(rect.x()), rintf(rect.y()),
+                ceilf(rect.width())), ceil(rect.height());
 }
 
 //
@@ -20,17 +20,17 @@ CGRect LOT_RectIntegral(CGRect rect) {
 
 // Returns a rectangle of the given size, centered at a point
 
-CGRect LOT_RectCenteredAtPoint(CGPoint center, CGSize size, BOOL integral) {
-  CGRect result;
-  result.origin.x = center.x - 0.5f * size.width;
-  result.origin.y = center.y - 0.5f * size.height;
-  result.size = size;
+QRectF LOT_RectCenteredAtPoint(QPointF center, QSizeF size, bool integral) {
+  QRectF result;
+  result.setX(center.x() - 0.5f * size.width());
+  result.setY(center.y() - 0.5f * size.height());
+  result.setSize(size);
   
   if (integral) { result = LOT_RectIntegral(result); }
   return result;
 }
 
-// Returns the center point of a CGRect
+// Returns the center point of a QRectF
 QPointF LOT_RectGetCenterPoint(const QRectF &rect) {
     return rect.center();
 }
@@ -40,49 +40,42 @@ QPointF LOT_RectGetCenterPoint(const QRectF &rect) {
 
 // Inset the rectangle on a single edge
 
-CGRect LOT_RectInsetLeft(CGRect rect, CGFloat inset) {
-  rect.origin.x += inset;
-  rect.size.width -= inset;
+QRectF LOT_RectInsetLeft(QRectF rect, qreal inset) {
+  rect.adjust(inset, 0, -inset, 0);
   return rect;
 }
 
-CGRect LOT_RectInsetRight(CGRect rect, CGFloat inset) {
-  rect.size.width -= inset;
+QRectF LOT_RectInsetRight(QRectF rect, qreal inset) {
+  rect.adjust(0, 0, -inset, 0);
   return rect;
 }
 
-CGRect LOT_RectInsetTop(CGRect rect, CGFloat inset) {
-  rect.origin.y += inset;
-  rect.size.height -= inset;
+QRectF LOT_RectInsetTop(QRectF rect, qreal inset) {
+  rect.adjust(0, inset, 0, -inset);
   return rect;
 }
 
-CGRect LOT_RectInsetBottom(CGRect rect, CGFloat inset) {
-  rect.size.height -= inset;
+QRectF LOT_RectInsetBottom(QRectF rect, qreal inset) {
+  rect.adjust(0, 0, 0, -inset);
   return rect;
 }
 
 // Inset the rectangle on two edges
 
-CGRect LOT_RectInsetHorizontal(CGRect rect, CGFloat leftInset, CGFloat rightInset) {
-  rect.origin.x += leftInset;
-  rect.size.width -= (leftInset + rightInset);
+QRectF LOT_RectInsetHorizontal(QRectF rect, qreal leftInset, qreal rightInset) {
+  rect.adjust(leftInset, 0, -(leftInset + rightInset), 0);
   return rect;
 }
 
-CGRect LOT_RectInsetVertical(CGRect rect, CGFloat topInset, CGFloat bottomInset) {
-  rect.origin.y += topInset;
-  rect.size.height -= (topInset + bottomInset);
+QRectF LOT_RectInsetVertical(QRectF rect, qreal topInset, qreal bottomInset) {
+  rect.adjust(0, topInset, 0, -(topInset + bottomInset));
   return rect;
 }
 
 // Inset the rectangle on all edges
 
-CGRect LOT_RectInsetAll(CGRect rect, CGFloat leftInset, CGFloat rightInset, CGFloat topInset, CGFloat bottomInset) {
-  rect.origin.x += leftInset;
-  rect.origin.y += topInset;
-  rect.size.width -= (leftInset + rightInset);
-  rect.size.height -= (topInset + bottomInset);
+QRectF LOT_RectInsetAll(QRectF rect, qreal leftInset, qreal rightInset, qreal topInset, qreal bottomInset) {
+  rect.adjust(leftInset, topInset, -(leftInset + rightInset), -(topInset + bottomInset));
   return rect;
 }
 
@@ -91,8 +84,8 @@ CGRect LOT_RectInsetAll(CGRect rect, CGFloat leftInset, CGFloat rightInset, CGFl
 
 // Returns a rectangle of size framed in the center of the given rectangle
 
-CGRect LOT_RectFramedCenteredInRect(CGRect rect, CGSize size, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedCenteredInRect(QRectF rect, QSizeF size, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rintf(0.5f * (rect.size.width - size.width));
   result.origin.y = rect.origin.y + rintf(0.5f * (rect.size.height - size.height));
   result.size = size;
@@ -103,8 +96,8 @@ CGRect LOT_RectFramedCenteredInRect(CGRect rect, CGSize size, BOOL integral) {
 
 // Returns a rectangle of size framed in the given rectangle and inset
 
-CGRect LOT_RectFramedLeftInRect(CGRect rect, CGSize size, CGFloat inset, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedLeftInRect(QRectF rect, QSizeF size, qreal inset, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + inset;
   result.origin.y = rect.origin.y + rintf(0.5f * (rect.size.height - size.height));
   result.size = size;
@@ -113,8 +106,8 @@ CGRect LOT_RectFramedLeftInRect(CGRect rect, CGSize size, CGFloat inset, BOOL in
   return result;
 }
 
-CGRect LOT_RectFramedRightInRect(CGRect rect, CGSize size, CGFloat inset, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedRightInRect(QRectF rect, QSizeF size, qreal inset, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rect.size.width - size.width - inset;
   result.origin.y = rect.origin.y + rintf(0.5f * (rect.size.height - size.height));
   result.size = size;
@@ -123,8 +116,8 @@ CGRect LOT_RectFramedRightInRect(CGRect rect, CGSize size, CGFloat inset, BOOL i
   return result;
 }
 
-CGRect LOT_RectFramedTopInRect(CGRect rect, CGSize size, CGFloat inset, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedTopInRect(QRectF rect, QSizeF size, qreal inset, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rintf(0.5f * (rect.size.width - size.width));
   result.origin.y = rect.origin.y + inset;
   result.size = size;
@@ -133,8 +126,8 @@ CGRect LOT_RectFramedTopInRect(CGRect rect, CGSize size, CGFloat inset, BOOL int
   return result;
 }
 
-CGRect LOT_RectFramedBottomInRect(CGRect rect, CGSize size, CGFloat inset, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedBottomInRect(QRectF rect, QSizeF size, qreal inset, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rintf(0.5f * (rect.size.width - size.width));
   result.origin.y = rect.origin.y + rect.size.height - size.height - inset;
   result.size = size;
@@ -143,8 +136,8 @@ CGRect LOT_RectFramedBottomInRect(CGRect rect, CGSize size, CGFloat inset, BOOL 
   return result;
 }
 
-CGRect LOT_RectFramedTopLeftInRect(CGRect rect, CGSize size, CGFloat insetWidth, CGFloat insetHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedTopLeftInRect(QRectF rect, QSizeF size, qreal insetWidth, qreal insetHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + insetWidth;
   result.origin.y = rect.origin.y + insetHeight;
   result.size = size;
@@ -153,8 +146,8 @@ CGRect LOT_RectFramedTopLeftInRect(CGRect rect, CGSize size, CGFloat insetWidth,
   return result;
 }
 
-CGRect LOT_RectFramedTopRightInRect(CGRect rect, CGSize size, CGFloat insetWidth, CGFloat insetHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedTopRightInRect(QRectF rect, QSizeF size, qreal insetWidth, qreal insetHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rect.size.width - size.width - insetWidth;
   result.origin.y = rect.origin.y + insetHeight;
   result.size = size;
@@ -163,8 +156,8 @@ CGRect LOT_RectFramedTopRightInRect(CGRect rect, CGSize size, CGFloat insetWidth
   return result;
 }
 
-CGRect LOT_RectFramedBottomLeftInRect(CGRect rect, CGSize size, CGFloat insetWidth, CGFloat insetHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedBottomLeftInRect(QRectF rect, QSizeF size, qreal insetWidth, qreal insetHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + insetWidth;
   result.origin.y = rect.origin.y + rect.size.height - size.height - insetHeight;
   result.size = size;
@@ -173,8 +166,8 @@ CGRect LOT_RectFramedBottomLeftInRect(CGRect rect, CGSize size, CGFloat insetWid
   return result;
 }
 
-CGRect LOT_RectFramedBottomRightInRect(CGRect rect, CGSize size, CGFloat insetWidth, CGFloat insetHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectFramedBottomRightInRect(QRectF rect, QSizeF size, qreal insetWidth, qreal insetHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rect.size.width - size.width - insetWidth;
   result.origin.y = rect.origin.y + rect.size.height - size.height - insetHeight;
   result.size = size;
@@ -185,8 +178,8 @@ CGRect LOT_RectFramedBottomRightInRect(CGRect rect, CGSize size, CGFloat insetWi
 
 // Returns a rectangle of size attached to the given rectangle
 
-CGRect LOT_RectAttachedLeftToRect(CGRect rect, CGSize size, CGFloat margin, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedLeftToRect(QRectF rect, QSizeF size, qreal margin, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x - size.width - margin;
   result.origin.y = rect.origin.y + rintf(0.5f * (rect.size.height - size.height));
   result.size = size;
@@ -195,8 +188,8 @@ CGRect LOT_RectAttachedLeftToRect(CGRect rect, CGSize size, CGFloat margin, BOOL
   return result;
 }
 
-CGRect LOT_RectAttachedRightToRect(CGRect rect, CGSize size, CGFloat margin, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedRightToRect(QRectF rect, QSizeF size, qreal margin, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rect.size.width + margin;
   result.origin.y = rect.origin.y + rintf(0.5f * (rect.size.height - size.height));
   result.size = size;
@@ -205,8 +198,8 @@ CGRect LOT_RectAttachedRightToRect(CGRect rect, CGSize size, CGFloat margin, BOO
   return result;
 }
 
-CGRect LOT_RectAttachedTopToRect(CGRect rect, CGSize size, CGFloat margin, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedTopToRect(QRectF rect, QSizeF size, qreal margin, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rintf(0.5f * (rect.size.width - size.width));
   result.origin.y = rect.origin.y - size.height - margin;
   result.size = size;
@@ -215,8 +208,8 @@ CGRect LOT_RectAttachedTopToRect(CGRect rect, CGSize size, CGFloat margin, BOOL 
   return result;
 }
 
-CGRect LOT_RectAttachedTopLeftToRect(CGRect rect, CGSize size, CGFloat marginWidth, CGFloat marginHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedTopLeftToRect(QRectF rect, QSizeF size, qreal marginWidth, qreal marginHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + marginWidth;
   result.origin.y = rect.origin.y - size.height - marginHeight;
   result.size = size;
@@ -225,8 +218,8 @@ CGRect LOT_RectAttachedTopLeftToRect(CGRect rect, CGSize size, CGFloat marginWid
   return result;
 }
 
-CGRect LOT_RectAttachedTopRightToRect(CGRect rect, CGSize size, CGFloat marginWidth, CGFloat marginHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedTopRightToRect(QRectF rect, QSizeF size, qreal marginWidth, qreal marginHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rect.size.width - size.width - marginWidth;
   result.origin.y = rect.origin.y - rect.size.height - marginHeight;
   result.size = size;
@@ -235,8 +228,8 @@ CGRect LOT_RectAttachedTopRightToRect(CGRect rect, CGSize size, CGFloat marginWi
   return result;
 }
 
-CGRect LOT_RectAttachedBottomToRect(CGRect rect, CGSize size, CGFloat margin, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedBottomToRect(QRectF rect, QSizeF size, qreal margin, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rintf(0.5f * (rect.size.width - size.width));
   result.origin.y = rect.origin.y + rect.size.height + margin;
   result.size = size;
@@ -245,8 +238,8 @@ CGRect LOT_RectAttachedBottomToRect(CGRect rect, CGSize size, CGFloat margin, BO
   return result;
 }
 
-CGRect LOT_RectAttachedBottomLeftToRect(CGRect rect, CGSize size, CGFloat marginWidth, CGFloat marginHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedBottomLeftToRect(QRectF rect, QSizeF size, qreal marginWidth, qreal marginHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + marginWidth;
   result.origin.y = rect.origin.y + rect.size.height + marginHeight;
   result.size = size;
@@ -255,8 +248,8 @@ CGRect LOT_RectAttachedBottomLeftToRect(CGRect rect, CGSize size, CGFloat margin
   return result;
 }
 
-CGRect LOT_RectAttachedBottomRightToRect(CGRect rect, CGSize size, CGFloat marginWidth, CGFloat marginHeight, BOOL integral) {
-  CGRect result;
+QRectF LOT_RectAttachedBottomRightToRect(QRectF rect, QSizeF size, qreal marginWidth, qreal marginHeight, bool integral) {
+  QRectF result;
   result.origin.x = rect.origin.x + rect.size.width - size.width - marginWidth;
   result.origin.y = rect.origin.y + rect.size.height + marginHeight;
   result.size = size;
@@ -267,12 +260,12 @@ CGRect LOT_RectAttachedBottomRightToRect(CGRect rect, CGSize size, CGFloat margi
 
 // Divides a rect into sections and returns the section at specified index
 
-CGRect LOT_RectDividedSection(CGRect rect, NSInteger sections, NSInteger index, CGRectEdge fromEdge) {
+QRectF LOT_RectDividedSection(QRectF rect, NSInteger sections, NSInteger index, QRectFEdge fromEdge) {
   if (sections == 0) {
-    return CGRectZero;
+    return QRectFZero;
   }
-  CGRect r = rect;
-  if (fromEdge == CGRectMaxXEdge || fromEdge == CGRectMinXEdge) {
+  QRectF r = rect;
+  if (fromEdge == QRectFMaxXEdge || fromEdge == QRectFMinXEdge) {
     r.size.width = rect.size.width / sections;
     r.origin.x += r.size.width * index;
   } else {
@@ -283,24 +276,24 @@ CGRect LOT_RectDividedSection(CGRect rect, NSInteger sections, NSInteger index, 
 }
 
 
-CGRect LOT_RectAddRect(CGRect rect, CGRect other) {
-  return CGRectMake(rect.origin.x + other.origin.x, rect.origin.y + other.origin.y,
+QRectF LOT_RectAddRect(QRectF rect, QRectF other) {
+  return QRectFMake(rect.origin.x + other.origin.x, rect.origin.y + other.origin.y,
                     rect.size.width + other.size.width, rect.size.height + other.size.height);
 }
 
-CGRect LOT_RectAddPoint(CGRect rect, CGPoint point) {
-  return CGRectMake(rect.origin.x + point.x, rect.origin.y + point.y,
+QRectF LOT_RectAddPoint(QRectF rect, QPointF point) {
+  return QRectFMake(rect.origin.x + point.x, rect.origin.y + point.y,
                     rect.size.width, rect.size.height);
 }
 
-CGRect LOT_RectAddSize(CGRect rect, CGSize size) {
-  return CGRectMake(rect.origin.x, rect.origin.y,
+QRectF LOT_RectAddSize(QRectF rect, QSizeF size) {
+  return QRectFMake(rect.origin.x, rect.origin.y,
                     rect.size.width + size.width, rect.size.height + size.height);
 }
 
-CGRect LOT_RectBounded(CGRect rect) {
-  CGRect returnRect = rect;
-  returnRect.origin = CGPointZero;
+QRectF LOT_RectBounded(QRectF rect) {
+  QRectF returnRect = rect;
+  returnRect.origin = QPointFZero;
   return returnRect;
 }
 
@@ -311,11 +304,11 @@ QPointF LOT_PointAddedToPoint(const QPointF &point1, const QPointF &point2) {
   return point1 + point2;
 }
 
-CGRect LOT_RectSetHeight(CGRect rect, CGFloat height) {
-  return CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, height);
+QRectF LOT_RectSetHeight(QRectF rect, qreal height) {
+  return QRectFMake(rect.origin.x, rect.origin.y, rect.size.width, height);
 }
 
-CGFloat LOT_DegreesToRadians(CGFloat degrees) {
+qreal LOT_DegreesToRadians(qreal degrees) {
   return degrees * M_PI / 180;
 }
 
@@ -326,7 +319,7 @@ qreal LOT_PointDistanceFromPoint(const QPointF &point1, const QPointF &point2) {
   return distance;
 }
 
-CGFloat LOT_RemapValue(CGFloat value, CGFloat low1, CGFloat high1, CGFloat low2, CGFloat high2 ) {
+qreal LOT_RemapValue(qreal value, qreal low1, qreal high1, qreal low2, qreal high2 ) {
   return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 }
 
@@ -356,7 +349,7 @@ QPointF LOT_PointInLine(const QPointF &A, const QPointF &B, qreal T) {
   return C;
 }
 
-CGFloat LOT_CubicBezierGetY(CGPoint cp1, CGPoint cp2, CGFloat T) {
+qreal LOT_CubicBezierGetY(QPointF cp1, QPointF cp2, qreal T) {
 //       (1-x)^3 * y0 + 3*(1-x)^2 * x * y1 + 3*(1-x) * x^2 * y2 + x^3 * y3
   return 3 * powf(1.f - T, 2.f) * T * cp1.y + 3.f * (1.f - T) * powf(T, 2.f) * cp2.y + powf(T, 3.f);
 }
@@ -371,17 +364,17 @@ QPointF LOT_PointInCubicCurve(const QPointF &start, const QPointF &cp1, const QP
   return F;
 }
 
-CGFloat LOT_SolveCubic(CGFloat a, CGFloat b, CGFloat c, CGFloat d) {
+qreal LOT_SolveCubic(qreal a, qreal b, qreal c, qreal d) {
   if (a == 0) return LOT_SolveQuadratic(b, c, d);
   if (d == 0) return 0;
   
   b /= a;
   c /= a;
   d /= a;
-  CGFloat q = (3.0 * c - LOT_Squared(b)) / 9.0;
-  CGFloat r = (-27.0 * d + b * (9.0 * c - 2.0 * LOT_Squared(b))) / 54.0;
-  CGFloat disc = LOT_Cubed(q) + LOT_Squared(r);
-  CGFloat term1 = b / 3.0;
+  qreal q = (3.0 * c - LOT_Squared(b)) / 9.0;
+  qreal r = (-27.0 * d + b * (9.0 * c - 2.0 * LOT_Squared(b))) / 54.0;
+  qreal disc = LOT_Cubed(q) + LOT_Squared(r);
+  qreal term1 = b / 3.0;
   
   if (disc > 0) {
     double s = r + sqrtf(disc);
@@ -418,8 +411,8 @@ CGFloat LOT_SolveCubic(CGFloat a, CGFloat b, CGFloat c, CGFloat d) {
   return -1;
 }
 
-CGFloat LOT_SolveQuadratic(CGFloat a, CGFloat b, CGFloat c) {
-  CGFloat result = (-b + sqrtf(LOT_Squared(b) - 4 * a * c)) / (2 * a);
+qreal LOT_SolveQuadratic(qreal a, qreal b, qreal c) {
+  qreal result = (-b + sqrtf(LOT_Squared(b) - 4 * a * c)) / (2 * a);
   if (result >= 0 && result <= 1) return result;
   
   result = (-b - sqrtf(LOT_Squared(b) - 4 * a * c)) / (2 * a);
@@ -428,11 +421,11 @@ CGFloat LOT_SolveQuadratic(CGFloat a, CGFloat b, CGFloat c) {
   return -1;
 }
 
-CGFloat LOT_Squared(CGFloat f) { return f * f; }
+qreal LOT_Squared(qreal f) { return f * f; }
 
-CGFloat LOT_Cubed(CGFloat f) { return f * f * f; }
+qreal LOT_Cubed(qreal f) { return f * f * f; }
 
-CGFloat LOT_CubicRoot(CGFloat f) { return powf(f, 1.0 / 3.0); }
+qreal LOT_CubicRoot(qreal f) { return powf(f, 1.0 / 3.0); }
 
 qreal LOT_CubicBezeirInterpolate(const QPointF &P0, const QPointF &P1, const QPointF &P2, const QPointF &P3, qreal x) {
   qreal t;
@@ -475,6 +468,6 @@ qreal LOT_CubicLength(const QPointF &fromPoint, const QPointF &toPoint, const QP
   return LOT_CubicLengthWithPrecision(fromPoint, toPoint, controlPoint1, controlPoint2, 20);
 }
 
-BOOL LOT_CGPointIsZero(CGPoint point) {
-  return CGPointEqualToPoint(point, CGPointZero);
+bool LOT_QPointFIsZero(QPointF point) {
+  return QPointFEqualToPoint(point, QPointFZero);
 }

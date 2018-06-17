@@ -15,7 +15,7 @@
 
 #include <QSharedPointer>
 
-const CGFloat kPOLYGON_MAGIC_NUMBER = .25f;
+const qreal kPOLYGON_MAGIC_NUMBER = .25f;
 
 LOTPolygonAnimator::LOTPolygonAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStar *shapeStar)
 : LOTAnimatorNode(inputNode, shapeStar->keyname)
@@ -58,15 +58,15 @@ void LOTPolygonAnimator::performLocalUpdate()
 
     QSharedPointer<LOTBezierPath> path = path.create();
     path->cacheLengths = pathShouldCacheLengths();
-    CGFloat currentAngle = LOT_DegreesToRadians(rotation - 90);
-    CGFloat anglePerPoint = (CGFloat)((2 * M_PI) / points);
+    qreal currentAngle = LOT_DegreesToRadians(rotation - 90);
+    qreal anglePerPoint = (qreal)((2 * M_PI) / points);
 
-    CGFloat x;
-    CGFloat y;
-    CGFloat previousX;
-    CGFloat previousY;
-    x = (CGFloat) (outerRadius * cosf(currentAngle));
-    y = (CGFloat) (outerRadius * sinf(currentAngle));
+    qreal x;
+    qreal y;
+    qreal previousX;
+    qreal previousY;
+    x = (qreal) (outerRadius * cosf(currentAngle));
+    y = (qreal) (outerRadius * sinf(currentAngle));
     path->LOT_moveToPoint(QPointF(x, y));
     currentAngle += anglePerPoint;
 
@@ -74,22 +74,22 @@ void LOTPolygonAnimator::performLocalUpdate()
     for (int i = 0; i < numPoints; i++) {
       previousX = x;
       previousY = y;
-      x = (CGFloat) (outerRadius * cosf(currentAngle));
-      y = (CGFloat) (outerRadius * sinf(currentAngle));
+      x = (qreal) (outerRadius * cosf(currentAngle));
+      y = (qreal) (outerRadius * sinf(currentAngle));
 
       if (outerRoundness != 0) {
-        CGFloat cp1Theta = (CGFloat) (atan2(previousY, previousX) - M_PI / 2.f);
-        CGFloat cp1Dx = (CGFloat) cosf(cp1Theta);
-        CGFloat cp1Dy = (CGFloat) sinf(cp1Theta);
+        qreal cp1Theta = (qreal) (atan2(previousY, previousX) - M_PI / 2.f);
+        qreal cp1Dx = (qreal) cosf(cp1Theta);
+        qreal cp1Dy = (qreal) sinf(cp1Theta);
 
-        CGFloat cp2Theta = (CGFloat) (atan2(y, x) - M_PI / 2.f);
-        CGFloat cp2Dx = (CGFloat) cosf(cp2Theta);
-        CGFloat cp2Dy = (CGFloat) sinf(cp2Theta);
+        qreal cp2Theta = (qreal) (atan2(y, x) - M_PI / 2.f);
+        qreal cp2Dx = (qreal) cosf(cp2Theta);
+        qreal cp2Dy = (qreal) sinf(cp2Theta);
 
-        CGFloat cp1x = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp1Dx;
-        CGFloat cp1y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp1Dy;
-        CGFloat cp2x = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dx;
-        CGFloat cp2y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dy;
+        qreal cp1x = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp1Dx;
+        qreal cp1y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp1Dy;
+        qreal cp2x = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dx;
+        qreal cp2y = outerRadius * outerRoundness * kPOLYGON_MAGIC_NUMBER * cp2Dy;
         path->LOT_addCurveToPoint(QPointF(x, y),
                                   QPointF(previousX - cp1x, previousY - cp1y),
                                   QPointF(x + cp2x, y + cp2y));

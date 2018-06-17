@@ -23,7 +23,7 @@ public:
     explicit LOTKeyframe(const LOTKeyframe *keyframe);
 
     void remapValueWithBlock(std::function<qreal(qreal inValue)> remapBlock);
-    LOTKeyframe *copyWithData(id data);
+//    LOTKeyframe *copyWithData(id data);
 
 //@property (nonatomic, readonly)
     qreal keyframeTime;

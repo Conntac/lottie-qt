@@ -79,14 +79,14 @@ void LOTKeyframe::remapValueWithBlock(std::function<qreal (qreal)> remapBlock)
     sizeValue = QSizeF(remapBlock(sizeValue.width()), remapBlock(sizeValue.height()));
 }
 
-LOTKeyframe *LOTKeyframe::copyWithData(id data)
-{
-    LOTKeyframe *newFrame = new LOTKeyframe(this);
-    Q_ASSERT(false);
-    // FIXME: Where is data from?!
-//    newFrame->data = data;
-    return newFrame;
-}
+//LOTKeyframe *LOTKeyframe::copyWithData(id data)
+//{
+//    LOTKeyframe *newFrame = new LOTKeyframe(this);
+//    Q_ASSERT(false);
+//    // FIXME: Where is data from?!
+////    newFrame->data = data;
+//    return newFrame;
+//}
 
 void LOTKeyframe::setupOutputWithData(const QVariant &data)
 {

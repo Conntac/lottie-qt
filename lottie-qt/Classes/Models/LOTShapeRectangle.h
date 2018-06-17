@@ -6,9 +6,7 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "LOTKeyframe.h"
-
+#include "LOTKeyframe.h"
 #include "lotbase.h"
 
 class LOTShapeRectangle : public LOTShapeItem

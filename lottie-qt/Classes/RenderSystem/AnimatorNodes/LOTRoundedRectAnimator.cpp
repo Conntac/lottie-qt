@@ -13,11 +13,11 @@
 
 #include <QSharedPointer>
 
-static void addCorner(const QPointF &cornerPoint, CGFloat radius, QSharedPointer<LOTBezierPath> path, bool clockwise)
+static void addCorner(const QPointF &cornerPoint, qreal radius, QSharedPointer<LOTBezierPath> path, bool clockwise)
 {
   QPointF currentPoint = path->currentPoint();
   
-  CGFloat ellipseControlPointPercentage = 0.55228;
+  qreal ellipseControlPointPercentage = 0.55228;
   
   if (cornerPoint.y() == currentPoint.y()) {
     // Moving east/west
@@ -102,12 +102,12 @@ bool LOTRoundedRectAnimator::needsUpdateForFrame(qreal frame)
 
 void LOTRoundedRectAnimator::performLocalUpdate()
 {
-    CGFloat cornerRadius = _cornerRadiusInterpolator->floatValueForFrame(currentFrame);
+    qreal cornerRadius = _cornerRadiusInterpolator->floatValueForFrame(currentFrame);
     QPointF size = _sizeInterpolator->pointValueForFrame(currentFrame);
     QPointF position = _centerInterpolator->pointValueForFrame(currentFrame);
 
-    CGFloat halfWidth = size.x() / 2;
-    CGFloat halfHeight = size.y() / 2;
+    qreal halfWidth = size.x() / 2;
+    qreal halfHeight = size.y() / 2;
 
     QRectF rectFrame(position.x() - halfWidth, position.y() - halfHeight, size.x(), size.y());
 
@@ -118,8 +118,8 @@ void LOTRoundedRectAnimator::performLocalUpdate()
     // UIBezierPath Draws rects from the top left corner, After Effects draws them from the top right.
     // Switching to manual drawing.
 
-    CGFloat radius = MIN(MIN(halfWidth, halfHeight), cornerRadius);
-    BOOL clockWise = !_reversed;
+    qreal radius = qMin(qMin(halfWidth, halfHeight), cornerRadius);
+    bool clockWise = !_reversed;
 
     QSharedPointer<LOTBezierPath> path1 = path1.create();
     path1->cacheLengths = pathShouldCacheLengths();
