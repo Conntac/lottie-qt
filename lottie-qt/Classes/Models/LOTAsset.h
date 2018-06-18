@@ -6,6 +6,8 @@
 //
 //
 
+#pragma once
+
 #include <QString>
 #include <QVariantMap>
 
@@ -17,7 +19,7 @@ class LOTAsset
 {
 public:
     LOTAsset(const QVariantMap &jsonDictionary,
-             LOTAssetGroup * _Nullable assetGroup,
+             LOTAssetGroup *assetGroup,
              qreal framerate);
 
 //@property (nonatomic, readonly, nullable)

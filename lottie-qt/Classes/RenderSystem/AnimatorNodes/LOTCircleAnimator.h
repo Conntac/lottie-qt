@@ -6,15 +6,17 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTAnimatorNode.h"
-#import "LOTShapeCircle.h"
-#import "LOTPointInterpolator.h"
+#pragma once
+
+#include "LOTAnimatorNode.h"
+#include "LOTShapeCircle.h"
+#include "LOTPointInterpolator.h"
 
 class LOTCircleAnimator : public LOTAnimatorNode
 {
 public:
     explicit LOTCircleAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
-                               LOTShapeCircle *_Nonnull shapeCircle);
+                               LOTShapeCircle *shapeCircle);
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

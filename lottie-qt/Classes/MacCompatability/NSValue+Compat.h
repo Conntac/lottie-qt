@@ -6,7 +6,7 @@
 #include <TargetConditionals.h>
 
 #if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
-#import <Foundation/Foundation.h>
+#include <Foundation/Foundation.h>
 
 @interface NSValue (Compat)
 

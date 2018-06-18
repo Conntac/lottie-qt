@@ -6,6 +6,8 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
+#pragma once
+
 #include "lotbase.h"
 
 #include <QString>

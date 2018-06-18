@@ -6,9 +6,11 @@
 //
 //
 
-#import "LOTBezierPath.h"
-#import "LOTKeypath.h"
-#import "LOTValueDelegate.h"
+#pragma once
+
+#include "LOTBezierPath.h"
+#include "LOTKeypath.h"
+#include "LOTValueDelegate.h"
 
 #include <QMap>
 #include <QSharedPointer>

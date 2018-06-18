@@ -6,8 +6,8 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPointInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTPointInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 LOTPointInterpolator::LOTPointInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
@@ -16,7 +16,7 @@ LOTPointInterpolator::LOTPointInterpolator(const QList<LOTKeyframe *> &keyframes
 
 QPointF LOTPointInterpolator::pointValueForFrame(qreal frame)
 {
-    CGFloat progress = progressForFrame(frame);
+    qreal progress = progressForFrame(frame);
     QPointF returnPoint;
     if (progress == 0) {
       returnPoint = leadingKeyframe->pointValue;
@@ -45,7 +45,7 @@ QPointF LOTPointInterpolator::pointValueForFrame(qreal frame)
 
 bool LOTPointInterpolator::hasDelegateOverride() const
 {
-    return delegate != nil;
+    return delegate != nullptr;
 }
 
 void LOTPointInterpolator::setValueDelegate(LOTValueDelegate *delegate)

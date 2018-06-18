@@ -6,11 +6,11 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //  Dream Big.
 
-#import <Foundation/Foundation.h>
-#import "LOTAnimationView_Compat.h"
-#import "LOTComposition.h"
-#import "LOTKeypath.h"
-#import "LOTValueDelegate.h"
+#include <Foundation/Foundation.h>
+#include "LOTAnimationView_Compat.h"
+#include "LOTComposition.h"
+#include "LOTKeypath.h"
+#include "LOTValueDelegate.h"
 
 typedef void (^LOTAnimationCompletionBlock)(BOOL animationFinished);
 

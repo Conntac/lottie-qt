@@ -6,8 +6,9 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import "LOTKeyframe.h"
+#pragma once
 
+#include "LOTKeyframe.h"
 #include "lotbase.h"
 
 #include <QString>
@@ -40,7 +41,7 @@ class LOTLayer
 {
 public:
     LOTLayer(const QVariantMap &jsonDictionary,
-             LOTAssetGroup * _Nullable assetGroup,
+             LOTAssetGroup *assetGroup,
              qreal framerate);
 
 //@property (nonatomic, readonly)

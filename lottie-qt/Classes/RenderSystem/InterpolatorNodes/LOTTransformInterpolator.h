@@ -6,11 +6,13 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTNumberInterpolator.h"
-#import "LOTPointInterpolator.h"
-#import "LOTSizeInterpolator.h"
-#import "LOTKeyframe.h"
-#import "LOTLayer.h"
+#pragma once
+
+#include "LOTNumberInterpolator.h"
+#include "LOTPointInterpolator.h"
+#include "LOTSizeInterpolator.h"
+#include "LOTKeyframe.h"
+#include "LOTLayer.h"
 
 #include <QTransform>
 

@@ -6,9 +6,9 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-//#import <QuartzCore/QuartzCore.h>
-#import "LOTMask.h"
+#pragma once
 
+#include "LOTMask.h"
 #include "qquicklottielayer.h"
 
 class LOTMaskNodeLayer;

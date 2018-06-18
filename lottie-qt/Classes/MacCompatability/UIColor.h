@@ -9,8 +9,8 @@
 #include <TargetConditionals.h>
 
 #if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
+#include <Foundation/Foundation.h>
+#include <CoreGraphics/CoreGraphics.h>
 
 @interface UIColor : NSObject <NSCopying>
 

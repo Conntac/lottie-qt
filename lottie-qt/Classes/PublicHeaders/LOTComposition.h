@@ -6,8 +6,7 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
+#pragma once
 
 #include <QString>
 #include <QRectF>
@@ -40,7 +39,7 @@ public:
     void setRootDirectory(const QString &rootDirectory);
     QString rootDirectory() const;
 //@property (nonatomic, readonly, nullable)
-    NSBundle *assetBundle = nil;
+//    NSBundle *assetBundle = nil;
 //@property (nonatomic, copy, nullable)
     QString cacheKey;
 

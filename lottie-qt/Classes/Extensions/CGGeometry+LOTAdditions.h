@@ -1,5 +1,4 @@
-
-#import <CoreGraphics/CoreGraphics.h>
+#pragma once
 
 #include <QPointF>
 #include <QRectF>
@@ -10,16 +9,16 @@
 
 extern const QSizeF QSizeFMax;
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
+//#ifdef __cplusplus
+//extern "C" {
+//#endif // __cplusplus
 
 QRectF LOT_RectIntegral(QRectF rect);
 
 // Centering
 
 // Returns a rectangle of the given size, centered at a point
-QRectF LOT_RectCenteredAtPoint(CGPoint center, QSizeF size, bool integral);
+QRectF LOT_RectCenteredAtPoint(QPointF center, QSizeF size, bool integral);
 
 // Returns the center point of a QRectF
 QPointF LOT_RectGetCenterPoint(const QRectF &rect);
@@ -70,12 +69,12 @@ QRectF LOT_RectAttachedBottomRightToRect(QRectF rect, QSizeF size, qreal marginW
 QRectF LOT_RectAttachedTopRightToRect(QRectF rect, QSizeF size, qreal marginWidth, qreal marginHeight, bool integral);
 QRectF LOT_RectAttachedTopLeftToRect(QRectF rect, QSizeF size, qreal marginWidth, qreal marginHeight, bool integral);
 
-bool LOT_CGPointIsZero(CGPoint point);
+bool LOT_CGPointIsZero(QPointF point);
 
 // Combining
 // Adds all values of the 2nd rect to the first rect
 QRectF LOT_RectAddRect(QRectF rect, QRectF other);
-QRectF LOT_RectAddPoint(QRectF rect, CGPoint point);
+QRectF LOT_RectAddPoint(QRectF rect, QPointF point);
 QRectF LOT_RectAddSize(QRectF rect, QSizeF size);
 QRectF LOT_RectBounded(QRectF rect);
 
@@ -103,5 +102,5 @@ qreal LOT_CubicLength(const QPointF &fromPoint, const QPointF &toPoint, const QP
 qreal LOT_CubicLengthWithPrecision(const QPointF &fromPoint, const QPointF &toPoint, const QPointF &controlPoint1, const QPointF &controlPoint2, qreal iterations);
 
 #ifdef __cplusplus
-} // extern "C"
+//} // extern "C"
 #endif // __cplusplus

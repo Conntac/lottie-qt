@@ -6,7 +6,9 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTKeyframe.h"
+#pragma once
+
+#include "LOTKeyframe.h"
 #include "lotbase.h"
 
 enum LOTPolystarShape {

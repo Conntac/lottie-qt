@@ -6,18 +6,20 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTLayerContainer.h"
-#import "LOTAssetGroup.h"
+#pragma once
+
+#include "LOTLayerContainer.h"
+#include "LOTAssetGroup.h"
 
 class LOTNumberInterpolator;
 
 class LOTCompositionContainer : public LOTLayerContainer
 {
 public:
-    explicit LOTCompositionContainer(LOTLayer * _Nullable layer,
-                                     LOTLayerGroup * _Nullable layerGroup,
-                                     LOTLayerGroup * _Nullable childLayerGroup,
-                                     LOTAssetGroup * _Nullable assetGroup);
+    explicit LOTCompositionContainer(LOTLayer *layer,
+                                     LOTLayerGroup *layerGroup,
+                                     LOTLayerGroup *childLayerGroup,
+                                     LOTAssetGroup *assetGroup);
 
     QStringList keysForKeyPath(LOTKeypath *keypath);
 

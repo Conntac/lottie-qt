@@ -6,8 +6,10 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTAnimatorNode.h"
-#import "LOTShapeStar.h"
+#pragma once
+
+#include "LOTAnimatorNode.h"
+#include "LOTShapeStar.h"
 
 class LOTNumberInterpolator;
 class LOTPointInterpolator;
@@ -16,7 +18,7 @@ class LOTPolystarAnimator : public LOTAnimatorNode
 {
 public:
     explicit LOTPolystarAnimator(const QSharedPointer<LOTAnimatorNode> &inputNode,
-                                 LOTShapeStar *_Nonnull shapeStar);
+                                 LOTShapeStar *shapeStar);
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

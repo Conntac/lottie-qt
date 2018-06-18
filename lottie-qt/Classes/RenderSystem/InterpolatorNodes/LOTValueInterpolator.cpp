@@ -6,8 +6,8 @@
 //
 //
 
-#import "LOTValueInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTValueInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 LOTValueInterpolator::LOTValueInterpolator(const QList<LOTKeyframe *> &keyframes)
 : keyframes(keyframes)
@@ -41,13 +41,13 @@ bool LOTValueInterpolator::hasUpdateForFrame(qreal frame)
      if leading keyframe is nil and time is before trailing
      */
     if (leadingKeyframe &&
-        trailingKeyframe == nil &&
+        trailingKeyframe == nullptr &&
         leadingKeyframe->keyframeTime < frame) {
       // Frame is after bounds of keyframes. Clip
       return false;
     }
     if (trailingKeyframe &&
-        leadingKeyframe == nil &&
+        leadingKeyframe == nullptr &&
         trailingKeyframe->keyframeTime > frame) {
       // Frame is before keyframes bounds. Clip.
       return false;
@@ -71,7 +71,7 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
       // Frame is leading keyframe
       return 0;
     }
-    if (trailingKeyframe == nil) {
+    if (trailingKeyframe == nullptr) {
       // Frame is after end of keyframe timeline
       return 0;
     }
@@ -79,7 +79,7 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
       // Hold Keyframe
       return 0;
     }
-    if (leadingKeyframe == nil) {
+    if (leadingKeyframe == nullptr) {
       // Frame is before start of keyframe timeline
       return 1;
     }
@@ -99,8 +99,8 @@ qreal LOTValueInterpolator::progressForFrame(qreal frame)
 
 void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
 {
-    if (leadingKeyframe == nil &&
-        trailingKeyframe == nil) {
+    if (leadingKeyframe == nullptr &&
+        trailingKeyframe == nullptr) {
       // Set Initial Keyframes
       LOTKeyframe *first = keyframes.first();
       if (first->keyframeTime > 0) {
@@ -118,7 +118,7 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
       bool keyframeFound = false;
 
       LOTKeyframe *testLeading = trailingKeyframe;
-      LOTKeyframe *testTrailing = nil;
+      LOTKeyframe *testTrailing = nullptr;
 
       while (keyframeFound == false) {
         index ++;
@@ -132,7 +132,7 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
           }
         } else {
           // Leading is Last object
-          testTrailing = nil;
+          testTrailing = nullptr;
           keyframeFound = true;
         }
       }
@@ -143,7 +143,7 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
       int index = keyframes.indexOf(leadingKeyframe);
       bool keyframeFound = false;
 
-      LOTKeyframe *testLeading = nil;
+      LOTKeyframe *testLeading = nullptr;
       LOTKeyframe *testTrailing = leadingKeyframe;
 
       while (keyframeFound == false) {
@@ -158,7 +158,7 @@ void LOTValueInterpolator::updateKeyframeSpanForFrame(qreal frame)
           }
         } else {
           // Trailing is first object
-          testLeading = nil;
+          testLeading = nullptr;
           keyframeFound = true;
         }
       }

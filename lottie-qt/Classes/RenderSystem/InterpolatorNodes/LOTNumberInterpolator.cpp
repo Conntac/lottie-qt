@@ -6,8 +6,8 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTNumberInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTNumberInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 LOTNumberInterpolator::LOTNumberInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
@@ -40,7 +40,7 @@ qreal LOTNumberInterpolator::floatValueForFrame(qreal frame)
 
 bool LOTNumberInterpolator::hasDelegateOverride() const
 {
-    return delegate != nil;
+    return delegate != nullptr;
 }
 
 void LOTNumberInterpolator::setValueDelegate(LOTValueDelegate *delegate)

@@ -6,10 +6,12 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTLayer.h"
-#import "LOTLayerGroup.h"
-#import "LOTKeypath.h"
-#import "LOTValueDelegate.h"
+#pragma once
+
+#include "LOTLayer.h"
+#include "LOTLayerGroup.h"
+#include "LOTKeypath.h"
+#include "LOTValueDelegate.h"
 
 #include "qquicklottielayer.h"
 
@@ -27,8 +29,8 @@ class LOTNumberInterpolator;
 class LOTLayerContainer : public QQuickLottieLayer
 {
 public:
-    explicit LOTLayerContainer(LOTLayer * _Nullable layer,
-                               LOTLayerGroup * _Nullable layerGroup);
+    explicit LOTLayerContainer(LOTLayer *layer,
+                               LOTLayerGroup *layerGroup);
 //    explicit LOTLayerContainer(const QSharedPointer<QQuickLottieLayer> &layer);
 
 //    @property (nonatomic, readonly, strong, nullable)
@@ -66,8 +68,8 @@ private:
 
     QSharedPointer<LOTTransformInterpolator> _transformInterpolator;
     QSharedPointer<LOTNumberInterpolator> _opacityInterpolator;
-    qreal _inFrame;
-    qreal _outFrame;
+    qreal _inFrame = 0.0;
+    qreal _outFrame = 0.0;
     QSharedPointer<QQuickLottieLayer> DEBUG_Center;
     QSharedPointer<LOTRenderGroup> _contentsGroup;
     QSharedPointer<LOTMaskContainer> _maskLayer;

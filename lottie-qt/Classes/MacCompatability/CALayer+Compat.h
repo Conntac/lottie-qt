@@ -6,8 +6,8 @@
 #include <TargetConditionals.h>
 
 #if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
-#import <Foundation/Foundation.h>
-#import <QuartzCore/QuartzCore.h>
+#include <Foundation/Foundation.h>
+#include <QuartzCore/QuartzCore.h>
 
 @interface CALayer (Compat)
 

@@ -6,7 +6,9 @@
 //
 //
 
-#import "LOTAnimatorNode.h"
+#pragma once
+
+#include "LOTAnimatorNode.h"
 
 #include "qquicklottielayer.h"
 

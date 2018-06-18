@@ -6,9 +6,11 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTRenderNode.h"
-#import "LOTShapeGradientFill.h"
-#import "LOTRadialGradientLayer.h"
+#pragma once
+
+#include "LOTRenderNode.h"
+#include "LOTShapeGradientFill.h"
+#include "LOTRadialGradientLayer.h"
 
 class LOTArrayInterpolator;
 class LOTPointInterpolator;

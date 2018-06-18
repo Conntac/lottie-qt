@@ -6,8 +6,10 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTAnimatorNode.h"
-#import "LOTShapeStar.h"
+#pragma once
+
+#include "LOTAnimatorNode.h"
+#include "LOTShapeStar.h"
 
 class LOTNumberInterpolator;
 class LOTPointInterpolator;

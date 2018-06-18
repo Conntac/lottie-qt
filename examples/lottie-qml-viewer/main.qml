@@ -8,20 +8,36 @@ Window {
     visible: true
     width: 640
     height: 480
-    title: qsTr("Hello World")
+    title: qsTr("Lottie-Qt viewer")
+
+    Rectangle {
+        anchors.fill: parent
+        color: "lightgray"
+    }
+
+//    Rectangle {
+//        anchors.fill: animation
+//        color: "red"
+//    }
 
     LottieAnimation {
         id: animation
-        anchors.centerIn: parent
+//        anchors.centerIn: parent
+        anchors.fill: parent
 
         width: 400
         height: 400
+
+        fillMode: LottieAnimation.PreserveAspectCrop
+//        fillMode: LottieAnimation.PreserveAspectFit
+//        fillMode: LottieAnimation.Pad
 
 //        source: "animations/LottieLogo1.json"
 //        source: "animations/9squares-AlBoardman.json
 //        source: "animations/GeometryTransformTest.json"
         source: "animations/newAnimation.json"
 
+        // Enable some form of antialiasing
         layer.enabled: true
         layer.samples: 4
 
@@ -51,8 +67,9 @@ Window {
             }
         }
 
-        Component.onCompleted: {
-            animation.currentFrame = animation.endFrame;
+        onSourceChanged: {
+            if (playAnimation.running)
+                playAnimation.restart();
         }
 
         NumberAnimation {

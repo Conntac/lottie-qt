@@ -6,8 +6,8 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTArrayInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTArrayInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 LOTArrayInterpolator::LOTArrayInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)

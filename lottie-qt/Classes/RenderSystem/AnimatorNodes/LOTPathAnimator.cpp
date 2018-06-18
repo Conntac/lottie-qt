@@ -6,7 +6,7 @@
 //
 //
 
-#import "LOTPathAnimator.h"
+#include "LOTPathAnimator.h"
 
 #include <QSharedPointer>
 

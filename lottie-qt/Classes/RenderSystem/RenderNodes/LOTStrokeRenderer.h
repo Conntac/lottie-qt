@@ -6,8 +6,10 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTRenderNode.h"
-#import "LOTShapeStroke.h"
+#pragma once
+
+#include "LOTRenderNode.h"
+#include "LOTShapeStroke.h"
 
 class LOTColorInterpolator;
 class LOTNumberInterpolator;
@@ -15,7 +17,7 @@ class LOTNumberInterpolator;
 class LOTStrokeRenderer : public LOTRenderNode
 {
 public:
-    explicit LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStroke *_Nonnull stroke);
+    explicit LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeStroke *stroke);
 
     // LOTRenderNode interface
 //    NSDictionary *actionsForRenderLayer() const override;

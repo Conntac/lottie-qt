@@ -6,8 +6,7 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
+#pragma once
 
 #include <QVariantMap>
 
@@ -18,7 +17,7 @@ class LOTLayerGroup
 {
 public:
     LOTLayerGroup(const QVariantList &layersJSON,
-                  LOTAssetGroup * _Nullable assetGroup,
+                  LOTAssetGroup * assetGroup,
                   qreal framerate);
 
 //@property (nonatomic, readonly)

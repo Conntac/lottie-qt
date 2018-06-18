@@ -6,7 +6,7 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTCircleAnimator.h"
+#include "LOTCircleAnimator.h"
 
 #include <QSharedPointer>
 

@@ -6,7 +6,7 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTColorInterpolator.h"
+#include "LOTColorInterpolator.h"
 
 #include <QColor>
 
@@ -37,7 +37,7 @@ inline const T& clamp(const T& x, const T& upper, const T& lower) {
 }
 
 static QColor LOT_colorByLerpingFromColor(QColor fromColor, QColor toColor, qreal amount) {
-  Q_ASSERT_X((!toColor.isValid() && !fromColor.isValid()), "LOT_colorByLerpingFromColor", "Passing Nil Color");
+  Q_ASSERT_X(toColor.isValid() && fromColor.isValid(), "LOT_colorByLerpingFromColor", "Passing Nil Color");
   amount = clamp(amount, 0.0, 1.0);
 
   qreal fromComponents[4];

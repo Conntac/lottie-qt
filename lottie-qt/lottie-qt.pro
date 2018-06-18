@@ -12,9 +12,8 @@ HEADERS += \
     $$LOTTIE_PATH/lotbase.h
 
 SOURCES += \
-    $$LOTTIE_PATH/lottieanimation.mm \
-    $$LOTTIE_PATH/qquicklottielayer.cpp \
-    $$LOTTIE_PATH/lotbase.cpp \
+    Classes/qquicklottielayer.cpp \
+    Classes/lotbase.cpp \
     Classes/RenderSystem/InterpolatorNodes/LOTNumberInterpolator.cpp \
     Classes/RenderSystem/InterpolatorNodes/LOTArrayInterpolator.cpp \
     Classes/RenderSystem/InterpolatorNodes/LOTColorInterpolator.cpp \
@@ -27,7 +26,43 @@ SOURCES += \
     Classes/RenderSystem/AnimatorNodes/LOTPathAnimator.cpp \
     Classes/RenderSystem/AnimatorNodes/LOTPolygonAnimator.cpp \
     Classes/RenderSystem/AnimatorNodes/LOTPolystarAnimator.cpp \
-    Classes/RenderSystem/AnimatorNodes/LOTRoundedRectAnimator.cpp
+    Classes/RenderSystem/AnimatorNodes/LOTRoundedRectAnimator.cpp \
+    Classes/Private/LOTKeypath.cpp \
+    Classes/Private/LOTInterpolatorCallback.cpp \
+    Classes/Private/LOTComposition.cpp \
+    Classes/Private/LOTBlockCallback.cpp \
+    Classes/RenderSystem/RenderNodes/LOTFillRenderer.cpp \
+    Classes/RenderSystem/RenderNodes/LOTGradientFillRender.cpp \
+    Classes/RenderSystem/RenderNodes/LOTRenderGroup.cpp \
+    Classes/RenderSystem/RenderNodes/LOTRepeaterRenderer.cpp \
+    Classes/RenderSystem/RenderNodes/LOTStrokeRenderer.cpp \
+    Classes/RenderSystem/LOTAnimatorNode.cpp \
+    Classes/RenderSystem/LOTRenderNode.cpp \
+    Classes/lottieanimation.cpp \
+    Classes/RenderSystem/ManipulatorNodes/LOTTrimPathNode.cpp \
+    Classes/AnimatableProperties/LOTKeyframe.cpp \
+    Classes/Models/LOTAsset.cpp \
+    Classes/Models/LOTAssetGroup.cpp \
+    Classes/Models/LOTLayer.cpp \
+    Classes/Models/LOTLayerGroup.cpp \
+    Classes/Models/LOTMask.cpp \
+    Classes/Models/LOTShapeCircle.cpp \
+    Classes/Models/LOTShapeFill.cpp \
+    Classes/Models/LOTShapeGradientFill.cpp \
+    Classes/Models/LOTShapePath.cpp \
+    Classes/Models/LOTShapeGroup.cpp \
+    Classes/Models/LOTShapeRectangle.cpp \
+    Classes/Models/LOTShapeRepeater.cpp \
+    Classes/Models/LOTShapeStar.cpp \
+    Classes/Models/LOTShapeStroke.cpp \
+    Classes/Models/LOTShapeTransform.cpp \
+    Classes/Models/LOTShapeTrimPath.cpp \
+    Classes/Extensions/LOTBezierPath.cpp \
+    Classes/AnimatableProperties/LOTBezierData.cpp \
+    Classes/AnimatableLayers/LOTMaskContainer.cpp \
+    Classes/AnimatableLayers/LOTLayerContainer.cpp \
+    Classes/AnimatableLayers/LOTCompositionContainer.cpp \
+    Classes/Extensions/CGGeometry+LOTAdditions.cpp
 
 # Shapes
 SHAPES_PATH = ../qtquick-shapes-5.10.1
@@ -138,54 +173,19 @@ HEADERS += \
     $$LOTTIE_PATH/RenderSystem/LOTRenderNode.h
 
 SOURCES += \
-    $$LOTTIE_PATH/AnimatableLayers/LOTCompositionContainer.mm \
-    $$LOTTIE_PATH/AnimatableLayers/LOTLayerContainer.mm \
-    $$LOTTIE_PATH/AnimatableLayers/LOTMaskContainer.mm \
-    $$LOTTIE_PATH/AnimatableProperties/LOTBezierData.mm \
-    $$LOTTIE_PATH/AnimatableProperties/LOTKeyframe.mm \
-#    $$LOTTIE_PATH/Extensions/CGGeometry+LOTAdditions.mm \
-    $$LOTTIE_PATH/Extensions/LOTBezierPath.mm \
-    $$LOTTIE_PATH/Extensions/LOTRadialGradientLayer.mm \
+#    Classes/Extensions/LOTRadialGradientLayer.mm \
 #    $$LOTTIE_PATH/Extensions/UIColor+Expanded.mm \
 #    $$LOTTIE_PATH/MacCompatability/CALayer+Compat.mm \
 #    $$LOTTIE_PATH/MacCompatability/NSValue+Compat.mm \
 #    $$LOTTIE_PATH/MacCompatability/UIBezierPath.mm \
-    $$LOTTIE_PATH/MacCompatability/UIColor.mm \
-    $$LOTTIE_PATH/Models/LOTAsset.mm \
-    $$LOTTIE_PATH/Models/LOTAssetGroup.mm \
-    $$LOTTIE_PATH/Models/LOTLayer.mm \
-    $$LOTTIE_PATH/Models/LOTLayerGroup.mm \
-    $$LOTTIE_PATH/Models/LOTMask.mm \
-    $$LOTTIE_PATH/Models/LOTShapeCircle.mm \
-    $$LOTTIE_PATH/Models/LOTShapeFill.mm \
-    $$LOTTIE_PATH/Models/LOTShapeGradientFill.mm \
-    $$LOTTIE_PATH/Models/LOTShapeGroup.mm \
-    $$LOTTIE_PATH/Models/LOTShapePath.mm \
-    $$LOTTIE_PATH/Models/LOTShapeRectangle.mm \
-    $$LOTTIE_PATH/Models/LOTShapeRepeater.mm \
-    $$LOTTIE_PATH/Models/LOTShapeStar.mm \
-    $$LOTTIE_PATH/Models/LOTShapeStroke.mm \
-    $$LOTTIE_PATH/Models/LOTShapeTransform.mm \
-    $$LOTTIE_PATH/Models/LOTShapeTrimPath.mm \
+#    Classes/MacCompatability/UIColor.mm
 #    $$LOTTIE_PATH/Private/LOTAnimationCache.mm \
 #    $$LOTTIE_PATH/Private/LOTAnimationView.mm \
-    $$LOTTIE_PATH/Private/LOTBlockCallback.mm \
-    $$LOTTIE_PATH/Private/LOTComposition.mm \
-    $$LOTTIE_PATH/Private/LOTInterpolatorCallback.mm \
-    $$LOTTIE_PATH/Private/LOTKeypath.mm \
 #    $$LOTTIE_PATH/Private/LOTValueCallback.mm \
-    Classes/RenderSystem/ManipulatorNodes/LOTTrimPathNode.mm \
-    Classes/RenderSystem/RenderNodes/LOTFillRenderer.mm \
-    Classes/RenderSystem/RenderNodes/LOTGradientFillRender.mm \
-    Classes/RenderSystem/RenderNodes/LOTRenderGroup.mm \
-    Classes/RenderSystem/RenderNodes/LOTRepeaterRenderer.mm \
-    Classes/RenderSystem/RenderNodes/LOTStrokeRenderer.mm \
-    Classes/RenderSystem/LOTAnimatorNode.mm \
-    Classes/RenderSystem/LOTRenderNode.mm
 
-LIBS += -lobjc -framework QuartzCore -framework Foundation -framework CoreGraphics
-
-macx:LIBS += -framework AppKit
-
-QMAKE_CFLAGS += -fobjc-arc
-QMAKE_CXXFLAGS += -fobjc-arc
+mac {
+    macx:LIBS += -framework AppKit
+    LIBS += -lobjc -framework QuartzCore -framework Foundation -framework CoreGraphics
+    QMAKE_CFLAGS += -fobjc-arc
+    QMAKE_CXXFLAGS += -fobjc-arc
+}

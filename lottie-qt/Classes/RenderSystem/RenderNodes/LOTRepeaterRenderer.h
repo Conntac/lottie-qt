@@ -6,8 +6,10 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTRenderNode.h"
-#import "LOTShapeRepeater.h"
+#pragma once
+
+#include "LOTRenderNode.h"
+#include "LOTShapeRepeater.h"
 
 class LOTTransformInterpolator;
 class LOTNumberInterpolator;
@@ -15,7 +17,7 @@ class LOTNumberInterpolator;
 class LOTRepeaterRenderer : public LOTRenderNode
 {
 public:
-    explicit LOTRepeaterRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeRepeater *_Nonnull repeater);
+    explicit LOTRepeaterRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeRepeater *repeater);
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;

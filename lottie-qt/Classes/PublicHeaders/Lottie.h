@@ -9,7 +9,7 @@
 #if __has_feature(modules)
 @import Foundation;
 #else
-#import <Foundation/Foundation.h>
+#include <Foundation/Foundation.h>
 #endif
 
 #ifndef Lottie_h
@@ -24,21 +24,21 @@ FOUNDATION_EXPORT const unsigned char LottieVersionString[];
 #include <TargetConditionals.h>
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "LOTAnimationTransitionController.h"
-#import "LOTAnimatedSwitch.h"
-#import "LOTAnimatedControl.h"
+#include "LOTAnimationTransitionController.h"
+#include "LOTAnimatedSwitch.h"
+#include "LOTAnimatedControl.h"
 #endif
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "LOTCacheProvider.h"
+#include "LOTCacheProvider.h"
 #endif
 
-#import "LOTAnimationView.h"
-#import "LOTAnimationCache.h"
-#import "LOTComposition.h"
-#import "LOTBlockCallback.h"
-#import "LOTInterpolatorCallback.h"
-#import "LOTValueCallback.h"
-#import "LOTValueDelegate.h"
+#include "LOTAnimationView.h"
+#include "LOTAnimationCache.h"
+#include "LOTComposition.h"
+#include "LOTBlockCallback.h"
+#include "LOTInterpolatorCallback.h"
+#include "LOTValueCallback.h"
+#include "LOTValueDelegate.h"
 
 #endif /* Lottie_h */

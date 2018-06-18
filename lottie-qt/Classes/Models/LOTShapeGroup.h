@@ -6,11 +6,9 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
+#pragma once
 
 #include "lotbase.h"
-
 #include <QString>
 
 class LOTShapeGroup : public LOTShapeItem

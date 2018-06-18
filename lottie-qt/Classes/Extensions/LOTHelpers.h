@@ -9,12 +9,12 @@
 #ifndef LOTHelpers_h
 #define LOTHelpers_h
 
-//#import "UIColor+Expanded.h"
-#import "CGGeometry+LOTAdditions.h"
-#import "LOTBezierPath.h"
+//#include "UIColor+Expanded.h"
+#include "CGGeometry+LOTAdditions.h"
+#include "LOTBezierPath.h"
 
-#define ENABLE_DEBUG_LOGGING YES
-#define ENABLE_DEBUG_SHAPES NO
+#define ENABLE_DEBUG_LOGGING false
+#define ENABLE_DEBUG_SHAPES false
 
 #endif /* LOTHelpers_h */
 

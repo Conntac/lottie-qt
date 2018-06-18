@@ -6,14 +6,15 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPolygonAnimator.h"
-#import "LOTKeyframe.h"
-#import "LOTPointInterpolator.h"
-#import "LOTNumberInterpolator.h"
-#import "LOTBezierPath.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTPolygonAnimator.h"
+#include "LOTKeyframe.h"
+#include "LOTPointInterpolator.h"
+#include "LOTNumberInterpolator.h"
+#include "LOTBezierPath.h"
+#include "CGGeometry+LOTAdditions.h"
 
 #include <QSharedPointer>
+#include <QtMath>
 
 const qreal kPOLYGON_MAGIC_NUMBER = .25f;
 

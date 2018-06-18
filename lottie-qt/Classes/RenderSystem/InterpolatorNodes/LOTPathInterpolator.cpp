@@ -6,8 +6,8 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPathInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTPathInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 LOTPathInterpolator::LOTPathInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
@@ -82,7 +82,7 @@ QSharedPointer<LOTBezierPath> LOTPathInterpolator::pathForFrame(qreal frame, boo
 
 bool LOTPathInterpolator::hasDelegateOverride() const
 {
-    return delegate != nil;
+    return delegate != nullptr;
 }
 
 void LOTPathInterpolator::setValueDelegate(LOTValueDelegate *delegate)

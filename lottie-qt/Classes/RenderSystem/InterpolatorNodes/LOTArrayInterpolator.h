@@ -6,7 +6,9 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTValueInterpolator.h"
+#pragma once
+
+#include "LOTValueInterpolator.h"
 
 class LOTArrayInterpolator : public LOTValueInterpolator
 {

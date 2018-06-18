@@ -6,8 +6,9 @@
 //
 //
 
+#pragma once
 
-#import "LOTBezierData.h"
+#include "LOTBezierData.h"
 
 #include <QSharedPointer>
 #include <QPointF>

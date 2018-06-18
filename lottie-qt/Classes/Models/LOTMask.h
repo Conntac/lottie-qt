@@ -6,8 +6,9 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "LOTKeyframe.h"
+#pragma once
+
+#include "LOTKeyframe.h"
 
 enum LOTMaskMode {
   LOTMaskModeAdd,
@@ -22,9 +23,9 @@ public:
     LOTMask(const QVariantMap &jsonDictionary);
 
 //@property (nonatomic, readonly)
-    BOOL closed;
+    bool closed;
 //@property (nonatomic, readonly)
-    BOOL inverted;
+    bool inverted;
 //@property (nonatomic, readonly)
     LOTMaskMode maskMode;
 //@property (nonatomic, readonly, nullable)

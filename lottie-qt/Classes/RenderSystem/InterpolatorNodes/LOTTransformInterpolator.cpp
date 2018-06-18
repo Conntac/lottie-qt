@@ -6,7 +6,7 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTTransformInterpolator.h"
+#include "LOTTransformInterpolator.h"
 
 // TODO BW Perf update, Cache transform
 
@@ -60,7 +60,7 @@ QTransform LOTTransformInterpolator::transformForFrame(qreal frame)
     QSizeF scale = scaleInterpolator->sizeValueForFrame(frame);
     qreal rotation = rotationInterpolator->floatValueForFrame(frame);
     baseXform.translate(position.x(), position.y());
-    baseXform.rotate(rotation);
+    baseXform.rotateRadians(rotation);
     baseXform.scale(scale.width(), scale.height());
     baseXform.translate(-1 * anchor.x(), -1 * anchor.y());
 //    CATransform3D translateXform = CATransform3DTranslate(baseXform, position.x, position.y, 0);

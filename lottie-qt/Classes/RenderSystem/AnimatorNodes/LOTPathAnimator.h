@@ -6,9 +6,11 @@
 //
 //
 
-#import "LOTAnimatorNode.h"
-#import "LOTShapePath.h"
-#import "LOTPathInterpolator.h"
+#pragma once
+
+#include "LOTAnimatorNode.h"
+#include "LOTShapePath.h"
+#include "LOTPathInterpolator.h"
 
 class LOTPathAnimator : public LOTAnimatorNode
 {

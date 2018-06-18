@@ -6,8 +6,10 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTRenderNode.h"
-#import "LOTShapeFill.h"
+#pragma once
+
+#include "LOTRenderNode.h"
+#include "LOTShapeFill.h"
 
 class LOTColorInterpolator;
 class LOTNumberInterpolator;
@@ -15,7 +17,7 @@ class LOTNumberInterpolator;
 class LOTFillRenderer : public LOTRenderNode
 {
 public:
-    explicit LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeFill *_Nonnull fill);
+    explicit LOTFillRenderer(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeFill *fill);
 
     // LOTRenderNode interface
 //    NSDictionary *actionsForRenderLayer() const override;
@@ -29,6 +31,6 @@ public:
 private:
     QSharedPointer<LOTColorInterpolator> colorInterpolator_;
     QSharedPointer<LOTNumberInterpolator> opacityInterpolator_;
-    BOOL _evenOddFillRule;
+    bool _evenOddFillRule;
     QSharedPointer<QQuickLottieLayer> centerPoint_DEBUG;
 };

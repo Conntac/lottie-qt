@@ -6,8 +6,7 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
+#pragma once
 
 #include <QList>
 #include <QMap>
@@ -24,7 +23,7 @@ public:
     QString rootDirectory() const;
 
 //@property (nonatomic, readonly, nullable)
-    NSBundle *assetBundle = nil;
+//    NSBundle *assetBundle = nil;
 
     LOTAssetGroup(const QVariantList &jsonArray,
                   qreal framerate);
@@ -33,7 +32,7 @@ public:
 
     void finalizeInitializationWithFramerate(qreal framerate);
 
-    LOTAsset *_Nullable assetModelForID(const QString &assetID);
+    LOTAsset *assetModelForID(const QString &assetID);
 
 private:
     QString _rootDirectory;

@@ -6,11 +6,9 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-#import <QuartzCore/QuartzCore.h>
-#import "LOTKeyframe.h"
+#pragma once
 
+#include "LOTKeyframe.h"
 #include "lotbase.h"
 
 class LOTShapeTransform : public LOTShapeItem

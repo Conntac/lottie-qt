@@ -6,6 +6,8 @@
 //  Copyright © 2018 Airbnb. All rights reserved.
 //
 
+#pragma once
+
 #include <QColor>
 #include <QSizeF>
 #include <QPainterPath>

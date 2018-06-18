@@ -8,12 +8,12 @@
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
-#import <UIKit/UIKit.h>
+#include <UIKit/UIKit.h>
 @compatibility_alias LOTView UIView;
 
 #else
 
-#import <AppKit/AppKit.h>
+#include <AppKit/AppKit.h>
 @compatibility_alias LOTView NSView;
 
 typedef NS_ENUM(NSInteger, LOTViewContentMode) {

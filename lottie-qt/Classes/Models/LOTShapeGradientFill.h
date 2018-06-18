@@ -6,9 +6,9 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "LOTKeyframe.h"
+#pragma once
 
+#include "LOTKeyframe.h"
 #include "lotbase.h"
 
 enum LOTGradientType {

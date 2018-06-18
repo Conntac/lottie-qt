@@ -6,6 +6,8 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
+#pragma once
+
 #include "LOTKeyframe.h"
 #include "lotbase.h"
 

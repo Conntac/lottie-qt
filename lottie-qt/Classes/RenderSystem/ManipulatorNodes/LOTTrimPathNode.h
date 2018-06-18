@@ -6,22 +6,24 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTAnimatorNode.h"
-#import "LOTShapeTrimPath.h"
+#pragma once
+
+#include "LOTAnimatorNode.h"
+#include "LOTShapeTrimPath.h"
 
 class LOTNumberInterpolator;
 
 class LOTTrimPathNode : public LOTAnimatorNode
 {
 public:
-    explicit LOTTrimPathNode(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeTrimPath *_Nonnull trimPath);
+    explicit LOTTrimPathNode(const QSharedPointer<LOTAnimatorNode> &inputNode, LOTShapeTrimPath *trimPath);
 
     // LOTAnimatorNode interface
     QMap<QString, QSharedPointer<LOTValueInterpolator> > valueInterpolators() const override;
     QSharedPointer<LOTBezierPath> localPath() const override;
     QSharedPointer<LOTBezierPath> outputPath() const override;
     bool needsUpdateForFrame(qreal frame) override;
-    bool updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode * _Nonnull inputNode)> modifier, bool forceUpdate) override;
+    bool updateWithFrame(qreal frame, std::function<void(LOTAnimatorNode *inputNode)> modifier, bool forceUpdate) override;
     void performLocalUpdate() override;
     void rebuildOutputs() override;
 

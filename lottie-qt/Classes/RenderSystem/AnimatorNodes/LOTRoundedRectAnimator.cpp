@@ -6,10 +6,10 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTRoundedRectAnimator.h"
-#import "LOTPointInterpolator.h"
-#import "LOTNumberInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTRoundedRectAnimator.h"
+#include "LOTPointInterpolator.h"
+#include "LOTNumberInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 #include <QSharedPointer>
 

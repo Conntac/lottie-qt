@@ -6,9 +6,9 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-#import "LOTValueDelegate.h"
+#pragma once
+
+#include "LOTValueDelegate.h"
 
 /*!
  @brief LOTPointInterpolatorCallback is a container for a CGPointRef. This container is a LOTPointValueDelegate that will return the point interpolated at currentProgress between fromPoint and toPoint. Externally changing currentProgress will change the point of the animation.

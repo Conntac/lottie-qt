@@ -6,8 +6,10 @@
 //
 //
 
-#import "LOTKeyframe.h"
-#import "LOTValueDelegate.h"
+#pragma once
+
+#include "LOTKeyframe.h"
+#include "LOTValueDelegate.h"
 
 class LOTValueInterpolator
 {

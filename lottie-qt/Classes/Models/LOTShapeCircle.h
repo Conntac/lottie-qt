@@ -6,8 +6,9 @@
 //  Copyright © 2015 Brandon Withrow. All rights reserved.
 //
 
-#import "LOTKeyframe.h"
+#pragma once
 
+#include "LOTKeyframe.h"
 #include "lotbase.h"
 
 class LOTShapeCircle : public LOTShapeItem

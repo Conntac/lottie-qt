@@ -6,13 +6,14 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTPolystarAnimator.h"
-#import "LOTPointInterpolator.h"
-#import "LOTNumberInterpolator.h"
-#import "LOTBezierPath.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTPolystarAnimator.h"
+#include "LOTPointInterpolator.h"
+#include "LOTNumberInterpolator.h"
+#include "LOTBezierPath.h"
+#include "CGGeometry+LOTAdditions.h"
 
 #include <QSharedPointer>
+#include <QtMath>
 
 const qreal kPOLYSTAR_MAGIC_NUMBER = .47829f;
 

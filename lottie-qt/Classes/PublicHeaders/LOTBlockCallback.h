@@ -6,9 +6,11 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-#import "LOTValueDelegate.h"
+#pragma once
+
+#include "LOTValueDelegate.h"
+
+#include <functional>
 
 /*!
  @brief A block that is used to change a Color value at keytime, the block is called continuously for a keypath while the aniamtion plays.

@@ -6,8 +6,8 @@
 //  Copyright © 2017 Airbnb. All rights reserved.
 //
 
-#import "LOTSizeInterpolator.h"
-#import "CGGeometry+LOTAdditions.h"
+#include "LOTSizeInterpolator.h"
+#include "CGGeometry+LOTAdditions.h"
 
 LOTSizeInterpolator::LOTSizeInterpolator(const QList<LOTKeyframe *> &keyframes)
 : LOTValueInterpolator(keyframes)
@@ -16,7 +16,7 @@ LOTSizeInterpolator::LOTSizeInterpolator(const QList<LOTKeyframe *> &keyframes)
 
 QSizeF LOTSizeInterpolator::sizeValueForFrame(qreal frame)
 {
-    CGFloat progress = progressForFrame(frame);
+    qreal progress = progressForFrame(frame);
     QSizeF returnSize;
     if (progress == 0) {
       returnSize = leadingKeyframe->sizeValue;
@@ -40,7 +40,7 @@ QSizeF LOTSizeInterpolator::sizeValueForFrame(qreal frame)
 
 bool LOTSizeInterpolator::hasDelegateOverride() const
 {
-    return delegate != nil;
+    return delegate != nullptr;
 }
 
 void LOTSizeInterpolator::setValueDelegate(LOTValueDelegate *delegate)
