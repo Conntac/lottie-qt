@@ -12,6 +12,13 @@ Window {
         anchors.fill: parent
         anchors.margins: 20
 
+        move: Transition {
+            NumberAnimation {
+                properties: "x"
+                duration: 60
+            }
+        }
+
         Repeater {
             model: ListModel {
                 id: typeModel
