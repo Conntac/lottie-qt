@@ -21,6 +21,7 @@ class LOTMask
 {
 public:
     LOTMask(const QVariantMap &jsonDictionary);
+    ~LOTMask();
 
 //@property (nonatomic, readonly)
     bool closed;

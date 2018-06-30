@@ -15,6 +15,7 @@ class LOTShapeTransform : public LOTShapeItem
 {
 public:
     LOTShapeTransform(const QVariantMap &jsonDictionary);
+    ~LOTShapeTransform();
 
     QString toString() const;
 

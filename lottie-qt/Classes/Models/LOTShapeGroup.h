@@ -15,6 +15,7 @@ class LOTShapeGroup : public LOTShapeItem
 {
 public:
     LOTShapeGroup(const QVariantMap &jsonDictionary);
+    ~LOTShapeGroup();
 
 //@property (nonatomic, readonly)
     QString keyname;

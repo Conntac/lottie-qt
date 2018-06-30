@@ -33,3 +33,9 @@ LOTShapeFill::LOTShapeFill(const QVariantMap &jsonDictionary)
 
     fillEnabled = jsonDictionary.value("fillEnabled").toBool();
 }
+
+LOTShapeFill::~LOTShapeFill()
+{
+    delete color;
+    delete opacity;
+}

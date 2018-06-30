@@ -53,3 +53,13 @@ LOTShapeStroke::LOTShapeStroke(const QVariantMap &jsonDictionary)
       this->dashOffset = new LOTKeyframeGroup(dashOffset);
     }
 }
+
+LOTShapeStroke::~LOTShapeStroke()
+{
+    delete color;
+    delete opacity;
+    delete width;
+    delete dashOffset;
+
+    qDeleteAll(lineDashPattern);
+}

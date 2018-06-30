@@ -26,3 +26,10 @@ LOTShapeRectangle::LOTShapeRectangle(const QVariantMap &jsonDictionary)
 
     reversed = jsonDictionary.value("d").toInt() == 3;
 }
+
+LOTShapeRectangle::~LOTShapeRectangle()
+{
+    delete position;
+    delete size;
+    delete cornerRadius;
+}

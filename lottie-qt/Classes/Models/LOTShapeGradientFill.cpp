@@ -50,3 +50,11 @@ LOTShapeGradientFill::LOTShapeGradientFill(const QVariantMap &jsonDictionary)
       evenOddFillRule = false;
     }
 }
+
+LOTShapeGradientFill::~LOTShapeGradientFill()
+{
+    delete startPoint;
+    delete endPoint;
+    delete gradient;
+    delete opacity;
+}

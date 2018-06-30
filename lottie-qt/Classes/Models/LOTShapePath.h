@@ -15,6 +15,7 @@ class LOTShapePath : public LOTShapeItem
 {
 public:
     LOTShapePath(const QVariantMap &jsonDictionary);
+    ~LOTShapePath();
 
 //@property (nonatomic, readonly)
     QString keyname;

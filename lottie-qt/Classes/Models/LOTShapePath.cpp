@@ -18,3 +18,8 @@ LOTShapePath::LOTShapePath(const QVariantMap &jsonDictionary)
       shapePath = new LOTKeyframeGroup(jsonDictionary.value("ks"));
     }
 }
+
+LOTShapePath::~LOTShapePath()
+{
+    delete shapePath;
+}

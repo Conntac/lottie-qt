@@ -24,3 +24,10 @@ LOTShapeTrimPath::LOTShapeTrimPath(const QVariantMap &jsonDictionary)
       offset = new LOTKeyframeGroup(jsonDictionary.value("o"));
     }
 }
+
+LOTShapeTrimPath::~LOTShapeTrimPath()
+{
+    delete start;
+    delete end;
+    delete offset;
+}

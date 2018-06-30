@@ -157,3 +157,18 @@ LOTLayer::LOTLayer(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup,
       }
     }
 }
+
+LOTLayer::~LOTLayer()
+{
+    qDeleteAll(shapes);
+    qDeleteAll(masks);
+
+    delete opacity;
+    delete timeRemapping;
+    delete rotation;
+    delete position;
+    delete positionX;
+    delete positionY;
+    delete anchor;
+    delete scale;
+}

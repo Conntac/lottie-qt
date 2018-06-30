@@ -15,6 +15,7 @@ class LOTShapeCircle : public LOTShapeItem
 {
 public:
     LOTShapeCircle(const QVariantMap &jsonDictionary);
+    ~LOTShapeCircle();
 
 //@property (nonatomic, readonly)
     QString keyname;

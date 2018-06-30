@@ -27,6 +27,7 @@ class LOTShapeStroke : public LOTShapeItem
 {
 public:
     LOTShapeStroke(const QVariantMap &jsonDictionary);
+    ~LOTShapeStroke();
 
 //@property (nonatomic, readonly)
     QString keyname;

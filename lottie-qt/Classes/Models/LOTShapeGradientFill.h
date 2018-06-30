@@ -20,6 +20,7 @@ class LOTShapeGradientFill : public LOTShapeItem
 {
 public:
     LOTShapeGradientFill(const QVariantMap &jsonDictionary);
+    ~LOTShapeGradientFill();
 
 //@property (nonatomic, readonly)
     QString keyname;

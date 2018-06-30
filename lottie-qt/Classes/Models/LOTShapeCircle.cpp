@@ -23,3 +23,9 @@ LOTShapeCircle::LOTShapeCircle(const QVariantMap &jsonDictionary)
     }
     reversed = (jsonDictionary.value("d").toInt() == 3);
 }
+
+LOTShapeCircle::~LOTShapeCircle()
+{
+    delete position;
+    delete size;
+}

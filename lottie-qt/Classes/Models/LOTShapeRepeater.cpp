@@ -59,3 +59,15 @@ LOTShapeRepeater::LOTShapeRepeater(const QVariantMap &jsonDictionary)
       });
     }
 }
+
+LOTShapeRepeater::~LOTShapeRepeater()
+{
+    delete copies;
+    delete offset;
+    delete anchorPoint;
+    delete scale;
+    delete position;
+    delete rotation;
+    delete startOpacity;
+    delete endOpacity;
+}

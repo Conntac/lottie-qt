@@ -43,6 +43,7 @@ public:
     LOTLayer(const QVariantMap &jsonDictionary,
              LOTAssetGroup *assetGroup,
              qreal framerate);
+    ~LOTLayer();
 
 //@property (nonatomic, readonly)
     QString layerName;

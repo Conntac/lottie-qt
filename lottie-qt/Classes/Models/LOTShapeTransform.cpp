@@ -62,6 +62,15 @@ LOTShapeTransform::LOTShapeTransform(const QVariantMap &jsonDictionary)
     }
 }
 
+LOTShapeTransform::~LOTShapeTransform()
+{
+    delete position;
+    delete anchor;
+    delete scale;
+    delete rotation;
+    delete opacity;
+}
+
 /*
 QString LOTShapeTransform::toString() const
 {

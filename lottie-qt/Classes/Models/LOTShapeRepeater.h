@@ -15,6 +15,7 @@ class LOTShapeRepeater : public LOTShapeItem
 {
 public:
     LOTShapeRepeater(const QVariantMap &jsonDictionary);
+    ~LOTShapeRepeater();
 
 //@property (nonatomic, readonly)
     QString keyname;

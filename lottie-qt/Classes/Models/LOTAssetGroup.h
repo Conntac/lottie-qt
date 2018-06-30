@@ -17,6 +17,9 @@ class LOTLayerGroup;
 class LOTAssetGroup
 {
 public:
+    LOTAssetGroup(const QVariantList &jsonArray,
+                  qreal framerate);
+    ~LOTAssetGroup();
 
 //@property (nonatomic, readwrite)
     void setRootDirectory(const QString &rootDirectory);
@@ -24,9 +27,6 @@ public:
 
 //@property (nonatomic, readonly, nullable)
 //    NSBundle *assetBundle = nil;
-
-    LOTAssetGroup(const QVariantList &jsonArray,
-                  qreal framerate);
 
     void buildAssetNamed(const QString &refID, qreal framerate);
 

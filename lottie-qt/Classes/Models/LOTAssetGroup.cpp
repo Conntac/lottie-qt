@@ -37,6 +37,11 @@ LOTAssetGroup::LOTAssetGroup(const QVariantList &jsonArray, qreal framerate)
     }
 }
 
+LOTAssetGroup::~LOTAssetGroup()
+{
+    qDeleteAll(_assetMap);
+}
+
 void LOTAssetGroup::buildAssetNamed(const QString &refID, qreal framerate)
 {
     if (assetModelForID(refID)) {

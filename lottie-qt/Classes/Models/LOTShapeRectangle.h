@@ -15,6 +15,7 @@ class LOTShapeRectangle : public LOTShapeItem
 {
 public:
     LOTShapeRectangle(const QVariantMap &jsonDictionary);
+    ~LOTShapeRectangle();
 
 //@property (nonatomic, readonly)
     QString keyname;

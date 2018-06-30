@@ -27,3 +27,8 @@ LOTAsset::LOTAsset(const QVariantMap &jsonDictionary, LOTAssetGroup *assetGroup,
         layerGroup = new LOTLayerGroup(layers.toList(), assetGroup, framerate);
     }
 }
+
+LOTAsset::~LOTAsset()
+{
+    delete layerGroup;
+}

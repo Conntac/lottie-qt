@@ -43,3 +43,10 @@ LOTMask::LOTMask(const QVariantMap &jsonDictionary)
       this->expansion = new LOTKeyframeGroup(expansion);
     }
 }
+
+LOTMask::~LOTMask()
+{
+    delete maskPath;
+    delete opacity;
+    delete expansion;
+}

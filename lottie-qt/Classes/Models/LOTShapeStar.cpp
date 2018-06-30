@@ -42,3 +42,14 @@ LOTShapeStar::LOTShapeStar(const QVariantMap &jsonDictionary)
 
     type = static_cast<LOTPolystarShape>(jsonDictionary.value("sy").toInt());
 }
+
+LOTShapeStar::~LOTShapeStar()
+{
+    delete outerRadius;
+    delete outerRoundness;
+    delete innerRadius;
+    delete innerRoundness;
+    delete position;
+    delete numberOfPoints;
+    delete rotation;
+}

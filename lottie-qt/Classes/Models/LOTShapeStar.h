@@ -21,6 +21,7 @@ class LOTShapeStar : public LOTShapeItem
 {
 public:
     LOTShapeStar(const QVariantMap &jsonDictionary);
+    ~LOTShapeStar();
 
 //@property (nonatomic, readonly)
     QString keyname;

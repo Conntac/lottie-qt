@@ -43,6 +43,11 @@ LOTShapeGroup::LOTShapeGroup(const QVariantMap &jsonDictionary)
     }
 }
 
+LOTShapeGroup::~LOTShapeGroup()
+{
+    qDeleteAll(items);
+}
+
 LOTShapeItem *LOTShapeGroup::shapeItemWithJSON(const QVariantMap &itemJSON)
 {
     QString type = itemJSON["ty"].toString();

@@ -21,6 +21,7 @@ public:
     LOTAsset(const QVariantMap &jsonDictionary,
              LOTAssetGroup *assetGroup,
              qreal framerate);
+    ~LOTAsset();
 
 //@property (nonatomic, readonly, nullable)
     QString referenceID;

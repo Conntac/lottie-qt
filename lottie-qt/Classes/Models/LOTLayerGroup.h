@@ -19,6 +19,7 @@ public:
     LOTLayerGroup(const QVariantList &layersJSON,
                   LOTAssetGroup * assetGroup,
                   qreal framerate);
+    ~LOTLayerGroup();
 
 //@property (nonatomic, readonly)
     QList<LOTLayer *> layers;

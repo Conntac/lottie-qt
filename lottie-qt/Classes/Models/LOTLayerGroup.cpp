@@ -25,6 +25,11 @@ LOTLayerGroup::LOTLayerGroup(const QVariantList &layersJSON, LOTAssetGroup *asse
     }
 }
 
+LOTLayerGroup::~LOTLayerGroup()
+{
+    qDeleteAll(layers);
+}
+
 LOTLayer *LOTLayerGroup::layerModelForID(int layerID)
 {
     return _modelMap.value(layerID);

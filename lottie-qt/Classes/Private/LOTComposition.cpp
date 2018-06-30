@@ -90,6 +90,8 @@ LOTComposition::LOTComposition()
 
 LOTComposition::~LOTComposition()
 {
+    delete layerGroup;
+    delete assetGroup;
 }
 
 bool LOTComposition::loadFromData(const QByteArray &data)
