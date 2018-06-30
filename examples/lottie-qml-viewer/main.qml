@@ -23,8 +23,7 @@ ApplicationWindow {
             ListView {
                 id: listView
                 model: FolderListModel {
-                    showDotAndDotDot: true
-                    showDirsFirst: false
+                    showDirs: false
 
                     folder: "tests"
                 }
@@ -129,11 +128,19 @@ ApplicationWindow {
         }
     }
 
-    ToolButton {
+    ColumnLayout {
         anchors.left: parent.left
         anchors.top: parent.top
-        text: "≡"
-        onClicked: drawer.open()
+
+        ToolButton {
+            text: "≡"
+            onClicked: drawer.open()
+        }
+
+        ToolButton {
+            text: "dbg"
+            onClicked: animation.logHierarchyKeypaths()
+        }
     }
 
     ComboBox {

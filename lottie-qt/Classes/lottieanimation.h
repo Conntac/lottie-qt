@@ -68,6 +68,8 @@ public slots:
     void start();
     void stop();
 
+    void logHierarchyKeypaths();
+
 protected:
     // QQuickItem interface
     QSGNode *updatePaintNode(QSGNode *rootNode, UpdatePaintNodeData *updatePaintNodeData) override;

@@ -381,12 +381,23 @@ void LottieAnimation::stop()
     setIsRunning(false);
 }
 
+void LottieAnimation::logHierarchyKeypaths()
+{
+    LOTKeypath path("**");
+
+    for (const QString &keypath : d->container->keysForKeyPath(&path)) {
+        qCDebug(logLottieAnimation) << keypath;
+    }
+}
+
 QSGNode *LottieAnimation::updatePaintNode(QSGNode *rootNode, UpdatePaintNodeData *updatePaintNodeData)
 {
     Q_UNUSED(updatePaintNodeData);
 
     // FIXME: If we don't change the root node, we're having caching problems
-    if (rootNode) {
+    if (/*d->clearNodes &&*/ rootNode) {
+        d->clearNodes = false;
+
         delete rootNode;
         rootNode = nullptr;
     }
