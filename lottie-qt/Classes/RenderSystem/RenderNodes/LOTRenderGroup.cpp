@@ -198,7 +198,9 @@ void LOTRenderGroup::buildContents(const QList<LOTBase *> &contents)
 
 void LOTRenderGroup::searchNodesForKeypath(LOTKeypath *keypath)
 {
-    inputNode->searchNodesForKeypath(keypath);
+    if (inputNode) {
+        inputNode->searchNodesForKeypath(keypath);
+    }
     if (keypath->pushKey(keyname)) {
       // Matches self. Dig deeper.
       // Check interpolators

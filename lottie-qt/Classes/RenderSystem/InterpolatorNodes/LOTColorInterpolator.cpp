@@ -74,11 +74,11 @@ QColor LOTColorInterpolator::colorForFrame(qreal frame)
     }
     if (hasDelegateOverride()) {
       return delegate->colorForFrame(frame,
-                                     leadingKeyframe->keyframeTime,
-                                     trailingKeyframe->keyframeTime,
+                                     leadingKeyframe ? leadingKeyframe->keyframeTime : 0.0,
+                                     trailingKeyframe ? trailingKeyframe->keyframeTime : 0.0,
                                      progress,
-                                     leadingKeyframe->colorValue,
-                                     trailingKeyframe->colorValue,
+                                     leadingKeyframe ? leadingKeyframe->colorValue : QColor(),
+                                     trailingKeyframe ? trailingKeyframe->colorValue : QColor(),
                                      returnColor);
     }
 

@@ -121,16 +121,18 @@ void LOTAnimatorNode::logString(const QString &string)
 
 void LOTAnimatorNode::searchNodesForKeypath(LOTKeypath *keypath)
 {
-    inputNode->searchNodesForKeypath(keypath);
+    if (inputNode) {
+        inputNode->searchNodesForKeypath(keypath);
+    }
     if (keypath->pushKey(keyname)) {
       // Matches self. Check interpolators
       if (keypath->endOfKeypath()) {
         // Add self
-//        [keypath addSearchResultForCurrentPath:this];
+          keypath->addSearchResultForCurrentPath(sharedFromThis());
       } else if (valueInterpolators()[keypath->currentKey()]) {
         keypath->pushKey(keypath->currentKey());
         // We have a match!
-//        [keypath addSearchResultForCurrentPath:this];
+        keypath->addSearchResultForCurrentPath(sharedFromThis());
         keypath->popKey();
       }
       keypath->popKey();
