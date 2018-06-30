@@ -31,7 +31,11 @@ QSharedPointer<LOTBezierPath> LOTRenderNode::localPath() const
 /// Forwards its input node's output path forwards downstream
 QSharedPointer<LOTBezierPath> LOTRenderNode::outputPath() const
 {
-    return inputNode->outputPath();
+    if (inputNode) {
+        return inputNode->outputPath();
+    }
+
+    return nullptr;
 }
 
 /// Local interpolators have changed. Update layer specific properties.

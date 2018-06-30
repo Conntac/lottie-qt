@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    lottie-qml-viewer
+    lottie-qml-viewer \
+    typewriter

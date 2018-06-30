@@ -1,0 +1,3 @@
+module Lottie
+plugin LottieQmlPlugin
+classname LottieQmlPlugin

@@ -110,18 +110,24 @@ void LOTRenderGroup::performLocalUpdate()
 //      CGAffineTransform appliedXform = ; // = CATransform3DGetAffineTransform(xform);
 //      QTransform appliedXform = xform;
 //      Q_ASSERT(false);
-      _localPath = _rootNode->outputPath()->copy();
-      _localPath->LOT_applyTransform(appliedXform);
+      if (_rootNode && _rootNode->outputPath()) {
+          _localPath = _rootNode->outputPath()->copy();
+          _localPath->LOT_applyTransform(appliedXform);
+      }
     } else {
-      _localPath = _rootNode->outputPath()->copy();
+        if (_rootNode && _rootNode->outputPath()) {
+            _localPath = _rootNode->outputPath()->copy();
+        }
     }
 }
 
 void LOTRenderGroup::rebuildOutputs()
 {
     if (inputNode) {
-      _outputPath = inputNode->outputPath()->copy();
-      _outputPath->LOT_appendPath(localPath());
+        if (inputNode->outputPath()) {
+            _outputPath = inputNode->outputPath()->copy();
+            _outputPath->LOT_appendPath(localPath());
+        }
     } else {
       _outputPath = localPath();
     }
@@ -243,5 +249,7 @@ void LOTRenderGroup::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *ke
     }
 
     // Check upstream
-    inputNode->setValueDelegate(delegate, keypath);
+    if (inputNode) {
+        inputNode->setValueDelegate(delegate, keypath);
+    }
 }

@@ -21,9 +21,10 @@ ApplicationWindow {
             anchors.fill: parent
 
             ListView {
+                id: listView
                 model: FolderListModel {
                     showDotAndDotDot: true
-                    showDirsFirst: true
+                    showDirsFirst: false
 
                     folder: "tests"
                 }
@@ -60,8 +61,9 @@ ApplicationWindow {
         width: 400
         height: 400
 
-        fillMode: LottieAnimation.PreserveAspectCrop
-        source: "https://www.lottiefiles.com/storage/datafiles/RsO0f9C8rU3E426/data.json"
+        fillMode: comboBox.currentIndex
+        source: "tests/IconTransitions.json"
+//        source: "https://www.lottiefiles.com/storage/datafiles/RsO0f9C8rU3E426/data.json"
 
         // Enable some form of antialiasing
         layer.enabled: true
@@ -132,5 +134,14 @@ ApplicationWindow {
         anchors.top: parent.top
         text: "≡"
         onClicked: drawer.open()
+    }
+
+    ComboBox {
+        id: comboBox
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        currentIndex: 1
+
+        model: ["Fit", "Crop", "Pad"]
     }
 }

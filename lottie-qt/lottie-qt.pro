@@ -1,15 +1,19 @@
 TEMPLATE = lib
-CONFIG += staticlib create_prl hide_symbols
+CONFIG += plugin staticlib create_prl hide_symbols
 
 QT += quick quick-private
 
 LOTTIE_PATH = $$PWD/Classes
 
+uri = Lottie # module name
+QMAKE_MOC_OPTIONS += -Muri=$$uri
+
 # Qt parts
 HEADERS += \
     $$LOTTIE_PATH/lottieanimation.h \
     $$LOTTIE_PATH/qquicklottielayer.h \
-    $$LOTTIE_PATH/lotbase.h
+    $$LOTTIE_PATH/lotbase.h \
+    Classes/plugin.h
 
 SOURCES += \
     Classes/qquicklottielayer.cpp \
@@ -62,7 +66,8 @@ SOURCES += \
     Classes/AnimatableLayers/LOTMaskContainer.cpp \
     Classes/AnimatableLayers/LOTLayerContainer.cpp \
     Classes/AnimatableLayers/LOTCompositionContainer.cpp \
-    Classes/Extensions/CGGeometry+LOTAdditions.cpp
+    Classes/Extensions/CGGeometry+LOTAdditions.cpp \
+    Classes/plugin.cpp
 
 # Shapes
 SHAPES_PATH = ../qtquick-shapes-5.10.1
@@ -89,7 +94,8 @@ SOURCES += \
     $$SHAPES_PATH/qquicknvprfunctions.cpp \
     $$SHAPES_PATH/qquickshapenvprrenderer.cpp
 
-RESOURCES += $$SHAPES_PATH/qtquickshapesplugin.qrc
+RESOURCES += $$SHAPES_PATH/qtquickshapesplugin.qrc \
+    lottie_qt.qrc
 
 # Real Lottie
 INCLUDEPATH += \

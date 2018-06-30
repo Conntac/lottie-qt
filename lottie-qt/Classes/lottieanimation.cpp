@@ -244,6 +244,8 @@ void LottieAnimation::setFillMode(LottieAnimation::FillMode fillMode)
         d->fillMode = fillMode;
 
         emit fillModeChanged();
+
+        polish();
     }
 }
 

@@ -148,5 +148,7 @@ void LOTAnimatorNode::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *k
       }
       keypath->popKey();
     }
-    inputNode->setValueDelegate(delegate, keypath);
+    if (inputNode) {
+        inputNode->setValueDelegate(delegate, keypath);
+    }
 }

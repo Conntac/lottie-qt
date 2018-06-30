@@ -103,7 +103,7 @@ void LOTStrokeRenderer::performLocalUpdate()
 
 void LOTStrokeRenderer::rebuildOutputs()
 {
-    if (inputNode->outputPath()) {
+    if (inputNode && inputNode->outputPath()) {
         outputLayer->setPath(inputNode->outputPath()->CGPath());
     }
 }
