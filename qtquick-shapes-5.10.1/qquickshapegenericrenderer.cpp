@@ -51,7 +51,7 @@
 
 QT_BEGIN_NAMESPACE
 
-static const qreal TRI_SCALE = 1;
+static const qreal TRI_SCALE = 5;
 
 struct ColoredVertex // must match QSGGeometry::ColoredPoint2D
 {
