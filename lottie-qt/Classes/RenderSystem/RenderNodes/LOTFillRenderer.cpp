@@ -59,5 +59,7 @@ void LOTFillRenderer::performLocalUpdate()
 
 void LOTFillRenderer::rebuildOutputs()
 {
-    outputLayer->setPath(inputNode->outputPath()->CGPath());
+    if (inputNode && inputNode->outputPath()) {
+        outputLayer->setPath(inputNode->outputPath()->CGPath());
+    }
 }

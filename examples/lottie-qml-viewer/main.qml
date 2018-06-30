@@ -2,44 +2,78 @@ import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
+import Qt.labs.folderlistmodel 2.1
 import Lottie 1.0
 
-Window {
+ApplicationWindow {
+    id: app
     visible: true
     width: 640
     height: 480
     title: qsTr("Lottie-Qt viewer")
 
-    Rectangle {
-        anchors.fill: parent
+    Drawer {
+        id: drawer
+        width: Math.min(200, 0.66 * app.width)
+        height: app.height
+
+        ScrollView {
+            anchors.fill: parent
+
+            ListView {
+                model: FolderListModel {
+                    showDotAndDotDot: true
+                    showDirsFirst: true
+
+                    folder: "tests"
+                }
+
+                delegate: ItemDelegate {
+                    width: ListView.view.width
+                    highlighted: ListView.isCurrentItem
+                    text: model.fileName
+                    onClicked: {
+                        drawer.close();
+                        ListView.view.currentIndex = index;
+                        animation.source = model.fileURL;
+                    }
+                }
+            }
+        }
+    }
+
+    Label {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 4
+        text: "%1 / %2".arg(animation.currentFrame).arg(animation.endFrame)
+    }
+
+    background: Rectangle {
         color: "lightgray"
     }
 
-//    Rectangle {
-//        anchors.fill: animation
-//        color: "red"
-//    }
-
     LottieAnimation {
         id: animation
-//        anchors.centerIn: parent
         anchors.fill: parent
 
         width: 400
         height: 400
 
         fillMode: LottieAnimation.PreserveAspectCrop
-//        fillMode: LottieAnimation.PreserveAspectFit
-//        fillMode: LottieAnimation.Pad
-
-//        source: "animations/LottieLogo1.json"
-//        source: "animations/9squares-AlBoardman.json
-//        source: "animations/GeometryTransformTest.json"
-        source: "animations/newAnimation.json"
+        source: "https://www.lottiefiles.com/storage/datafiles/RsO0f9C8rU3E426/data.json"
 
         // Enable some form of antialiasing
         layer.enabled: true
         layer.samples: 4
+
+        running: autoPlayButton.checked
+        loops: -1
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: animation.status === LottieAnimation.Loading
+        }
 
         DropArea {
             anchors.fill: parent
@@ -67,37 +101,19 @@ Window {
             }
         }
 
-        onSourceChanged: {
-            if (playAnimation.running)
-                playAnimation.restart();
-        }
-
-        NumberAnimation {
-            id: playAnimation
-            from: animation.startFrame
-            to: animation.endFrame
-
-            duration: animation.timeDuration
-
-            loops: -1
-            running: autoPlayButton.checked
-
-            target: animation
-            property: "currentFrame"
-        }
-
         RowLayout {
             anchors {
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
+                margins: 4
             }
 
             Button {
                 id: autoPlayButton
                 text: "Autoplay"
                 checkable: true
-//                checked: true
+                checked: true
             }
 
             Slider {
@@ -109,6 +125,12 @@ Window {
                 onValueChanged: animation.currentFrame = value
             }
         }
+    }
 
+    ToolButton {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        text: "≡"
+        onClicked: drawer.open()
     }
 }

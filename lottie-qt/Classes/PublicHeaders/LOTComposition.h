@@ -19,7 +19,10 @@ class LOTAssetGroup;
 class LOTComposition
 {
 public:
-    LOTComposition(const QString &filePath);
+    LOTComposition();
+    ~LOTComposition();
+
+    bool loadFromData(const QByteArray &data);
 
 //@property (nonatomic, readonly)
     QRectF compBounds;

@@ -1,11 +1,12 @@
 TEMPLATE = app
 
-QT += quick
+QT += quick quickcontrols2
 
 SOURCES += \
     main.cpp
 
 RESOURCES += \
-    qml.qrc
+    qml.qrc \
+    ../tests/tests.qrc
 
 include(../../lottie-qt.pri)

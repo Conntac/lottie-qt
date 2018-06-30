@@ -1,6 +1,11 @@
 #include "lottieanimation.h"
 
 #include <QLoggingCategory>
+#include <QQmlEngine>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QPropertyAnimation>
 
 #include "qquickshape_p.h"
 #include "qquickshapegenericrenderer_p.h"
@@ -25,6 +30,9 @@ public:
 
     // Properties
     LottieAnimation::FillMode fillMode = LottieAnimation::PreserveAspectFit;
+    LottieAnimation::Status status = LottieAnimation::Null;
+
+    QString errorString;
 
     qreal currentFrame = 0;
     qreal startFrame = 0.0;
@@ -32,7 +40,11 @@ public:
     qreal frameRate = 0.0;
     qreal timeDuration = 0.0;
 
+    bool running = false;
+
     QUrl source;
+
+    QPropertyAnimation* animation = nullptr;
 
     QSharedPointer<LOTComposition> composition;
     QSharedPointer<LOTCompositionContainer> container;
@@ -42,7 +54,11 @@ public:
     QSGTransformNode *transformNode = nullptr;
 
     // Functions
+    void init();
+    void setStatus(LottieAnimation::Status status, const QString &errorString = QString());
+
     void loadAnimation();
+    void loadAnimation(const QByteArray &data);
     void sync();
 };
 
@@ -58,25 +74,90 @@ static void walkLayers(int indent, const QSharedPointer<QQuickLottieLayer> &laye
     }
 }
 
+void LottieAnimation::Private::init()
+{
+    animation = new QPropertyAnimation(q, "currentFrame", q);
+}
+
+void LottieAnimation::Private::setStatus(LottieAnimation::Status status, const QString &errorString)
+{
+    if (this->status != status) {
+        this->status = status;
+        this->errorString = errorString;
+
+        emit q->statusChanged();
+    }
+}
+
 void LottieAnimation::Private::loadAnimation()
 {
+    setStatus(LottieAnimation::Loading);
+
+    bool fromDisk = true;
+
+    composition.clear();
+    container.clear();
+
     QString path = source.toString();
     if (path.startsWith("qrc:")) {
         path.remove(0, 3);
-    }
-
-    if (source.scheme() == "file") {
+    } else if (source.scheme() == "file") {
         path = source.toLocalFile();
+    } else {
+        fromDisk = false;
+
+        QNetworkRequest request(source);
+
+        QNetworkAccessManager *mgr = qmlEngine(q)->networkAccessManager();
+        QNetworkReply *reply = mgr->get(request);
+        QObject::connect(reply, &QNetworkReply::finished, q, [=]() {
+            reply->deleteLater();
+
+            if (reply->error() == QNetworkReply::NoError) {
+                loadAnimation(reply->readAll());
+
+                setStatus(LottieAnimation::Ready);
+            } else {
+                qCCritical(logLottieAnimation) << "Unable to open" << reply->url() << ":" << reply->errorString();
+
+                setStatus(LottieAnimation::Error, reply->errorString());
+            }
+        });
     }
 
-    composition = composition.create(path);
-    if (composition) {
+    if (fromDisk) {
+        QFile file(path);
+        if (file.open(QIODevice::ReadOnly)) {
+            loadAnimation(file.readAll());
+
+            setStatus(LottieAnimation::Ready);
+        } else {
+            qCCritical(logLottieAnimation) << "Unable to open" << path << ":" << file.errorString();
+
+            setStatus(LottieAnimation::Error, file.errorString());
+        }
+    }
+}
+
+void LottieAnimation::Private::loadAnimation(const QByteArray &data)
+{
+    composition = composition.create();
+    if (composition->loadFromData(data)) {
         container = container.create(nullptr, nullptr, composition->layerGroup, composition->assetGroup);
 
         startFrame = composition->startFrame;
         endFrame = composition->endFrame;
         frameRate = composition->framerate;
         timeDuration = composition->timeDuration;
+
+        animation->stop();
+        animation->setDuration(timeDuration * 1000);
+        animation->setStartValue(startFrame);
+        animation->setEndValue(endFrame);
+
+        if (running) {
+            animation->start();
+        }
 
         emit q->startFrameChanged();
         emit q->endFrameChanged();
@@ -147,6 +228,8 @@ LottieAnimation::LottieAnimation(QQuickItem *parent)
 : QQuickItem(parent)
 , d(new Private(this))
 {
+    d->init();
+
     setFlag(ItemHasContents);
 }
 
@@ -169,6 +252,16 @@ LottieAnimation::FillMode LottieAnimation::fillMode() const
     return d->fillMode;
 }
 
+LottieAnimation::Status LottieAnimation::status() const
+{
+    return d->status;
+}
+
+QString LottieAnimation::errorString() const
+{
+    return d->errorString;
+}
+
 qreal LottieAnimation::currentFrame() const
 {
     if (d->container) {
@@ -180,6 +273,10 @@ qreal LottieAnimation::currentFrame() const
 
 void LottieAnimation::setCurrentFrame(qreal currentFrame)
 {
+    if (!d->container) {
+        return;
+    }
+
     if (d->container->currentFrame == currentFrame) {
         return;
     }
@@ -227,6 +324,40 @@ QUrl LottieAnimation::source() const
     return d->source;
 }
 
+void LottieAnimation::setIsRunning(bool isRunning)
+{
+    if (d->running != isRunning) {
+        d->running = isRunning;
+
+        if (isRunning && d->container && d->animation->state() != QPropertyAnimation::Running) {
+            d->animation->start();
+        } else if (!isRunning) {
+            d->animation->stop();
+        }
+
+        emit runningChanged();
+    }
+}
+
+bool LottieAnimation::isRunning() const
+{
+    return d->animation->state() == QPropertyAnimation::Running;
+}
+
+void LottieAnimation::setLoops(int loops)
+{
+    if (d->animation->loopCount() != loops) {
+        d->animation->setLoopCount(loops);
+
+        emit loopsChanged();
+    }
+}
+
+int LottieAnimation::loops() const
+{
+    return d->animation->loopCount();
+}
+
 void LottieAnimation::componentComplete()
 {
     QQuickItem::componentComplete();
@@ -236,6 +367,16 @@ void LottieAnimation::componentComplete()
     }
 
     polish();
+}
+
+void LottieAnimation::start()
+{
+    setIsRunning(true);
+}
+
+void LottieAnimation::stop()
+{
+    setIsRunning(false);
 }
 
 QSGNode *LottieAnimation::updatePaintNode(QSGNode *rootNode, UpdatePaintNodeData *updatePaintNodeData)
@@ -261,7 +402,6 @@ QSGNode *LottieAnimation::updatePaintNode(QSGNode *rootNode, UpdatePaintNodeData
 
     if (d->composition) {
         QRectF compBounds = d->composition->compBounds;
-        QRectF viewportBOunds = d->container->viewportBounds();
         QRectF itemBounds = boundingRect();
 
         qreal xScale = itemBounds.width() / compBounds.width();

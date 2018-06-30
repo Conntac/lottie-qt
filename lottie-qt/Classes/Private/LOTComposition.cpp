@@ -84,22 +84,29 @@ Q_LOGGING_CATEGORY(logLOTComposition, "lottie.composition")
 }
 */
 
-LOTComposition::LOTComposition(const QString &filePath)
+LOTComposition::LOTComposition()
 {
-    QFile file(filePath);
-    if (file.open(QIODevice::ReadOnly)) {
-        QJsonParseError error;
-        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
+}
 
-        if (error.error == QJsonParseError::NoError) {
-            QJsonObject obj = doc.object();
-            mapFromJSON(obj.toVariantMap());
-        } else {
-            qCCritical(logLOTComposition) << "Error parsing" << filePath << "as JSON:" << error.errorString();
-        }
+LOTComposition::~LOTComposition()
+{
+}
+
+bool LOTComposition::loadFromData(const QByteArray &data)
+{
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+
+    if (error.error == QJsonParseError::NoError) {
+        QJsonObject obj = doc.object();
+        mapFromJSON(obj.toVariantMap());
+
+        return true;
     } else {
-        qCCritical(logLOTComposition) << "Unable to open" << filePath << ":" << file.errorString();
+        qCCritical(logLOTComposition) << "Error parsing JSON:" << error.errorString();
     }
+
+    return false;
 }
 
 void LOTComposition::setRootDirectory(const QString &rootDirectory)
