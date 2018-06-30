@@ -32,7 +32,7 @@ QColor qcolorFromCGColor(CGColorRef cgcolor)
 */
 
 template<class T>
-inline const T& clamp(const T& x, const T& upper, const T& lower) {
+inline const T& clamp(const T& x, const T& lower, const T& upper) {
     return qMin(upper, qMax(x, lower));
 }
 
