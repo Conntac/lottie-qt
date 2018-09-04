@@ -230,10 +230,10 @@ void LOTCompositionContainer::searchNodesForKeypath(LOTKeypath *keypath)
 
 void LOTCompositionContainer::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath)
 {
-    if (layerName != nullptr) {
+    if (!layerName.isEmpty()) {
       LOTLayerContainer::setValueDelegate(delegate, keypath);
     }
-    if (layerName == nullptr ||
+    if (layerName.isEmpty() ||
         keypath->pushKey(layerName)) {
       for (auto child : childLayers) {
         child->setValueDelegate(delegate, keypath);

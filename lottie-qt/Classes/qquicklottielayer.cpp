@@ -110,7 +110,7 @@ Qt::PenJoinStyle QQuickLottieLayer::joinStyle() const
 
 void QQuickLottieLayer::setStrokeStyle(Qt::PenStyle strokeStyle)
 {
-    m_strokeColor = strokeStyle;
+    m_strokeStyle = strokeStyle;
 }
 
 Qt::PenStyle QQuickLottieLayer::strokeStyle() const
@@ -131,6 +131,12 @@ int QQuickLottieLayer::miterLimit() const
 void QQuickLottieLayer::setDashPattern(const QVector<qreal> &dashPattern)
 {
     m_dashPattern = dashPattern;
+
+    if (dashPattern.isEmpty()) {
+        setStrokeStyle(Qt::SolidLine);
+    } else {
+        setStrokeStyle(Qt::DashLine);
+    }
 }
 
 QVector<qreal> QQuickLottieLayer::dashPattern() const

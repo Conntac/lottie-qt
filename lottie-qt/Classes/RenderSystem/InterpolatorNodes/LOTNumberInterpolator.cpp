@@ -18,9 +18,9 @@ qreal LOTNumberInterpolator::floatValueForFrame(qreal frame)
 {
     qreal progress = progressForFrame(frame);
     qreal returnValue;
-    if (progress == 0) {
+    if (qFuzzyCompare(progress, 0.0)) {
       returnValue = leadingKeyframe->floatValue;
-    } else if (progress == 1) {
+    } else if (qFuzzyCompare(progress, 1.0)) {
       returnValue = trailingKeyframe->floatValue;
     } else {
       returnValue = LOT_RemapValue(progress, 0, 1, leadingKeyframe->floatValue, trailingKeyframe->floatValue);

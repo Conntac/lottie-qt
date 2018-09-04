@@ -22,21 +22,23 @@ LOTStrokeRenderer::LOTStrokeRenderer(const QSharedPointer<LOTAnimatorNode> &inpu
 
   QList<QSharedPointer<LOTNumberInterpolator>> dashPatternIntpolators;
   QVector<qreal> dashPatterns;
+  bool dashPatternsValid = true;
   for (LOTKeyframeGroup *keyframegroup : stroke->lineDashPattern) {
     QSharedPointer<LOTNumberInterpolator> interpolator = interpolator.create(keyframegroup->keyframes);
     dashPatternIntpolators.append(interpolator);
-    if (/*dashPatterns &&*/ keyframegroup->keyframes.size() == 1) {
+    if (dashPatternsValid && keyframegroup->keyframes.size() == 1) {
       LOTKeyframe *first = keyframegroup->keyframes.first();
       dashPatterns.append(first->floatValue);
     }
     if (keyframegroup->keyframes.size() > 1) {
       dashPatterns.clear();
-      Q_ASSERT(false); // this code block is wrong
+      dashPatternsValid = false;
+//      Q_ASSERT(false); // this code block is wrong
     }
   }
 
   if (dashPatterns.size()) {
-      Q_ASSERT(false);
+//      Q_ASSERT(false);
     outputLayer->setDashPattern(dashPatterns);
   } else {
     _dashPatternInterpolators = dashPatternIntpolators;

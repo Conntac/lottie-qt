@@ -39,7 +39,7 @@ public:
           setFillRule(Qt::OddEvenFill);
 //          CGPathRelease(pathRef);
         } else {
-//          path = path->CGPath();
+            setPath(path->CGPath());
         }
 
         qreal opacity = _opacityInterpolator->floatValueForFrame(frame);

@@ -143,7 +143,7 @@ private:
         IndexContainerType fillIndices;
         QSGGeometry::Type indexType;
         VertexContainerType strokeVertices;
-        float opacity = 1.0;
+        qreal opacity = 1.0;
         int syncDirty;
         int effectiveDirty = 0;
         QQuickShapeFillRunnable *pendingFill = nullptr;

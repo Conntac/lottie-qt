@@ -16,7 +16,14 @@
 #include <QEnableSharedFromThis>
 
 struct LOT_Subpath {
-  QPainterPath::ElementType type;
+  enum ElementType {
+    MoveToPoint,
+    AddLineToPoint,
+    AddCurveToPoint,
+    CloseSubpath
+  };
+
+  ElementType type;
   qreal length;
   QPointF endPoint;
   QPointF controlPoint1;
@@ -82,7 +89,7 @@ private:
     void _clearPathData();
     bool containsPoint(const QPointF &point) const;
     void setWithCGPath(const QPainterPath &path);
-    void addSubpathWithType(QPainterPath::ElementType type,
+    void addSubpathWithType(LOT_Subpath::ElementType type,
                             qreal length,
                             const QPointF &endPoint,
                             const QPointF &controlPoint1,

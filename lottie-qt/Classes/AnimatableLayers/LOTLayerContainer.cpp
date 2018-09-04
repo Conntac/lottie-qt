@@ -149,7 +149,9 @@ void LOTLayerContainer::searchNodesForKeypath(LOTKeypath *keypath)
       }
       keypath->popKey();
     }
-    _contentsGroup->searchNodesForKeypath(keypath);
+    if (_contentsGroup) {
+        _contentsGroup->searchNodesForKeypath(keypath);
+    }
 }
 
 void LOTLayerContainer::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath *keypath)
@@ -167,7 +169,9 @@ void LOTLayerContainer::setValueDelegate(LOTValueDelegate *delegate, LOTKeypath 
       }
       keypath->popKey();
     }
-    _contentsGroup->setValueDelegate(delegate, keypath);
+    if (_contentsGroup) {
+        _contentsGroup->setValueDelegate(delegate, keypath);
+    }
 }
 
 void LOTLayerContainer::actionForKey(const QString &event)

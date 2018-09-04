@@ -94,7 +94,7 @@ QSharedPointer<LOTBezierPath> LOTBezierPath::copy()
 void LOTBezierPath::LOT_moveToPoint(const QPointF &point)
 {
     subpathStartPoint_ = point;
-    addSubpathWithType(QPainterPath::MoveToElement, 0, point, QPointF(), QPointF());
+    addSubpathWithType(LOT_Subpath::MoveToPoint, 0, point, QPointF(), QPointF());
     _path.moveTo(point);
 }
 
@@ -105,7 +105,7 @@ void LOTBezierPath::LOT_addLineToPoint(const QPointF &point)
       length = LOT_PointDistanceFromPoint(currentPoint(), point);
       _length = _length + length;
     }
-    addSubpathWithType(QPainterPath::LineToElement, length, point, QPointF(), QPointF());
+    addSubpathWithType(LOT_Subpath::AddLineToPoint, length, point, QPointF(), QPointF());
     _path.lineTo(point);
 }
 
@@ -116,7 +116,7 @@ void LOTBezierPath::LOT_addCurveToPoint(const QPointF &point, const QPointF &cp1
       length = LOT_CubicLengthWithPrecision(currentPoint(), point, cp1, cp2, 5);
       _length = _length + length;
     }
-    addSubpathWithType(QPainterPath::CurveToElement, length, point, cp1, cp2);
+    addSubpathWithType(LOT_Subpath::AddCurveToPoint, length, point, cp1, cp2);
     _path.cubicTo(cp1, cp2, point);
 }
 
@@ -128,7 +128,7 @@ void LOTBezierPath::LOT_closePath()
       _length = _length + length;
     }
 //    Q_ASSERT(false);
-//    addSubpathWithType(kCGPathElementCloseSubpath, length, subpathStartPoint_, QPointF(), QPointF());
+    addSubpathWithType(LOT_Subpath::CloseSubpath, length, subpathStartPoint_, QPointF(), QPointF());
     _path.closeSubpath();
 }
 
@@ -146,33 +146,33 @@ void LOTBezierPath::LOT_appendPath(QSharedPointer<LOTBezierPath> bezierPath)
 
     _path.addPath(bezierPath->CGPath());
 
-//    LOT_Subpath *nextSubpath = bezierPath->headSubpath();
-//    while (nextSubpath) {
+    LOT_Subpath *nextSubpath = bezierPath->headSubpath();
+    while (nextSubpath) {
 //        Q_ASSERT(false); // This code is clearly wrong
-//      qreal length = 0;
-//      if (cacheLengths) {
-//        if (bezierPath->cacheLengths) {
-//          length = nextSubpath->length;
-//        } else {
-//          // No previous length data, measure.
-////          if (nextSubpath->type == QPainterPath::LineToElement) {
-////            length = LOT_PointDistanceFromPoint(currentPoint(), nextSubpath->endPoint);
-////          } else if (nextSubpath->type == QPainterPath::CurveToElement) {
-////            length = LOT_CubicLengthWithPrecision(currentPoint(), nextSubpath->endPoint, nextSubpath->controlPoint1, nextSubpath->controlPoint2, 5);
-////          } else if (nextSubpath->type == kCGPathElementCloseSubpath) {
-////            length = LOT_PointDistanceFromPoint(currentPoint(), nextSubpath->endPoint);
-////          }
-//        }
-//      }
-//      _length = _length + length;
-//      addSubpathWithType(nextSubpath->type,
-//                         length,
-//                         nextSubpath->endPoint,
-//                         nextSubpath->controlPoint1,
-//                         nextSubpath->controlPoint2);
+      qreal length = 0;
+      if (cacheLengths) {
+        if (bezierPath->cacheLengths) {
+          length = nextSubpath->length;
+        } else {
+          // No previous length data, measure.
+          if (nextSubpath->type == LOT_Subpath::AddLineToPoint) {
+            length = LOT_PointDistanceFromPoint(currentPoint(), nextSubpath->endPoint);
+          } else if (nextSubpath->type == LOT_Subpath::AddCurveToPoint) {
+            length = LOT_CubicLengthWithPrecision(currentPoint(), nextSubpath->endPoint, nextSubpath->controlPoint1, nextSubpath->controlPoint2, 5);
+          } else if (nextSubpath->type == LOT_Subpath::CloseSubpath) {
+            length = LOT_PointDistanceFromPoint(currentPoint(), nextSubpath->endPoint);
+          }
+        }
+      }
+      _length = _length + length;
+      addSubpathWithType(nextSubpath->type,
+                         length,
+                         nextSubpath->endPoint,
+                         nextSubpath->controlPoint1,
+                         nextSubpath->controlPoint2);
 
-//      nextSubpath = nextSubpath->nextSubpath;
-//    }
+      nextSubpath = nextSubpath->nextSubpath;
+    }
 }
 
 void LOTBezierPath::trimPathFromT(qreal fromT, qreal toT, qreal offset)
@@ -240,14 +240,14 @@ void LOTBezierPath::trimPathFromT(qreal fromT, qreal toT, qreal offset)
 
       qreal pathLength = subpath->length;
       if (!cacheLengths) {
-          Q_ASSERT(false);
-//        if (subpath->type == kCGPathElementAddLineToPoint) {
-//          pathLength = LOT_PointDistanceFromPoint(currentPoint, subpath->endPoint);
-//        } else if (subpath->type == kCGPathElementAddCurveToPoint) {
-//          pathLength = LOT_CubicLengthWithPrecision(currentPoint, subpath->endPoint, subpath->controlPoint1, subpath->controlPoint2, 5);
-//        } else if (subpath->type == kCGPathElementCloseSubpath) {
-//          pathLength = LOT_PointDistanceFromPoint(currentPoint, subpath->endPoint);
-//        }
+//          Q_ASSERT(false);
+        if (subpath->type == LOT_Subpath::AddLineToPoint) {
+          pathLength = LOT_PointDistanceFromPoint(currentPoint, subpath->endPoint);
+        } else if (subpath->type == LOT_Subpath::AddCurveToPoint) {
+          pathLength = LOT_CubicLengthWithPrecision(currentPoint, subpath->endPoint, subpath->controlPoint1, subpath->controlPoint2, 5);
+        } else if (subpath->type == LOT_Subpath::CloseSubpath) {
+          pathLength = LOT_PointDistanceFromPoint(currentPoint, subpath->endPoint);
+        }
       }
       qreal subpathEndLength = subpathBeginningLength + pathLength;
 
@@ -440,7 +440,7 @@ void LOTBezierPath::setWithCGPath(const QPainterPath &path)
 //    });
 }
 
-void LOTBezierPath::addSubpathWithType(QPainterPath::ElementType type, qreal length, const QPointF &endPoint, const QPointF &controlPoint1, const QPointF &controlPoint2)
+void LOTBezierPath::addSubpathWithType(LOT_Subpath::ElementType type, qreal length, const QPointF &endPoint, const QPointF &controlPoint1, const QPointF &controlPoint2)
 {
     LOT_Subpath *subPath = new LOT_Subpath;
     subPath->type = type;

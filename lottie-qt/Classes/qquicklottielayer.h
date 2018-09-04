@@ -110,7 +110,7 @@ public:
 private:
     Q_DISABLE_COPY(QQuickLottieLayer)
 
-    QColor m_fillColor;
+    QColor m_fillColor = Qt::transparent;
     Qt::FillRule m_fillRule = Qt::OddEvenFill;
     qreal m_opacity = 1.0;
     Qt::PenCapStyle m_capStyle = Qt::FlatCap;

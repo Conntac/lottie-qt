@@ -1,0 +1,18 @@
+{
+  "name": "net.conntac.lottie",
+  "author": {
+    "name": "Christoph Keller",
+    "email": "keller@conntac.net"
+  },
+  "repository": {
+    "type": "GIT",
+    "url": "git@gitlab.com:Conntac/playground/lottie-ios-port.git"
+  },
+  "version": {
+    "label": "0.0.1"
+  },
+  "dependencies": [
+  ],
+  "license": "APACHE_2_0",
+  "priFilename": "lottie-qt.pri"
+}

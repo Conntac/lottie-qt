@@ -15,6 +15,8 @@
 #include "LOTComposition.h"
 #include "LOTCompositionContainer.h"
 
+#include "LOTBlockCallback.h"
+
 Q_LOGGING_CATEGORY(logLottieAnimation, "lottie.qml.animation")
 
 class LottieAnimation::Private
@@ -40,8 +42,6 @@ public:
     qreal frameRate = 0.0;
     qreal timeDuration = 0.0;
 
-    bool running = false;
-
     QUrl source;
 
     QPropertyAnimation* animation = nullptr;
@@ -52,6 +52,9 @@ public:
     QQuickShapeGenericRenderer renderer;
     QQuickShapeGenericNode *rootNode = nullptr;
     QSGTransformNode *transformNode = nullptr;
+
+    bool running = false;
+    bool clearNodes = false;
 
     // Functions
     void init();
@@ -151,7 +154,7 @@ void LottieAnimation::Private::loadAnimation(const QByteArray &data)
         timeDuration = composition->timeDuration;
 
         animation->stop();
-        animation->setDuration(timeDuration * 1000);
+        animation->setDuration(static_cast<int>(timeDuration * 1000));
         animation->setStartValue(startFrame);
         animation->setEndValue(endFrame);
 
@@ -164,6 +167,9 @@ void LottieAnimation::Private::loadAnimation(const QByteArray &data)
         emit q->frameRateChanged();
         emit q->timeDurationChanged();
         emit q->currentFrameChanged();
+
+        // Clear all known render nodes in the next frame
+        clearNodes = true;
 
         // Update the item now
         q->polish();
@@ -191,10 +197,14 @@ void LottieAnimation::Private::sync()
     for(int i=0; i < count; ++i) {
         QQuickLottieLayer *layer = flatLayers.at(i);
 
+        qreal completeOpacity = 1.0;
+
         QList<QTransform> transformTree;
         QQuickLottieLayer *p = layer;
         while (p) {
             transformTree.append(p->transform());
+
+            completeOpacity *= p->opacity();
 
             p = p->parentLayer;
         }
@@ -207,14 +217,22 @@ void LottieAnimation::Private::sync()
         renderer.setTransform(i, absoluteTransform);
         renderer.setHidden(i, layer->hidden());
         renderer.setOpacity(i, layer->opacity());
+        renderer.setOpacity(i, /*layer->opacity()*/ completeOpacity);
         renderer.setPath(i, layer->path());
         renderer.setStrokeColor(i, layer->strokeColor());
         renderer.setStrokeWidth(i, layer->strokeWidth());
         renderer.setFillColor(i, layer->fillColor());
-        renderer.setFillRule(i, (QQuickShapePath::FillRule)layer->fillRule());
-        renderer.setJoinStyle(i, (QQuickShapePath::JoinStyle)layer->joinStyle(), layer->miterLimit());
-        renderer.setCapStyle(i, (QQuickShapePath::CapStyle)layer->capStyle());
-        renderer.setStrokeStyle(i, (QQuickShapePath::StrokeStyle)layer->strokeStyle(), layer->dashOffset(), layer->dashPattern());
+        renderer.setFillRule(i, static_cast<QQuickShapePath::FillRule>(layer->fillRule()));
+        renderer.setJoinStyle(i, static_cast<QQuickShapePath::JoinStyle>(layer->joinStyle()), layer->miterLimit());
+        renderer.setCapStyle(i, static_cast<QQuickShapePath::CapStyle>(layer->capStyle()));
+
+        // Make the dash pattern even
+        QVector<qreal> dashPattern = layer->dashPattern();
+        if (dashPattern.size() % 2) {
+//            dashPattern.append(dashPattern.last());
+            debugPainterPath(layer->path());
+        }
+        renderer.setStrokeStyle(i, static_cast<QQuickShapePath::StrokeStyle>(layer->strokeStyle()), layer->dashOffset(), dashPattern);
         renderer.setFillGradient(i, layer->fillGradient());
     }
 
@@ -279,7 +297,7 @@ void LottieAnimation::setCurrentFrame(qreal currentFrame)
         return;
     }
 
-    if (d->container->currentFrame == currentFrame) {
+    if (qFuzzyCompare(d->container->currentFrame, currentFrame)) {
         return;
     }
 
