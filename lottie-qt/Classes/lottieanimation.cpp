@@ -230,7 +230,7 @@ void LottieAnimation::Private::sync()
         QVector<qreal> dashPattern = layer->dashPattern();
         if (dashPattern.size() % 2) {
 //            dashPattern.append(dashPattern.last());
-            debugPainterPath(layer->path());
+//            debugPainterPath(layer->path());
         }
         renderer.setStrokeStyle(i, static_cast<QQuickShapePath::StrokeStyle>(layer->strokeStyle()), layer->dashOffset(), dashPattern);
         renderer.setFillGradient(i, layer->fillGradient());
