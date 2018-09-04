@@ -198,6 +198,7 @@ void LottieAnimation::Private::sync()
         QQuickLottieLayer *layer = flatLayers.at(i);
 
         qreal completeOpacity = 1.0;
+        bool completeHidden = false;
 
         QList<QTransform> transformTree;
         QQuickLottieLayer *p = layer;
@@ -205,6 +206,7 @@ void LottieAnimation::Private::sync()
             transformTree.append(p->transform());
 
             completeOpacity *= p->opacity();
+            completeHidden |= p->hidden();
 
             p = p->parentLayer;
         }
@@ -215,7 +217,7 @@ void LottieAnimation::Private::sync()
         }
 
         renderer.setTransform(i, absoluteTransform);
-        renderer.setHidden(i, layer->hidden());
+        renderer.setHidden(i, completeHidden);
         renderer.setOpacity(i, layer->opacity());
         renderer.setOpacity(i, /*layer->opacity()*/ completeOpacity);
         renderer.setPath(i, layer->path());
