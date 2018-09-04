@@ -20,7 +20,7 @@ class LottieAnimation : public QQuickItem
 
 public:
     explicit LottieAnimation(QQuickItem *parent = nullptr);
-    ~LottieAnimation();
+    ~LottieAnimation() override;
 
     enum FillMode {
         PreserveAspectFit,

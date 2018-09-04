@@ -8,3 +8,5 @@ LIBS += -L$$shadowed($$PWD/lottie-qt) -llottie-qt
 
 PRE_TARGETDEPS += $$shadowed($$PWD/lottie-qt)/liblottie-qt.a
 
+QML_IMPORT_PATH += $$PWD/lottie-qt
+
