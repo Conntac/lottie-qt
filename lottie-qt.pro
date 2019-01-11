@@ -1,10 +1,10 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    lottie-qt \
+    lottie_qt \
     examples
 
-examples.depends = lottie-qt
+examples.depends = lottie_qt
 
 OTHER_FILES += \
     lottie-qt.pri
