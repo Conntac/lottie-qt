@@ -30,7 +30,7 @@ public:
       if (hasUpdateForFrame(frame)) {
         QSharedPointer<LOTBezierPath> path = _pathInterpolator->pathForFrame(frame, false);
 
-        Q_ASSERT(false);
+//        Q_ASSERT(false);
         if (maskNode->maskMode == LOTMaskModeSubtract) {
 //          CGMutablePathRef pathRef = CGPathCreateMutable();
 //          CGPathAddRect(pathRef, NULL, viewBounds.toCGRect());

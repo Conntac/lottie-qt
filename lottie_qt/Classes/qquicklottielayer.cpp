@@ -192,11 +192,11 @@ void QQuickLottieLayer::display()
 
 QQuickLottieShapeLayer::QQuickLottieShapeLayer()
 {
-    Q_ASSERT(false);
+//    Q_ASSERT(false);
 }
 
 QQuickLottieReplicatorLayer::QQuickLottieReplicatorLayer()
 {
-    Q_ASSERT(false);
+//    Q_ASSERT(false);
 }
 
